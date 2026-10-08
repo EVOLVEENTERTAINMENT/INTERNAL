@@ -1,0 +1,32 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot]=[process.argv[2],process.argv[3]];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8795);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:1440,height:900}});const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock4.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8795/');await p.waitForTimeout(2000);
+ const R=await p.evaluate(async()=>{const A=[];const ok=(n,c)=>A.push((c?"PASS ":"FAIL ")+n);
+  const f=ppFloat(S.tasks.filter(t=>t.project==="acmebrand"));
+  ok("room A=0 B=0 Edit=0",f.room.A===0&&f.room.B===0&&f.room.Dd===0);
+  ok("room Stills=4 Retouch=3 Permits=9 ("+[f.room.C,f.room.E,f.room.F]+")",f.room.C===4&&f.room.E===3&&f.room.F===9);
+  ok("done task ignored",f.room.G===undefined);
+  ok("critical set is Script, Shoot, Edit",Object.keys(f.crit).sort().join()==="A,B,Dd");
+  ok("no links means no path",ppFloat([{id:"x",title:"x",start:"2026-10-12",due:"2026-10-13",status:"todo"}])===null);
+  // a loop in the links must not hang
+  const L=[{id:"p",start:"2026-10-12",due:"2026-10-13",status:"todo",depends:["q"]},{id:"q",start:"2026-10-14",due:"2026-10-15",status:"todo",depends:["p"]}];
+  ok("a loop returns",!!ppFloat(L));
+  // render
+  S.room=null;S.mode="co";S.pv="split";const w=pwState();w.id="acmebrand";w.full=true;w.area="plan";w.zoom="week";paint();
+  await new Promise(r=>setTimeout(r,400));
+  const bars=[...document.querySelectorAll('.gb.crit')].map(n=>n.getAttribute('aria-label'));
+  ok("three critical bars drawn ("+bars.length+")",bars.length===3);
+  ok("legend shows critical path",[...document.querySelectorAll('.gleg span')].some(n=>n.textContent==="critical path"));
+  ok("critical links drawn",document.querySelectorAll('.gdep path.crit').length===2);
+  const tip=[...document.querySelectorAll('.gb')].map(n=>n.title);
+  ok("tooltip room on Stills",tip.some(t=>/^Stills[\s\S]*4 days of room/.test(t)));
+  ok("tooltip on Edit",tip.some(t=>/^Edit[\s\S]*Sets the end date/.test(t)));
+  const g=document.querySelector('.gt'); if(g)g.scrollIntoView();
+  return A;});
+ await p.screenshot({path:shot});
+ console.log(R.join("\n"),"\nerrors",errs);await b.close();srv.close();})();

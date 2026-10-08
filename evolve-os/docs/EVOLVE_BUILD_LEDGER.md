@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V142**, published live at
+- Source: Evolve OS artifact, **V143**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V142 (published 9 Oct 2026, build stamp
-  `V142 2026-10-09T01:00Z`, artifact version 142, version id
-  `1791477397-70ea`). V141 was never published alone; V142 carries it.
+- Last known-good: V143 (published 9 Oct 2026, build stamp
+  `V143 2026-10-09T03:00Z`, artifact version 143, version id
+  `1791480016-7207`). V142 is artifact version 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
   V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
@@ -59,6 +59,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V143 | The critical path on the project timeline. `ppFloat(tasks)` gives each open dated task its room in days; zero is critical. Underlined bars, heavier links, a legend entry, room on hover. Only when a project has a link between open tasks. See below. |
 | V142 | 114 unused style rules removed and 8 selector lists trimmed, 34 class names, 9.6KB. Proved by `harness/cstyle.js`: every element's computed style on all 19 screens, animation frozen, identical to V141 at 1440 and 390 (6,128 elements each). The other 51 unused names share a prefix with a class the page builds at runtime and were kept. |
 | V141 | Inbox and money sweeps follow `nextPageToken` up to 75 threads (was one page of 25); each thread tells the model `more_after_this` when the preview left newer messages out, and `search_email` says to read the thread then. Capture line does not pull during the tour. Activity loads `orderBy("at","desc").limit(160)` instead of every row ever written. |
 | V140 | Last rule-bending wording trimmed, as approved by Jackson: "Carried, not failed." to "Carried." (3 toasts and a button note), "Nothing is overdue." cut from the clear-the-small-stuff line, recap heading "What carries", Settings principle "Things are carried" / "The wording on this board only ever says carried.", help "done, moved or did not happen" (2), sweep note second sentence cut. The model instruction keeps its wording. |
@@ -66,6 +67,41 @@ an MCP server Jackson adds in his Claude settings.
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V143: THE CRITICAL PATH
+
+**Why.** Tier 3 item 18. The V132 cascade moves a chain on request but never
+said which chain sets the delivery date. He picked this build on 9 Oct 2026.
+
+**The rule.** Dates on tasks are fixed, not worked out from durations, so this
+is a backward pass over the dates as they stand. For each open task with a
+date, room = the fewest days it could finish later before it pushes back the
+last task end on the project, through the tasks that wait on it:
+`room(t) = min(days to the last end, min over waiters (gap - 1 + room(waiter)))`.
+A waiter that starts the day after leaves zero room, so a back to back chain
+reads as one; a same day start or an overlap is already less than zero. Room
+of zero or less is critical. Done tasks and tasks without dates are left out.
+A loop in the links returns zero room instead of hanging. With no link between
+open tasks `ppFloat` returns null and nothing is drawn, because without links
+there is no chain, only a calendar.
+
+**On screen.** Critical bars get a 3px underline in `--fg2` (`.gb.crit`, with a
+`.gb.blocked.crit` that keeps the stripes). A link between two critical tasks
+with no gap draws as `.gdep path.crit`, heavier. The legend gains "critical
+path". Hovering a bar adds "Sets the end date" or "N days of room"; the screen
+reader label adds ", sets the end date". Words approved by Jackson as drafted.
+
+**Not done.** Milestones and deliverable due dates are not part of the end date;
+only tasks are. The drawer does not show room. Home and the header do not
+mention the path.
+
+**Verified.** `harness/cptest.js` on `mock4.js` (Script, Shoot, Edit in a back to
+back chain; Stills and Retouch off it; Permits on its own; a done task): room
+0, 0, 0, 4, 3, 9; critical set Script, Shoot, Edit; null with no links; a loop
+returns; three bars, two heavy links, legend and both hover lines drawn.
+Screenshot in `docs/shots/V143_critical_path.png`. Click sweep at 1440 and 390
+on the usual data and at 1440 on the linked project: zero errors, zero
+overflow. Bin suite 61 of 61.
 
 ## V138: THE BIN
 
@@ -535,6 +571,7 @@ localStorage unpredictably on `file://`.
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
 | `bintest.js` + `mock3.js`, `tourtest.js` | V138. The bin end to end on a live in-memory store, and the tour gate on delete. |
+| `cptest.js` + `mock4.js`, `sweep4.js` | V143. The critical path engine and its drawing, and the click sweep on a linked project. |
 | `cstyle.js` | V142. Computed style of every element on 19 screens, two builds side by side, animation frozen. Must read 0 differences. |
 | `v141test.js` | V141. Gmail paging and the capture line in the tour. |
 | `sweep.js` | V137. Presses every button on 19 screens at a given width, reports errors and overflow. `node harness/sweep.js file out.json 390` |
@@ -619,8 +656,7 @@ a hypothesis to check against the live file, not a fact.
 15. Rollups across typed relationships: client totals, project totals.
 16. Expiring read-only client links, replacing the status email.
 17. Synced content blocks for usage rights, delivery specs, retouch notes.
-18. Dependency cascade with critical path. Cascade shipped in V132; critical
-    path did not.
+18. ~~Dependency cascade with critical path.~~ Cascade V132, critical path V143.
 
 ### Deliberately not building
 
