@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V136**, published live at
+- Source: Evolve OS artifact, **V137**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V136 (published 8 Oct 2026, build stamp
-  `V136 2026-10-08T17:00Z`, artifact version 137, version id
-  `1791459879-cf77`). Rollback is the artifact's own version history.
+- Last known-good: V137 (published 8 Oct 2026, build stamp
+  `V137 2026-10-08T19:00Z`, artifact version 138, version id
+  `1791460916-b51a`). V136 is artifact version 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
   passed reading as carried. Copy only, no logic changed. V133 = V132 plus
@@ -58,7 +58,77 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V137: THE 8 OCTOBER AUDIT
+
+**How it was run.** A click sweep (`harness/sweep.js`) opened 19 screens (12
+modes and 7 project areas) and pressed every button on each, about 1,155 presses
+at 1440 and again at 390 wide, catching page errors, rejections and
+console errors, and measuring horizontal overflow. Result on V136 and V137:
+zero errors, zero overflow. Three read-only code audits ran beside it: the
+safety rules, the open items below, and every connector call against the real
+tool schemas, with one live read each of `list_events` and `search_threads`
+(field names only, no content kept).
+
+**Fixed in V137.**
+- The reassign stager (`stage({type:"edit"...` in the reassign sheet) set no
+  `fromS`, `fromE` or `wasU`. So `queueGate` checked nothing, and Approve
+  would drag a block back if it had been moved in Google after staging, the
+  B1 bug by another route. Undo also got undefined times. It now carries all
+  three, like every other edit stager. Unit test: a moved event is held.
+- Meet link: the live payload has `conferenceUrl` and
+  `conferenceData.videoEntryPoint.uri`, never `hangoutLink` or `entryPoints`.
+  `link` was always empty. Now reads the live names first.
+- Gmail `search_threads` messages come back oldest first. Both the inbox sweep
+  and the `search_email` tool read `messages[0]`, often his own sent mail.
+  New `gmLatest(t)` picks the newest by `internalDate`, else the last.
+- B7: the board chip toggle now calls `saveBiz()`, as the Settings one does.
+- B8: undo and recover now force `watch(true)` when `invalidate` fails. The
+  ripple writer's own two sites were left alone on purpose (standing rule).
+- O4: every page title div has `role="heading" aria-level="1"`. No visible change.
+
+**Confirmed fine.** O2 (`prompt2` labels use for/id). Running timer cost: every
+dollar path goes through `timeEntryBillMins()`. No ClickUp anywhere. No Gmail
+send, reply, forward or draft; no iMessage send; no mailto or sms. No calendar
+write from any timer, snapshot, load or model reply: the model's propose tools
+only stage. Every db wrapper and the queue respect the tour gate. All seven
+Google calls use correct argument names, required fields and enum values.
+
+**Found, not fixed, needs a decision.**
+- Queue writer fails open: `queueGate` returns null when `get_event` errors,
+  so the write goes ahead unchecked. The ripple writer aborts instead. Making
+  the queue hold the row needs a hold reason he would read: COPY REQUIRED.
+- The queue writes row by row with no automatic rollback, only the Undo toast.
+- `shiftGo` (+15 / +30 / +1h) moves up to 12 later blocks on one tap, no preview.
+- Deletes of projects, clients, leads, invoices, deliverables, expenses,
+  decisions, tasks and milestones say "This cannot be undone" and are not
+  copied to `recover`. A recycle bin is a design call.
+- Capture Line items handled on the 60s timer can write scraps and waiting
+  rows with no staging (`catch_note`, `add_waiting`). By design so far.
+- `dbMerge` falls back from `update` to `set(patch)` on any error, not just a
+  missing document. A partial patch could replace a whole record if `update`
+  failed for another reason. The db's error shape is unknown, so not changed.
+- `queueSave` writes `queue/pending` raw with an empty catch (localStorage
+  copy kept).
+- `rwSet` sends `timeZone:TZ` on update, which resets an event's own zone to
+  Chicago on every ripple move. Ripple writer, so not touched.
+- `iso()` always adds an offset while `list_events` also sends `timeZone`.
+  Works, but the schema says pick one.
+- Gmail searches ignore `nextPageToken` (pageSize 20 and 25).
+- During the tour `mark_filed` is blocked and swallowed, so capture items come
+  back on the next pull. The tour gate itself is correct and stays.
+- N2: 85 class names in the styles are never used (83 certain, `fl1` and `fl4`
+  may be built as `"fl"+key`). List in the V137 session notes; deleting needs
+  rule by rule care. N4 unchanged: `activity`, `calmeta`, `intent`, `notes`,
+  `mustdo`, `audit`, `done`, `time_entries` only grow.
+
+**Words he reads that bend his rule, COPY REQUIRED.** "Nothing is overdue. It
+was all carried." and the Settings heading "Nothing is overdue" (both say the
+word to deny it); "Slipped, and what carries"; help text "done, moved or
+missed" where the buttons say "Did not happen"; the sweep line "The things
+that get missed because no block exists"; "Carried, not failed." (twice).
 
 ## V134 TO V136: CARRIED, NOT LATE
 
@@ -423,6 +493,8 @@ localStorage unpredictably on `file://`.
 | `caltest.js` | Both calendar-writer paths. |
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
+| `sweep.js` | V137. Presses every button on 19 screens at a given width, reports errors and overflow. `node harness/sweep.js file out.json 390` |
+| `unit.js` | V137. `gmLatest` and the queue gate on a moved event. |
 | `probe.js` + `mock2.js` | V136. Seeds a project with carried work and a late invoice, renders every mode and the project workspace, dumps the text for a wording grep. Kept in the repo under `harness/`. |
 
 ## STILL OPEN FROM THE 129-FINDING AUDIT
@@ -437,14 +509,16 @@ localStorage unpredictably on `file://`.
 - ~~M8 search across money, clients, leads, deliverables.~~ Done as of V118.
 - N2 39 remaining orphan CSS classes.
 - N4 four collections grow forever with no pruning.
-- O2 `prompt2` labels not programmatically associated.
-- O4 pages start at h3.
-- B7 board calendar chip does not persist `on`.
-- B8 invalidate swallowed in undo, ripple and recover.
+- ~~O2 `prompt2` labels not programmatically associated.~~ Already fixed, confirmed V137.
+- ~~O4 pages start at h3.~~ Fixed V137 with heading roles.
+- ~~B7 board calendar chip does not persist `on`.~~ Fixed V137.
+- B8 invalidate swallowed. Undo and recover fixed V137; the two ripple sites
+  left alone under the ripple writer rule.
 - ~~E12 the four per-kind Make-tab surfaces.~~ Superseded by the V131 Playbook and kits.
 - Running-timer contamination of the cost model. Partly addressed: every path
   that ends in a dollar figure now goes through `timeEntryBillMins()`, which
-  caps an unclosed entry at `billCapMins()`. Not reverified end to end.
+  caps an unclosed entry at `billCapMins()`. Reverified end to end in V137:
+  no dollar figure reads raw minutes.
 
 ## OPEN, CARRIED FORWARD FROM V130 AND V133
 
@@ -561,6 +635,9 @@ two per page maximum, never per card.
 
 - Google Calendar: create, get_event, update, delete verified live. All 7 CALS
   ids match. `list_events` field shapes confirmed against a live payload.
+- 8 Oct 2026: all seven Google calls checked against the live tool schemas,
+  plus one live read each. Meet link field names corrected in V137, and
+  Gmail threads now read the newest message.
 - Gmail `search_threads`: verified live; thread and message shapes match.
   `get_thread` verified 5 Oct 2026; field names come back camelCase, not the
   snake_case the docs use, so both spellings are read.
