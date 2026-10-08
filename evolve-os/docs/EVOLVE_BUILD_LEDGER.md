@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V145**, published live at
+- Source: Evolve OS artifact, **V146**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V145 (published 9 Oct 2026, build stamp
-  `V145 2026-10-09T07:00Z`, artifact version 145, version id
-  `1791499124-45df`). V144 is artifact version 144, id `1791480897-aae2`. V143 is artifact version 143, id `1791480016-7207`;
+- Last known-good: V146 (published 9 Oct 2026, build stamp
+  `V146 2026-10-09T09:00Z`, artifact version 146, version id
+  `1791502225-1f56`). V145 is artifact version 145, id `1791499124-45df`. V144 is artifact version 144, id `1791480897-aae2`. V143 is artifact version 143, id `1791480016-7207`;
   V142 is 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
   V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
@@ -60,6 +60,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V146 | The plan: what it costs to run, a payment calendar, and when the next project has to land, with the weekly pace of wins and cold reach outs. On Money, and one strip on Home. New collection `costs`, new prefs `plan_avg`, `plan_win`, `plan_cash`. See below. |
 | V145 | Leads link to clients. The lead editor has a Client select (`clientOpts`, every client the Projects page knows plus whatever the lead already names). The Won sheet starts from the lead's client and now saves it on the lead (it asked and then threw it away). Booked (`wonFor`, the Money page rule: won leads at their value) joins the client and project totals line. A lead counts for a client only if it names that client or was won into one of its projects (`project_slug`), never on a name match. Verified: `harness/leadtest.js` + `mock6.js`, 11 of 11, including a won lead called "Acme" with no link that must not count until linked. All earlier suites clean. New words "Client", "No client yet" and "booked" follow existing ones; "No client yet" awaits his ruling. |
 | V144 | Client and project totals: invoiced, paid, owed and hours logged on every client card and each project row in it, owed on the project list. One money rule (`invTotals`) for all of them, which also fixes the client card and the project Money page counting drafts, voids and ignoring part payments. See below. |
 | V143 | The critical path on the project timeline. `ppFloat(tasks)` gives each open dated task its room in days; zero is critical. Underlined bars, heavier links, a legend entry, room on hover. Only when a project has a link between open tasks. See below. |
@@ -70,6 +71,63 @@ an MCP server Jackson adds in his Claude settings.
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V146: THE PLAN
+
+**Why.** Jackson, 9 Oct 2026: a payment calendar so he knows what is coming
+in, and a calendar of when a new project has to land, which sets how many
+cold reach outs and wins he needs a week. Overhead and personal living costs
+were mapped by Gavin, but no figures were found in Drive or ClickUp (searched
+read only), and `evolve-context` has overhead, win rate and average project
+value all `[UNFILLED]`. So nothing is seeded: he enters his costs and three
+numbers, and the page says when it is working from a guess or from zero.
+Privacy: he chose to keep everything, personal costs included, in the shared
+database although the page is shared as anyone with the link.
+
+**Records.** `costs/<id>`: name, amount, kind (business or personal), every
+(month, year, week), day (day of month, or 1 to 7 for Monday to Sunday on a
+weekly one), month (for a yearly one). Deleting one goes through the bin.
+`prefs/operating` gains `plan_avg` (average project), `plan_win` (his cold
+win rate guess, percent), `plan_cash` and `plan_cash_at` (cash on hand).
+
+**The math.** `planWalk` goes day by day for 90 days from today, starting at
+cash on hand (or zero, and says so). In: open invoices (`isOut`, not paid) on
+their due date, less `paidAmount`. Drafts are not counted. Invoices already
+late are shown as "Not counted" and left out. Out: each cost on its days
+(`costHits`; a day past the end of a month falls on its last day). The first
+day under zero is the land-by date; the lowest point is the gap.
+`planNeed`: projects = ceil(gap / average project); over the weeks to the
+land-by date; reach outs a week = ceil(projects / weeks / win rate).
+`coldRate`: the real rate from pipeline leads whose source says cold once
+five have closed (won or lost), else his guess, labeled.
+
+**On screen.** Money, under the counters: "When the next project has to land"
+(cost per month split business and personal, short from, land, that is, cold
+win rate, not counted, cash on hand), the payment calendar (one month, money
+in green, business costs grey, personal orange, paid in faded, back one month
+and ahead five, each chip opens its invoice or cost), then "What it costs to
+run" with Add a cost, Edit, Delete. Home: one strip under the greeting with
+this week's reach outs, land by, and the next money in; it opens Money.
+Words approved by Jackson as drafted.
+
+**Not built yet.** Deposits on won work that has no invoice (the rate card's
+50/50 is a rule, not a date). The turnaround planner (Mumbai as crew, front
+and back end split, sites in parallel). The plan feeding the day's schedule
+beyond the Home strip.
+
+**Verified.** `harness/plantest.js` on `mock7.js` (five costs across all three
+cadences and both kinds; invoices sent, part paid, draft, late; cash 1,500;
+average 2,900; guess 5%): the lowest point and first day under match an
+independent walk over the raw records; late shown and not counted; draft left
+out; projects, monthly split, guess, reach outs; panel, chips and personal
+marks drawn; yesterday's payment on the calendar as paid; landed in 30 days
+counts it; add a cost through the form and delete it; the numbers form shows
+what is saved. 16 of 16. Click sweeps at 1440 and 390 on the usual data and
+on the plan data, all earlier suites: clean. No sideways scroll at 390. Shots
+in `docs/shots/V146_*`.
+
+**Bug caught while building.** The calendar first read a payment's date as
+`at`; the real field is `on` (`paidWhen`). Fixed before publishing.
 
 ## V144: CLIENT AND PROJECT TOTALS
 
@@ -609,6 +667,7 @@ localStorage unpredictably on `file://`.
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
 | `bintest.js` + `mock3.js`, `tourtest.js` | V138. The bin end to end on a live in-memory store, and the tour gate on delete. |
+| `plantest.js` + `mock7.js`, `sweep7.js`, `plan2.js`, `stripshot.js` | V146. The plan's math against an independent walk, the forms, the calendar, phone layout, and the Home strip. |
 | `tottest.js` + `mock5.js`, `sweep5.js` | V144. Totals against hand worked numbers, and the click sweep on that data. |
 | `cptest.js` + `mock4.js`, `sweep4.js` | V143. The critical path engine and its drawing, and the click sweep on a linked project. |
 | `cstyle.js` | V142. Computed style of every element on 19 screens, two builds side by side, animation frozen. Must read 0 differences. |
@@ -676,7 +735,7 @@ a hypothesis to check against the live file, not a fact.
 
 ### Tier 2
 
-6. **Cash flow coach.** Runs off invoices, payments and booked pipeline. Needs
+6. **Cash flow coach.** Largely V146 (the plan and payment calendar). Still open: deposits on won work with no invoice. Runs off invoices, payments and booked pipeline. Needs
    a visibility gate first, see the open question below.
 7. ~~Saved views as stored JSON queries.~~ Shipped (`VIEW_SOURCES`, `viewRows`,
    `SEED_VIEWS`).

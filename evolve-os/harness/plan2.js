@@ -1,0 +1,12 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot,W]=[process.argv[2],process.argv[3],+(process.argv[4]||1440)];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8799);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:W,height:1400}});
+ await p.addInitScript({path:__dirname+'/mock7.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8799/');await p.waitForTimeout(2000);
+ const sw=await p.evaluate(async()=>{S.room=null;S.mode="money";paint();await new Promise(r=>setTimeout(r,300));
+   const pan=[...document.querySelectorAll('.pan')].filter(n=>/What it costs to run/.test(n.querySelector('h3')?n.querySelector('h3').textContent:""))[0];
+   pan.scrollIntoView({block:"end"}); return document.documentElement.scrollWidth;});
+ await p.screenshot({path:shot}); console.log("scrollWidth",sw,"viewport",W); await b.close();srv.close();})();

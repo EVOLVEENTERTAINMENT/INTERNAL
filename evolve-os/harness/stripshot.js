@@ -1,0 +1,13 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot,W]=[process.argv[2],process.argv[3],+(process.argv[4]||1440)];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8800);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:W,height:900}});const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock7.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8800/');await p.waitForTimeout(2000);
+ const t=await p.evaluate(async()=>{S.room=null;S.mode="dash";paint();await new Promise(r=>setTimeout(r,300));
+   const n=document.querySelector('.planstrip'); if(n)n.scrollIntoView({block:"center"}); 
+   const txt=n?n.innerText:null; if(n)n.click(); await new Promise(r=>setTimeout(r,200)); return [txt,S.mode];});
+ await p.evaluate(async()=>{S.mode="dash";paint();await new Promise(r=>setTimeout(r,200));const n=document.querySelector('.planstrip');if(n)n.scrollIntoView({block:"center"});});
+ await p.screenshot({path:shot}); console.log(JSON.stringify(t),errs); await b.close();srv.close();})();

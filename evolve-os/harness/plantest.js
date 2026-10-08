@@ -1,0 +1,51 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot,W]=[process.argv[2],process.argv[3],+(process.argv[4]||1440)];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8798);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:W,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock7.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8798/');await p.waitForTimeout(2000);
+ const R=await p.evaluate(async()=>{const A=[];const ok=(n,c)=>A.push((c?"PASS ":"FAIL ")+n);
+  // an independent walk over the raw records
+  const D=window.__DATA; const t0=new Date();t0.setHours(0,0,0,0);
+  const K=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  let bal=1500,low=1500,under=null;
+  for(let i=0;i<90;i++){const d=new Date(t0);d.setDate(d.getDate()+i);const k=K(d);
+    D.invoices.forEach(x=>{const r=x.data; if(r.state!=="sent"||r.due!==k)return; const got=(r.payments||[]).reduce((a,p)=>a+p.amount,0); bal+=r.amount-got;});
+    D.costs.forEach(x=>{const c=x.data,a=c.amount,last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+      if(c.every==="month"&&d.getDate()===Math.min(+c.day,last))bal-=a;
+      if(c.every==="year"&&d.getMonth()+1===+c.month&&d.getDate()===Math.min(+c.day,last))bal-=a;
+      if(c.every==="week"&&((d.getDay()+6)%7)+1===+c.day)bal-=a;});
+    if(bal<low)low=bal; if(bal<0&&!under)under=k;}
+  const P=planNeed();
+  ok("lowest point matches ("+P.walk.low+" vs "+low+")",Math.abs(P.walk.low-low)<0.01);
+  ok("first day under matches ("+P.walk.under+" vs "+under+")",P.walk.under===under);
+  ok("late invoice shown, not counted ("+P.walk.late+")",P.walk.late===1000);
+  ok("draft not counted",!Object.values(P.walk.ins).flat().some(x=>x.r.id==="i3"));
+  ok("projects = ceil(gap/2900) ("+P.proj+")",P.proj===Math.ceil(-low/2900));
+  ok("monthly cost business "+Math.round(P.bus)+" personal "+Math.round(P.per),Math.round(P.bus)===1600&&Math.round(P.per)===Math.round(2500+150*52/12));
+  ok("guess rate used",P.rate&&!P.rate.real&&P.rate.pct===5);
+  ok("reach outs = ceil(winsWk/0.05) ("+P.reachWk+")",P.reachWk===Math.ceil(P.winsWk/0.05));
+  S.room=null;S.mode="money";paint();await new Promise(r=>setTimeout(r,300));
+  const pan=[...document.querySelectorAll('.pan')].filter(n=>/When the next project has to land/.test(n.textContent))[0];
+  ok("panel drawn",!!pan);
+  ok("calendar has in and out chips",document.querySelectorAll('.pcal .pin').length>0&&document.querySelectorAll('.pcal .pout').length>0);
+  ok("personal chips marked",document.querySelectorAll('.pcal .pout.me').length>0);
+  ok("yesterday's payment shows as paid on the calendar",document.querySelectorAll('.pcal .pin.got').length===1||new Date().getDate()===1);
+  ok("landed in 30 days counts it ("+moneyNums().paid30+")",moneyNums().paid30===300);
+  // add a cost through the form, then delete it to the bin
+  let cap=null; const r2=prompt2; window.prompt2=(t,f,cb)=>{cap={f,cb};};
+  costEdit(null); const v={}; cap.f.forEach(x=>{v[x.k]=x.value;}); v.name="Phone"; v.amount="$90"; v.kind="personal"; v.day="20"; cap.cb(v);
+  const added=(S.costs||[]).filter(c=>c.name==="Phone")[0];
+  ok("cost added through the form",!!added&&added.amount===90&&added.kind==="personal");
+  window.prompt2=r2;
+  let go=null; const r3=confirm2; window.confirm2=(t,b,g)=>{go=g;}; costDelete(added); go(); window.confirm2=r3;
+  ok("cost deleted",!(S.costs||[]).some(c=>c.name==="Phone"));
+  // the plan numbers form
+  window.prompt2=(t,f,cb)=>{cap={f,cb};}; planEdit(); const pv={}; cap.f.forEach(x=>{pv[x.k]=x.value;});
+  ok("plan form shows saved numbers ("+[pv.avg,pv.win,pv.cash]+")",pv.avg==="2900"&&pv.win==="5"&&pv.cash==="1500"); window.prompt2=r2;
+  if(pan)pan.scrollIntoView();
+  return {A,text:pan?pan.querySelector('.rows').innerText:""};});
+ await p.screenshot({path:shot});
+ console.log(R.A.join("\n"),"\n---\n"+R.text,"\nerrors",errs);await b.close();srv.close();})();
