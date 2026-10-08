@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V137**, published live at
+- Source: Evolve OS artifact, **V138**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V137 (published 8 Oct 2026, build stamp
-  `V137 2026-10-08T19:00Z`, artifact version 138, version id
-  `1791460916-b51a`). V136 is artifact version 137. Rollback is the artifact's own version history.
+- Last known-good: V138 (published 8 Oct 2026, build stamp
+  `V138 2026-10-08T21:00Z`, artifact version 139, version id
+  `1791461602-0b14`). V137 is artifact version 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
   passed reading as carried. Copy only, no logic changed. V133 = V132 plus
@@ -58,8 +58,46 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V138: THE BIN
+
+**Why.** The 8 October audit found that deleting a project, client, lead,
+invoice, deliverable, expense, decision, task or milestone was permanent, with
+"This cannot be undone." on the warning. He chose a recycle bin, 30 days.
+
+**How.** `binDel(path,rec,label,kind,extra,rollback)` writes the record to
+`bin/<id>` through `dbSetCritical` and only then calls `dbDel`. If the copy
+fails, nothing is deleted and the screen is rolled back. If the delete fails,
+the bin copy is removed and the screen rolled back. During the tour it does
+nothing. `binRestore(b)` writes `b.data` back to `b.path`, mends the links
+the delete cut (`extra.dependents` re-adds a task to its dependents' `depends`,
+`extra.tasks` re-hangs tasks on a milestone), removes the bin row, and logs it.
+`binSaid(b)` shows "Deleted." with a Put it back button. The bin collection is
+subscribed beside expenses; on its first snapshot, rows older than
+`BIN_DAYS` (30) are cleared. Settings has a section listing the bin, newest
+first. Crew removal was already a soft delete (`{removed:true}`) and is not
+routed through the bin.
+
+**Words, approved by Jackson on 8 Oct 2026 as drafted.** The delete warning
+"It goes to the bin in Settings for 30 days. Nothing else in the app points at
+it."; toast "Deleted." with "Put it back"; Settings "The bin", "deleted things
+stay here for 30 days", "kind · deleted N days ago", "Nothing in the bin.";
+after a restore "X is back."
+
+**Verified.** `harness/bintest.js` on a live in-memory store (`mock3.js`):
+all nine kinds deleted through their real editors, copied to the bin, listed in
+Settings, put back field for field, links re-made, bin emptied; a failed bin
+copy deletes nothing; the toast restore works; a 40 day old row is swept on
+load. 61 of 61. `tourtest.js`: a delete during the tour changes nothing. Click
+sweep at 1440 and 390: zero errors, zero overflow.
+
+**Known limits.** A project whose doc id differs from its slug was already
+deleted at `projects/<slug>`, and the bin keeps that same path. Links other
+than task dependents and milestone hooks (a deliverable's project, an
+invoice's project) are fields on the record itself, so they come back with it.
 
 ## V137: THE 8 OCTOBER AUDIT
 
@@ -102,9 +140,7 @@ Google calls use correct argument names, required fields and enum values.
   the queue hold the row needs a hold reason he would read: COPY REQUIRED.
 - The queue writes row by row with no automatic rollback, only the Undo toast.
 - `shiftGo` (+15 / +30 / +1h) moves up to 12 later blocks on one tap, no preview.
-- Deletes of projects, clients, leads, invoices, deliverables, expenses,
-  decisions, tasks and milestones say "This cannot be undone" and are not
-  copied to `recover`. A recycle bin is a design call.
+- ~~Deletes could not be undone.~~ The bin, V138.
 - Capture Line items handled on the 60s timer can write scraps and waiting
   rows with no staging (`catch_note`, `add_waiting`). By design so far.
 - `dbMerge` falls back from `update` to `set(patch)` on any error, not just a
@@ -493,6 +529,7 @@ localStorage unpredictably on `file://`.
 | `caltest.js` | Both calendar-writer paths. |
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
+| `bintest.js` + `mock3.js`, `tourtest.js` | V138. The bin end to end on a live in-memory store, and the tour gate on delete. |
 | `sweep.js` | V137. Presses every button on 19 screens at a given width, reports errors and overflow. `node harness/sweep.js file out.json 390` |
 | `unit.js` | V137. `gmLatest` and the queue gate on a moved event. |
 | `probe.js` + `mock2.js` | V136. Seeds a project with carried work and a late invoice, renders every mode and the project workspace, dumps the text for a wording grep. Kept in the repo under `harness/`. |
