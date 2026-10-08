@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V144**, published live at
+- Source: Evolve OS artifact, **V145**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V144 (published 9 Oct 2026, build stamp
-  `V144 2026-10-09T05:00Z`, artifact version 144, version id
-  `1791480897-aae2`). V143 is artifact version 143, id `1791480016-7207`;
+- Last known-good: V145 (published 9 Oct 2026, build stamp
+  `V145 2026-10-09T07:00Z`, artifact version 145, version id
+  `1791499124-45df`). V144 is artifact version 144, id `1791480897-aae2`. V143 is artifact version 143, id `1791480016-7207`;
   V142 is 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
   V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
@@ -60,6 +60,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V145 | Leads link to clients. The lead editor has a Client select (`clientOpts`, every client the Projects page knows plus whatever the lead already names). The Won sheet starts from the lead's client and now saves it on the lead (it asked and then threw it away). Booked (`wonFor`, the Money page rule: won leads at their value) joins the client and project totals line. A lead counts for a client only if it names that client or was won into one of its projects (`project_slug`), never on a name match. Verified: `harness/leadtest.js` + `mock6.js`, 11 of 11, including a won lead called "Acme" with no link that must not count until linked. All earlier suites clean. New words "Client", "No client yet" and "booked" follow existing ones; "No client yet" awaits his ruling. |
 | V144 | Client and project totals: invoiced, paid, owed and hours logged on every client card and each project row in it, owed on the project list. One money rule (`invTotals`) for all of them, which also fixes the client card and the project Money page counting drafts, voids and ignoring part payments. See below. |
 | V143 | The critical path on the project timeline. `ppFloat(tasks)` gives each open dated task its room in days; zero is critical. Underlined bars, heavier links, a legend entry, room on hover. Only when a project has a link between open tasks. See below. |
 | V142 | 114 unused style rules removed and 8 selector lists trimmed, 34 class names, 9.6KB. Proved by `harness/cstyle.js`: every element's computed style on all 19 screens, animation frozen, identical to V141 at 1440 and 390 (6,128 elements each). The other 51 unused names share a prefix with a class the page builds at runtime and were kept. |
