@@ -5,11 +5,12 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V140**, published live at
+- Source: Evolve OS artifact, **V142**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V140 (published 8 Oct 2026, build stamp
-  `V140 2026-10-08T23:00Z`, artifact version 141, version id
-  `1791462346-2940`). V139 is artifact version 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
+- Last known-good: V142 (published 9 Oct 2026, build stamp
+  `V142 2026-10-09T01:00Z`, artifact version 142, version id
+  `1791477397-70ea`). V141 was never published alone; V142 carries it.
+  V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
   passed reading as carried. Copy only, no logic changed. V133 = V132 plus
@@ -58,6 +59,8 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V142 | 114 unused style rules removed and 8 selector lists trimmed, 34 class names, 9.6KB. Proved by `harness/cstyle.js`: every element's computed style on all 19 screens, animation frozen, identical to V141 at 1440 and 390 (6,128 elements each). The other 51 unused names share a prefix with a class the page builds at runtime and were kept. |
+| V141 | Inbox and money sweeps follow `nextPageToken` up to 75 threads (was one page of 25); each thread tells the model `more_after_this` when the preview left newer messages out, and `search_email` says to read the thread then. Capture line does not pull during the tour. Activity loads `orderBy("at","desc").limit(160)` instead of every row ever written. |
 | V140 | Last rule-bending wording trimmed, as approved by Jackson: "Carried, not failed." to "Carried." (3 toasts and a button note), "Nothing is overdue." cut from the clear-the-small-stuff line, recap heading "What carries", Settings principle "Things are carried" / "The wording on this board only ever says carried.", help "done, moved or did not happen" (2), sweep note second sentence cut. The model instruction keeps its wording. |
 | V139 | The approval queue fails closed: if `get_event` does not answer, `queueGate` holds the row ("Google did not answer the check, so nothing was written", wording approved by Jackson) instead of writing blind. `harness/gatetest.js` shows V138 writing and V139 holding. |
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
@@ -153,10 +156,11 @@ Google calls use correct argument names, required fields and enum values.
   Chicago on every ripple move. Ripple writer, so not touched.
 - `iso()` always adds an offset while `list_events` also sends `timeZone`.
   Works, but the schema says pick one.
-- Gmail searches ignore `nextPageToken` (pageSize 20 and 25).
-- During the tour `mark_filed` is blocked and swallowed, so capture items come
-  back on the next pull. The tour gate itself is correct and stays.
-- N2: 85 class names in the styles are never used (83 certain, `fl1` and `fl4`
+- ~~Gmail searches ignore `nextPageToken`.~~ The sweeps page, V141. The model
+  tool stays at 20 and is told when a thread has more.
+- ~~During the tour `mark_filed` is blocked.~~ capPull skips the tour, V141.
+  The tour gate itself is correct and stays.
+- N2: 34 removed in V142. 51 left on purpose, see V142. Was: 85 class names in the styles are never used (83 certain, `fl1` and `fl4`
   may be built as `"fl"+key`). List in the V137 session notes; deleting needs
   rule by rule care. N4 unchanged: `activity`, `calmeta`, `intent`, `notes`,
   `mustdo`, `audit`, `done`, `time_entries` only grow.
@@ -531,6 +535,8 @@ localStorage unpredictably on `file://`.
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
 | `bintest.js` + `mock3.js`, `tourtest.js` | V138. The bin end to end on a live in-memory store, and the tour gate on delete. |
+| `cstyle.js` | V142. Computed style of every element on 19 screens, two builds side by side, animation frozen. Must read 0 differences. |
+| `v141test.js` | V141. Gmail paging and the capture line in the tour. |
 | `sweep.js` | V137. Presses every button on 19 screens at a given width, reports errors and overflow. `node harness/sweep.js file out.json 390` |
 | `unit.js` | V137. `gmLatest` and the queue gate on a moved event. |
 | `probe.js` + `mock2.js` | V136. Seeds a project with carried work and a late invoice, renders every mode and the project workspace, dumps the text for a wording grep. Kept in the repo under `harness/`. |
