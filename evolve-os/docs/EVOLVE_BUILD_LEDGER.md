@@ -5,11 +5,12 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V143**, published live at
+- Source: Evolve OS artifact, **V144**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V143 (published 9 Oct 2026, build stamp
-  `V143 2026-10-09T03:00Z`, artifact version 143, version id
-  `1791480016-7207`). V142 is artifact version 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
+- Last known-good: V144 (published 9 Oct 2026, build stamp
+  `V144 2026-10-09T05:00Z`, artifact version 144, version id
+  `1791480897-aae2`). V143 is artifact version 143, id `1791480016-7207`;
+  V142 is 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
   V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
@@ -59,6 +60,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V144 | Client and project totals: invoiced, paid, owed and hours logged on every client card and each project row in it, owed on the project list. One money rule (`invTotals`) for all of them, which also fixes the client card and the project Money page counting drafts, voids and ignoring part payments. See below. |
 | V143 | The critical path on the project timeline. `ppFloat(tasks)` gives each open dated task its room in days; zero is critical. Underlined bars, heavier links, a legend entry, room on hover. Only when a project has a link between open tasks. See below. |
 | V142 | 114 unused style rules removed and 8 selector lists trimmed, 34 class names, 9.6KB. Proved by `harness/cstyle.js`: every element's computed style on all 19 screens, animation frozen, identical to V141 at 1440 and 390 (6,128 elements each). The other 51 unused names share a prefix with a class the page builds at runtime and were kept. |
 | V141 | Inbox and money sweeps follow `nextPageToken` up to 75 threads (was one page of 25); each thread tells the model `more_after_this` when the preview left newer messages out, and `search_email` says to read the thread then. Capture line does not pull during the tour. Activity loads `orderBy("at","desc").limit(160)` instead of every row ever written. |
@@ -67,6 +69,41 @@ an MCP server Jackson adds in his Claude settings.
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V144: CLIENT AND PROJECT TOTALS
+
+**Why.** Tier 3 item 15, picked by Jackson on 9 Oct 2026.
+
+**One rule.** `invTotals(invs)` is the only place a total is worked out, and it
+matches `moneyNums` (the Money page): void is left out; a draft is not
+invoiced, paid or owed; paid is `paidAmount` (the payment records, so part
+payments count); owed is the rest of what was billed unless the invoice is
+paid; late is the owed part of invoices whose state is late. `totLine` draws it
+and leaves out anything that is nought.
+
+**Bugs this fixed.** `clientsOf` summed `r.paid` falsy invoices at full amount,
+so a draft, a void or a part paid invoice all counted as owed in full, and the
+client card's late tag and its sort order used those numbers. The project Money
+page's "Still owed" counted drafts. Both now use `invTotals`. On the test data
+the old card would have said $6,700 owed against the Money page's $3,900.
+
+**Where.** Client card: a line inside the header under the project count.
+Each project row in the card: its own line under it. Split view project list:
+"$X owed" after the phase. Client invoices are their projects' invoices
+(`invForProj`) plus any billed to the client by name with no project, each once.
+Hours are `projCost(slug).mins`, the billable minutes, so a running timer is
+capped the same way as everywhere money is involved.
+
+**Left out on purpose.** Booked: a lead has no link to a client, and matching
+by name would be a guess. Words approved by Jackson as drafted.
+
+**Verified.** `harness/tottest.js` on `mock5.js` (two projects, six invoices:
+late, paid in full, draft, void, part paid, client only with no project; three
+time entries): client invoiced 5,200, paid 1,300, owed 3,900, late 2,400,
+logged 3h; project 3,400 / 1,000 / 2,400; Money page owed equals the client's;
+lines and tag drawn; split list shows owed. 11 of 11 at 1440 and 390, shots in
+`docs/shots/`. Click sweeps (usual data at both widths, totals data at 1440),
+bin 61/61, critical path 11/11, queue gate: all clean.
 
 ## V143: THE CRITICAL PATH
 
@@ -571,6 +608,7 @@ localStorage unpredictably on `file://`.
 | V133 suite | t1, t2, t2b, t3, wbtest, cadtest, captest, auto, p0, p1, p2, p3, p5, p6, p78, pb. 206 assertions. Rebuilt from scratch that session. |
 | `wtest.mjs` | The worker, 13 assertions, including Twilio's published signature vector. |
 | `bintest.js` + `mock3.js`, `tourtest.js` | V138. The bin end to end on a live in-memory store, and the tour gate on delete. |
+| `tottest.js` + `mock5.js`, `sweep5.js` | V144. Totals against hand worked numbers, and the click sweep on that data. |
 | `cptest.js` + `mock4.js`, `sweep4.js` | V143. The critical path engine and its drawing, and the click sweep on a linked project. |
 | `cstyle.js` | V142. Computed style of every element on 19 screens, two builds side by side, animation frozen. Must read 0 differences. |
 | `v141test.js` | V141. Gmail paging and the capture line in the tour. |
@@ -653,7 +691,7 @@ a hypothesis to check against the live file, not a fact.
 12. Scheduled overnight lead scrub, timed to when tokens are otherwise idle.
 13. Monthly token budget tracker that spends the remainder before it expires.
 14. Scheduled email triage and cleanup.
-15. Rollups across typed relationships: client totals, project totals.
+15. ~~Rollups: client totals, project totals.~~ V144. Booked per client waits on a lead to client link.
 16. Expiring read-only client links, replacing the status email.
 17. Synced content blocks for usage rights, delivery specs, retouch notes.
 18. ~~Dependency cascade with critical path.~~ Cascade V132, critical path V143.

@@ -1,0 +1,28 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot,W]=[process.argv[2],process.argv[3],+(process.argv[4]||1440)];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8796);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:W,height:900}});const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock5.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8796/');await p.waitForTimeout(2000);
+ const R=await p.evaluate(async()=>{const A=[];const ok=(n,c)=>A.push((c?"PASS ":"FAIL ")+n);
+  const cl=clientsOf(view()).filter(c=>c.key==="acme")[0];
+  ok("client found",!!cl);
+  const t=cl.tot; ok("invoiced 5200 ("+t.invoiced+")",t.invoiced===5200); ok("paid 1300 ("+t.paid+")",t.paid===1300);
+  ok("owed 3900 ("+t.owed+")",t.owed===3900); ok("late 2400 ("+t.late+")",t.late===2400);
+  ok("logged 180 min ("+cl.logged+")",cl.logged===180);
+  const pb=invTotals(invForProj("acmebrand",coProjects(view())));
+  ok("project brand: invoiced 3400 paid 1000 owed 2400 ("+[pb.invoiced,pb.paid,pb.owed]+")",pb.invoiced===3400&&pb.paid===1000&&pb.owed===2400);
+  ok("money page owed matches the client ("+moneyNums().out+")",moneyNums().out===3900);
+  S.room=null;S.mode="co";S.pv="client";paint();await new Promise(r=>setTimeout(r,300));
+  const ct=document.querySelector('.ccard .ctot'); ok("client line drawn: "+(ct&&ct.textContent),!!ct&&/invoiced/.test(ct.textContent));
+  const pts=[...document.querySelectorAll('.ccard .ptot')].map(n=>n.textContent); ok("two project lines: "+pts.join(" | "),pts.length===2);
+  const tag=[...document.querySelectorAll('.ccard .chd .tag')].map(n=>n.textContent).join(","); ok("late tag uses the same rule: "+tag,/\$2,400 late/.test(tag));
+  document.querySelector('.ccard').scrollIntoView();
+  return A;});
+ await p.screenshot({path:shot});
+ // split list and money page
+ const R2=await p.evaluate(async()=>{S.pv="split";paint();await new Promise(r=>setTimeout(r,300));
+   return [...document.querySelectorAll('.pli .sb')].map(n=>n.textContent);});
+ console.log(R.join("\n"),"\nsplit list:",JSON.stringify(R2),"\nerrors",errs);await b.close();srv.close();})();

@@ -1,5 +1,5 @@
 # EVOLVE OS, HANDOFF PACKET
-### State as of 8 October 2026, build V143
+### State as of 8 October 2026, build V144
 
 Paste this whole file into a new session as the first message. Everything a
 fresh Claude needs is in here or named in here.
@@ -13,8 +13,8 @@ self-contained HTML page published as a Claude Artifact at
 **https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR**. It reads his Google
 Calendar and Gmail through claude.ai connectors, keeps its own records in the
 artifact database, and never writes a calendar or sends a message without his
-tap. The live build is **V143**, published 9 Oct 2026, artifact version 143,
-version id `1791480016-7207`. V143 added the critical path to project timelines; V142 removed unused styles and made the inbox sweeps read past one page; V140 trimmed the last overdue and failed wording; V139 made Approve hold a change Google cannot confirm; V138 added the 30 day bin; V137 is the 8 October audit fixes. Before it, the carried wording
+tap. The live build is **V144**, published 9 Oct 2026, artifact version 144,
+version id `1791480897-aae2`. V144 added client and project totals; V143 added the critical path to project timelines; V142 removed unused styles and made the inbox sweeps read past one page; V140 trimmed the last overdue and failed wording; V139 made Approve hold a change Google cannot confirm; V138 added the 30 day bin; V137 is the 8 October audit fixes. Before it, the carried wording
 sweep (V134 to V136): every project and deliverable date that has passed now
 reads as carried. Invoices keep late and past due. The capture line was V133.
 
