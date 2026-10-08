@@ -60,6 +60,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V147 | **Built, not published.** Work Orders with the developer, from the Evolve x Logicnova agreement of 6 Oct 2026. New collection `workorders`. Waiting on Jackson's ruling on its words. Source `src/EvolveOS_V147_UNPUBLISHED.html`, patch `patches/v147.py`, tests `harness/wotest.js` 12 of 12. See below. |
 | V146 | The plan: what it costs to run, a payment calendar, and when the next project has to land, with the weekly pace of wins and cold reach outs. On Money, and one strip on Home. New collection `costs`, new prefs `plan_avg`, `plan_win`, `plan_cash`. See below. |
 | V145 | Leads link to clients. The lead editor has a Client select (`clientOpts`, every client the Projects page knows plus whatever the lead already names). The Won sheet starts from the lead's client and now saves it on the lead (it asked and then threw it away). Booked (`wonFor`, the Money page rule: won leads at their value) joins the client and project totals line. A lead counts for a client only if it names that client or was won into one of its projects (`project_slug`), never on a name match. Verified: `harness/leadtest.js` + `mock6.js`, 11 of 11, including a won lead called "Acme" with no link that must not count until linked. All earlier suites clean. New words "Client", "No client yet" and "booked" follow existing ones; "No client yet" awaits his ruling. |
 | V144 | Client and project totals: invoiced, paid, owed and hours logged on every client card and each project row in it, owed on the project list. One money rule (`invTotals`) for all of them, which also fixes the client card and the project Money page counting drafts, voids and ignoring part payments. See below. |
@@ -71,6 +72,54 @@ an MCP server Jackson adds in his Claude settings.
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
+
+## V147: WORK ORDERS (BUILT, NOT PUBLISHED)
+
+**Source of the rules.** The Website Development Services Agreement between
+Evolve and Logicnova Technologies (Mumbai), dated 6 Oct 2026. The copy Jackson
+sent has blank signature lines; whether both have signed is his to confirm.
+Logicnova is a contractor on fixed fee Work Orders, not crew with hours, so it
+is not added to `crew`. Read off the agreement: 30% of the fee within 7 days
+of both accepting a Work Order of US$1,000 or more (2.12); 14 days for Evolve
+to review a delivery, then a reminder and 5 more days before it is treated as
+accepted (4.8); fixes back within 7 days with a 7 day review (4.9); balance no
+later than 30 days after their invoice, sooner once the client has paid (2.9);
+warranty to 45 days after the earlier of Launch and 60 days after acceptance
+(9.1). Contacts: contact@logicnova.in, rohan@, mahesh@.
+
+**Records.** `workorders/<id>`: no, project, dev, fee, pay (start or one),
+accepted_on, start_paid_on, build_on, final_due, delivered_on, redelivery,
+work_ok_on, invoiced_on, balance_paid_on, launched_on. Only dates he enters
+drive anything. A date that does not read as YYYY-MM-DD is left blank and he
+is told. Delete goes through the bin.
+
+**Where.** Deliverables page: "With Logicnova", one row per Work Order with its
+next step. `woOwed` puts the start payment (accepted + 7) and the balance
+(invoiced + 30, the latest the agreement allows) into the plan's walk and onto
+the payment calendar in blue; an amount already past its day lands today.
+Needs You: a review window inside 5 days.
+
+**Not done.** The balance before they invoice is not projected. The fee is not
+yet counted in project cost and margin. His own hours per site are not modeled.
+
+**Verified.** `harness/wotest.js` on `mock8.js` (four Work Orders at different
+stages plus one added through the form): start payment amount and day, review
+window and its hot flag, nothing owed before an invoice, one payment schedule,
+no start payment under US$1,000, warranty date, the plan's walk counting both
+payments, Needs You showing only the closing review, a redelivery's 7 days,
+the form suggesting WO-005 and Logicnova, a bad date left blank, the panel at
+1440 and 390. 12 of 12. Click sweeps at both widths on the usual data and on
+the Work Order data, and every earlier suite: clean.
+
+## THE MASTER LIST, 8 OCT 2026
+
+`docs/LifeOS_MasterList_PLN_26-10-08_FINAL.pdf` (text copy `docs/MASTER_LIST.txt`)
+is the one list of everything open: state of every build, mistakes found this
+session, clashes between the Brain plan, the Lead Engine plan and the board,
+his quick actions, his decisions, words waiting on him, board work still to
+build, and his ideas that need more input. Read it before planning a session.
+Top board item: projects stored twice (16 of 21, hyphenated and not). A delete,
+including through the bin, removes only one copy, so the twin comes back.
 
 ## V146: THE PLAN
 

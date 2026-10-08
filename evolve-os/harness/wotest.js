@@ -1,0 +1,37 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const [file,shot,W]=[process.argv[2],process.argv[3],+(process.argv[4]||1440)];
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(8801);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage({viewport:{width:W,height:1000}});const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock8.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8801/');await p.waitForTimeout(2000);
+ const R=await p.evaluate(async()=>{const A=[];const ok=(n,c)=>A.push((c?"PASS ":"FAIL ")+n);
+  const W=id=>S.wos.filter(x=>x.id===id)[0]; const T=n=>ppAdd(ppToday(),n);
+  ok("WO-001 start 30% = 600 due in 4 days: "+woNext(W("w1")).t, woOwed(W("w1"))[0].amt===600&&woOwed(W("w1"))[0].d===T(4));
+  const n2=woNext(W("w2")); ok("WO-002 review due in 3 days, hot: "+n2.t, n2.by===T(3)&&n2.hot);
+  ok("WO-002 owes nothing yet (balance not invoiced)", woOwed(W("w2")).length===0);
+  const o3=woOwed(W("w3")); ok("WO-003 one payment 1500 due 30 days after invoice: "+woNext(W("w3")).t, o3.length===1&&o3[0].amt===1500&&o3[0].d===T(20));
+  const n4=woNext(W("w4")); ok("WO-004 under 1000 has no start payment, warranty to launch+45: "+n4.t, woStartAmt(W("w4"))===0&&n4.t==="Warranty to "+ppFmt(T(40)));
+  const w=planWalk(90); const devOuts=Object.values(w.outs).flat().filter(x=>x.c.kind==="dev");
+  ok("plan counts 600 and 1500 to the developer ("+devOuts.map(x=>x.amt)+")", devOuts.length===2&&devOuts.some(x=>x.amt===600&&x.d===T(4))&&devOuts.some(x=>x.amt===1500&&x.d===T(20)));
+  const ny=needYou(view()).filter(x=>String(x.id).indexOf("wo-")===0);
+  ok("Needs You has the WO-002 review only ("+ny.map(x=>x.cond)+")", ny.length===1&&/WO-002/.test(ny[0].cond));
+  // a redelivery gets 7 days
+  ok("redelivery review is 7 days", woNext(Object.assign({},W("w2"),{redelivery:true})).by===ppAdd(W("w2").delivered_on,7));
+  // form round trip
+  let cap=null; const r2=prompt2; window.prompt2=(t,f,cb)=>{cap={f,cb};};
+  woEdit(null); const v={}; cap.f.forEach(x=>{v[x.k]=x.value;});
+  ok("new form suggests WO-005 and Logicnova",v.no==="WO-005"&&v.dev==="Logicnova");
+  v.fee="$4,000"; v.accepted_on=T(0); v.final_due="next week"; cap.cb(v);
+  const nw=S.wos.filter(x=>x.no==="WO-005")[0];
+  ok("saved, bad date left blank",!!nw&&nw.fee===4000&&nw.final_due===""&&woOwed(nw)[0].amt===1200);
+  window.prompt2=r2;
+  S.room=null;S.mode="deliver";paint();await new Promise(r=>setTimeout(r,300));
+  const pan=[...document.querySelectorAll('.pan')].filter(n=>/With Logicnova/.test(n.textContent))[0];
+  ok("Deliverables shows the panel with 5 rows",!!pan&&pan.querySelectorAll('.rw').length===5);
+  ok("hot rows marked",pan.querySelectorAll('.when.hot').length>=1);
+  if(pan)pan.scrollIntoView();
+  return {A,txt:pan?pan.innerText:""};});
+ await p.screenshot({path:shot});
+ console.log(R.A.join("\n"),"\n---\n"+R.txt,"\nerrors",errs);await b.close();srv.close();})();
