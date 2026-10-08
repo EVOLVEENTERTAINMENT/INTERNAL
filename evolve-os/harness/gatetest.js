@@ -1,0 +1,17 @@
+const {chromium}=require('playwright');const http=require('http');const fs=require('fs');
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(process.argv[2]));}).listen(8793);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mock2.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:8793/');await p.waitForTimeout(2000);
+ const R=await p.evaluate(async()=>{const o={};const calls=[];const said=[];
+  const s0=Date.now()+86400e3,e0=s0+3600e3;
+  mcp={callTool:async(sv,t,a)=>{calls.push(t);if(t==="get_event")throw {code:"upstream_error"};return {payload:{}};},invalidate:async()=>{},listTools:async()=>[]};
+  window.canWriteCalendar=()=>true; const sy=say; window.say=(m,x,a)=>{said.push(m);};
+  const row={pid:"q1",type:"edit",evId:"x",calId:"c",cal:"EVOLVE",title:"Brand film edit block",fromS:s0,fromE:e0,wasU:"u1",toS:s0+1800e3,toE:e0+1800e3};
+  S.pending=[row];
+  await approve([row]);
+  o.wrote=calls.filter(t=>t==="update_event").length; o.stillQueued=S.pending.length; o.said=said;
+  return o;});
+ console.log(JSON.stringify(R),errs);await b.close();srv.close();})();
