@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V139**, published live at
+- Source: Evolve OS artifact, **V140**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V139 (published 8 Oct 2026, build stamp
-  `V139 2026-10-08T22:00Z`, artifact version 140, version id
-  `1791461982-0da1`). V138 is artifact version 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
+- Last known-good: V140 (published 8 Oct 2026, build stamp
+  `V140 2026-10-08T23:00Z`, artifact version 141, version id
+  `1791462346-2940`). V139 is artifact version 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
 - Phase: V134 to V136 = V133 with every project and deliverable date that has
   passed reading as carried. Copy only, no logic changed. V133 = V132 plus
@@ -58,6 +58,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
+| V140 | Last rule-bending wording trimmed, as approved by Jackson: "Carried, not failed." to "Carried." (3 toasts and a button note), "Nothing is overdue." cut from the clear-the-small-stuff line, recap heading "What carries", Settings principle "Things are carried" / "The wording on this board only ever says carried.", help "done, moved or did not happen" (2), sweep note second sentence cut. The model instruction keeps its wording. |
 | V139 | The approval queue fails closed: if `get_event` does not answer, `queueGate` holds the row ("Google did not answer the check, so nothing was written", wording approved by Jackson) instead of writing blind. `harness/gatetest.js` shows V138 writing and V139 holding. |
 | V138 | The bin: every delete is copied to `bin/<id>` first and can be put back from Settings or the toast for 30 days. New collection `bin`. See below. |
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
@@ -138,7 +139,8 @@ Google calls use correct argument names, required fields and enum values.
 **Found, not fixed, needs a decision.**
 - ~~Queue writer fails open.~~ Holds the row since V139.
 - The queue writes row by row with no automatic rollback, only the Undo toast.
-- `shiftGo` (+15 / +30 / +1h) moves up to 12 later blocks on one tap, no preview.
+- `shiftGo` (+15 / +30 / +1h) moves up to 12 later blocks on one tap, no
+  preview. **Decided 8 Oct 2026: keep it one tap.** It has undo and rollback.
 - ~~Deletes could not be undone.~~ The bin, V138.
 - Capture Line items handled on the 60s timer can write scraps and waiting
   rows with no staging (`catch_note`, `add_waiting`). By design so far.
@@ -159,7 +161,7 @@ Google calls use correct argument names, required fields and enum values.
   rule by rule care. N4 unchanged: `activity`, `calmeta`, `intent`, `notes`,
   `mustdo`, `audit`, `done`, `time_entries` only grow.
 
-**Words he reads that bend his rule, COPY REQUIRED.** "Nothing is overdue. It
+**Words he reads that bend his rule.** All trimmed in V140, his approval. "Nothing is overdue. It
 was all carried." and the Settings heading "Nothing is overdue" (both say the
 word to deny it); "Slipped, and what carries"; help text "done, moved or
 missed" where the buttons say "Did not happen"; the sweep line "The things
