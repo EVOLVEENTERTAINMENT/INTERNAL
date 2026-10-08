@@ -5,11 +5,11 @@ device and across chats. Updated after every green phase.
 
 ## CURRENT
 
-- Source: Evolve OS artifact, **V146**, published live at
+- Source: Evolve OS artifact, **V147**, published live at
   https://claude.ai/artifact/KmwskLGeZxU6vG284njSfR
-- Last known-good: V146 (published 9 Oct 2026, build stamp
-  `V146 2026-10-09T09:00Z`, artifact version 146, version id
-  `1791502225-1f56`). V145 is artifact version 145, id `1791499124-45df`. V144 is artifact version 144, id `1791480897-aae2`. V143 is artifact version 143, id `1791480016-7207`;
+- Last known-good: V147 (published 9 Oct 2026, build stamp
+  `V147 2026-10-09T11:00Z`, artifact version 147, version id
+  `1791503701-1309`). V146 is artifact version 146, id `1791502225-1f56`. V145 is artifact version 145, id `1791499124-45df`. V144 is artifact version 144, id `1791480897-aae2`. V143 is artifact version 143, id `1791480016-7207`;
   V142 is 142, id `1791477397-70ea`. V141 was never published alone; V142 carries it.
   V140 is artifact version 141, V139 is 140, V138 is 139, V137 is 138, V136 is 137. Rollback is the artifact's own version history.
   V133 is artifact version 134, version id `1791457347-7091`.
@@ -60,7 +60,7 @@ an MCP server Jackson adds in his Claude settings.
 | V133 | The capture line: text a number or hold a button and talk, it lands on the board. New connector `Capture Line`, new collection `prefs/capline`, three new proposing tools. See below. |
 | V134 | The V68 late bug: Today row, Needs You and the badges now say carried. 6 anchored replacements. |
 | V135 | Carried everywhere a project or deliverable date has passed: slate, company callout, Needs You, weekly brief, recap, fix list, delivery rows, workspace. Invoices untouched by choice. 24 anchored replacements. |
-| V147 | **Built, not published.** Work Orders with the developer, from the Evolve x Logicnova agreement of 6 Oct 2026. New collection `workorders`. Waiting on Jackson's ruling on its words. Source `src/EvolveOS_V147_UNPUBLISHED.html`, patch `patches/v147.py`, tests `harness/wotest.js` 12 of 12. See below. |
+| V147 | Work Orders with the developer, from the Evolve x Logicnova agreement of 6 Oct 2026. New collection `workorders`. Words approved by Jackson as drafted. Source `src/EvolveOS_V147.html`, patch `patches/v147.py`, tests `harness/wotest.js` 12 of 12. See below. |
 | V146 | The plan: what it costs to run, a payment calendar, and when the next project has to land, with the weekly pace of wins and cold reach outs. On Money, and one strip on Home. New collection `costs`, new prefs `plan_avg`, `plan_win`, `plan_cash`. See below. |
 | V145 | Leads link to clients. The lead editor has a Client select (`clientOpts`, every client the Projects page knows plus whatever the lead already names). The Won sheet starts from the lead's client and now saves it on the lead (it asked and then threw it away). Booked (`wonFor`, the Money page rule: won leads at their value) joins the client and project totals line. A lead counts for a client only if it names that client or was won into one of its projects (`project_slug`), never on a name match. Verified: `harness/leadtest.js` + `mock6.js`, 11 of 11, including a won lead called "Acme" with no link that must not count until linked. All earlier suites clean. New words "Client", "No client yet" and "booked" follow existing ones; "No client yet" awaits his ruling. |
 | V144 | Client and project totals: invoiced, paid, owed and hours logged on every client card and each project row in it, owed on the project list. One money rule (`invTotals`) for all of them, which also fixes the client card and the project Money page counting drafts, voids and ignoring part payments. See below. |
@@ -73,7 +73,7 @@ an MCP server Jackson adds in his Claude settings.
 | V137 | Audit fixes: reassign carries its staged times (queue gate and undo now work on it), Meet links read from the live field names, Gmail reads the newest message in a thread, board calendar chip remembers on/off (B7), undo and recover refresh if the cache drop fails (B8), page titles are level 1 headings to a screen reader (O4). 19 anchored replacements. |
 | V136 | The spots V135 missed, found by rendering every screen: Deliverables count, project pulse, owner rows, timeline tooltips, milestone rows, task groups, one help line. 10 anchored replacements. |
 
-## V147: WORK ORDERS (BUILT, NOT PUBLISHED)
+## V147: WORK ORDERS
 
 **Source of the rules.** The Website Development Services Agreement between
 Evolve and Logicnova Technologies (Mumbai), dated 6 Oct 2026. The copy Jackson

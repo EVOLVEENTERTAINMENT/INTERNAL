@@ -1,6 +1,6 @@
 Evolve OS, the master list
 8 October 2026. Everything still open from this conversation, the Assistant Brain plan, the Night Lead Engine
-status, the second audit and the Logicnova agreement. Live board: V146 at
+status, the second audit and the Logicnova agreement. Live board: V147 at
 claude.ai/artifact/KmwskLGeZxU6vG284njSfR.
 
 
@@ -30,9 +30,9 @@ V144, V145         Client and project totals, one money rule everywhere, leads l
 V146               The plan: costs, payment calendar, when the next project has to land, wins and         Live
                    reach outs a week, the Home strip.
 
-V147               Work Orders with Logicnova: start payment, your review window, balance,                Built and tested, 12 of 12.
-                   warranty. Money owed to them on the payment calendar and in the plan. A                Waiting on your OK for
-                   Needs You line when a review window is closing.                                        the words.
+V147               Work Orders with Logicnova: start payment, your review window, balance,                Live
+                   warranty. Money owed to them on the payment calendar and in the plan. A
+                   Needs You line when a review window is closing.
 
 Every build is in the repo with its patch and its tests, and each one rebuilds byte for byte from the one before.
 
@@ -138,12 +138,6 @@ A main branch for the repo, so changes can go through pull requests.            
 6. Words waiting on you
 Where                     Words
 
-V147 Work Orders          "With Logicnova", "Work Orders, what is due from you and when", "Add a Work Order", "Start
-                          payment $600 due by Oct 12", "Your review is due by Oct 11", "Balance $1,500 due by Oct 28",
-                          "Accepted, ready to launch", "Warranty to Nov 17", "Not accepted by both yet", "Build not started",
-                          the form labels, and on Needs You "WO-002: your review is due by Oct 11. After that they can send a
-                          reminder, and 5 days later it counts as accepted."
-
 V134 to V136              Five lines I worded: "Brand film cut, carried 9 days" with "Acme is waiting. Move it or move the date.",
                           "3 things for Acme are carried", "One other thing on it is already carried behind this.", "The next
                           move, carried 3 days", and the Owed row ending in "9 days".
@@ -159,62 +153,57 @@ Brain plan B11            The morning text, shift alert, hold prefix, does not f
 1   Fix projects stored twice: one name for every write, merge the 16 twins,        Two writers can each win a different copy.
     delete leftovers, and make delete and the bin cover both.                       Deletes do not stick.
 
-2   Publish V147 once the words are approved.                                       Logicnova money and review windows.
-
-3   Lead Engine board work: Prospects lens, outcome buttons, promotion              The other session's plan, now built on V147.
+2   Lead Engine board work: Prospects lens, outcome buttons, promotion              The other session's plan, now built on V147.
     row, Lead Engine panel, two Today groups.
 
-4   A won or replied prospect becomes a pipeline lead marked cold.                  The plan's cold win rate switches from your
+3   A won or replied prospect becomes a pipeline lead marked cold.                  The plan's cold win rate switches from your
                                                                                     guess to real numbers only through the
                                                                                     pipeline.
 
-5   Logicnova fees count as project cost.                                           Margin per site is wrong without what you pay
+4   Logicnova fees count as project cost.                                           Margin per site is wrong without what you pay
                                                                                     Mumbai.
 
-6   A won lead with no invoice offers a draft deposit invoice, 50/50 per the        Booked work stays invisible on the payment
+5   A won lead with no invoice offers a draft deposit invoice, 50/50 per the        Booked work stays invisible on the payment
     rate card.                                                                      calendar until it is invoiced.
-#   What                                                                          Why
 
-7   Brain plan Publish 1 and 2: time needed and real time on tasks, the brain     The board side of the scheduler.
+6   Brain plan Publish 1 and 2: time needed and real time on tasks, the brain       The board side of the scheduler.
     section in Settings, owed, holds, dates, prep, replaced decisions.
 
-8   Smaller: one save that can overwrite a record on an odd error, a raw          Housekeeping. None is hurting anything today.
+7   Smaller: one save that can overwrite a record on an odd error, a raw            Housekeeping. None is hurting anything today.
     write on the queue, two time zone details in the time shift code (needs
     your OK to touch it), 51 maybe unused styles, records that only grow.
-
-
-8. Ideas that need more thought
+8. Ideas that need more thought
 These are yours, and each needs input before it can be built properly.
-Idea                          What exists now                                 What I need from you
+Idea                         What exists now                              What I need from you
 
-Project turnaround            V147 tracks each Work Order's dates and         How many hours your part of a site takes, how
-schedule: you on design       money. The rate card says a Starter or          many client meetings a site needs, how many sites
-and client meetings,          Growth site turns in 3 to 5 weeks.              you can run at once, and how long Logicnova really
-Logicnova on the back                                                         takes (the first Work Order will tell us).
+Project turnaround           V147 tracks each Work Order's dates and      How many hours your part of a site takes, how
+schedule: you on design      money. The rate card says a Starter or       many client meetings a site needs, how many sites
+and client meetings,         Growth site turns in 3 to 5 weeks.           you can run at once, and how long Logicnova really
+Logicnova on the back                                                     takes (the first Work Order will tell us).
 end, several sites at once
 
-How many projects to land     V146 works it out from money: what you          Your capacity, so the board can say: money says
-a month                       need to land by when.                           4, capacity says 3, here is the gap. The levers are
-                                                                              price, retainers (the rate card's $20K a month
-                                                                              lever) or more help.
+How many projects to land    V146 works it out from money: what you       Your capacity, so the board can say: money says
+a month                      need to land by when.                        4, capacity says 3, here is the gap. The levers are
+                                                                          price, retainers (the rate card's $20K a month
+                                                                          lever) or more help.
 
-The cold campaign funnel:     The engine has 85 leads that pass every         The steps you want tracked, the time a mock really
-scrape, mock a hero,          gate. The plan counts reach outs a week         takes (rate card says 30 to 60 minutes), and
-reach out, call, close        from your guess.                                whether mocks go on your calendar. At 16 reach
-                                                                              outs a week, 85 leads is about 5 weeks of supply.
+The cold campaign funnel:    The engine has 85 leads that pass every      The steps you want tracked, the time a mock really
+scrape, mock a hero,         gate. The plan counts reach outs a week      takes (rate card says 30 to 60 minutes), and
+reach out, call, close       from your guess.                             whether mocks go on your calendar. At 16 reach
+                                                                          outs a week, 85 leads is about 5 weeks of supply.
 
-The daily schedule brain      The Brain plan is the full design. The          The section 8 decisions. Then it is built in the plan's
-                              board has the Home strip, Needs You and         phases.
-                              the approval queue.
+The daily schedule brain     The Brain plan is the full design. The       The section 8 decisions. Then it is built in the plan's
+                             board has the Home strip, Needs You and      phases.
+                             the approval queue.
 
-Real money in                 Cash on hand is typed in by you. No bank,       Whether a weekly cash on hand prompt is enough,
-                              QuickBooks or Relay connector exists.           or a bank link is worth building outside the board.
+Real money in                Cash on hand is typed in by you. No bank,    Whether a weekly cash on hand prompt is enough,
+                             QuickBooks or Relay connector exists.        or a bank link is worth building outside the board.
 
-Gavin's overhead map          Not found in Drive or ClickUp.                  Where it lives, or just type the costs in on Money.
+Gavin's overhead map         Not found in Drive or ClickUp.               Where it lives, or just type the costs in on Money.
 
-Your business facts           Overhead, win rate, average project,            Once your costs are in, I can copy the totals
-                              capacity and turnaround are all blank in        across, with your OK.
-                              the facts file every strategy skill reads.
+Your business facts          Overhead, win rate, average project,         Once your costs are in, I can copy the totals
+                             capacity and turnaround are all blank in     across, with your OK.
+                             the facts file every strategy skill reads.
 
 
 9. What it still cannot do

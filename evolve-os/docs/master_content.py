@@ -1,7 +1,7 @@
 S=[]
 P=lambda t:S.append(Paragraph(t,B))
 S.append(Paragraph("Evolve OS, the master list",T))
-P("8 October 2026. Everything still open from this conversation, the Assistant Brain plan, the Night Lead Engine status, the second audit and the Logicnova agreement. Live board: V146 at claude.ai/artifact/KmwskLGeZxU6vG284njSfR.")
+P("8 October 2026. Everything still open from this conversation, the Assistant Brain plan, the Night Lead Engine status, the second audit and the Logicnova agreement. Live board: V147 at claude.ai/artifact/KmwskLGeZxU6vG284njSfR.")
 
 S.append(Paragraph("1. Where things stand",H))
 S.append(tbl(["Build","What it did","State"],[
@@ -14,7 +14,7 @@ S.append(tbl(["Build","What it did","State"],[
  ["V143","Critical path on project timelines.","Live"],
  ["V144, V145","Client and project totals, one money rule everywhere, leads linked to clients, booked.","Live"],
  ["V146","The plan: costs, payment calendar, when the next project has to land, wins and reach outs a week, the Home strip.","Live"],
- ["V147","Work Orders with Logicnova: start payment, your review window, balance, warranty. Money owed to them on the payment calendar and in the plan. A Needs You line when a review window is closing.","Built and tested, 12 of 12. Waiting on your OK for the words."],
+ ["V147","Work Orders with Logicnova: start payment, your review window, balance, warranty. Money owed to them on the payment calendar and in the plan. A Needs You line when a review window is closing.","Live"],
 ],[70,330,112]))
 P("Every build is in the repo with its patch and its tests, and each one rebuilds byte for byte from the one before.")
 
@@ -61,7 +61,6 @@ S.append(tbl(["Decision","Where it comes from"],[
 
 S.append(Paragraph("6. Words waiting on you",H))
 S.append(tbl(["Where","Words"],[
- ["V147 Work Orders","\"With Logicnova\", \"Work Orders, what is due from you and when\", \"Add a Work Order\", \"Start payment $600 due by Oct 12\", \"Your review is due by Oct 11\", \"Balance $1,500 due by Oct 28\", \"Accepted, ready to launch\", \"Warranty to Nov 17\", \"Not accepted by both yet\", \"Build not started\", the form labels, and on Needs You \"WO-002: your review is due by Oct 11. After that they can send a reminder, and 5 days later it counts as accepted.\""],
  ["V134 to V136","Five lines I worded: \"Brand film cut, carried 9 days\" with \"Acme is waiting. Move it or move the date.\", \"3 things for Acme are carried\", \"One other thing on it is already carried behind this.\", \"The next move, carried 3 days\", and the Owed row ending in \"9 days\"."],
  ["V145","\"No client yet\" in the lead's client list."],
  ["Brain plan B11","The morning text, shift alert, hold prefix, does not fit, asks, and every new board label it adds."],
@@ -70,13 +69,12 @@ S.append(tbl(["Where","Words"],[
 S.append(Paragraph("7. Board work still to build",H))
 S.append(tbl(["#","What","Why"],[
  ["1","Fix projects stored twice: one name for every write, merge the 16 twins, delete leftovers, and make delete and the bin cover both.","Two writers can each win a different copy. Deletes do not stick."],
- ["2","Publish V147 once the words are approved.","Logicnova money and review windows."],
- ["3","Lead Engine board work: Prospects lens, outcome buttons, promotion row, Lead Engine panel, two Today groups.","The other session's plan, now built on V147."],
- ["4","A won or replied prospect becomes a pipeline lead marked cold.","The plan's cold win rate switches from your guess to real numbers only through the pipeline."],
- ["5","Logicnova fees count as project cost.","Margin per site is wrong without what you pay Mumbai."],
- ["6","A won lead with no invoice offers a draft deposit invoice, 50/50 per the rate card.","Booked work stays invisible on the payment calendar until it is invoiced."],
- ["7","Brain plan Publish 1 and 2: time needed and real time on tasks, the brain section in Settings, owed, holds, dates, prep, replaced decisions.","The board side of the scheduler."],
- ["8","Smaller: one save that can overwrite a record on an odd error, a raw write on the queue, two time zone details in the time shift code (needs your OK to touch it), 51 maybe unused styles, records that only grow.","Housekeeping. None is hurting anything today."],
+ ["2","Lead Engine board work: Prospects lens, outcome buttons, promotion row, Lead Engine panel, two Today groups.","The other session's plan, now built on V147."],
+ ["3","A won or replied prospect becomes a pipeline lead marked cold.","The plan's cold win rate switches from your guess to real numbers only through the pipeline."],
+ ["4","Logicnova fees count as project cost.","Margin per site is wrong without what you pay Mumbai."],
+ ["5","A won lead with no invoice offers a draft deposit invoice, 50/50 per the rate card.","Booked work stays invisible on the payment calendar until it is invoiced."],
+ ["6","Brain plan Publish 1 and 2: time needed and real time on tasks, the brain section in Settings, owed, holds, dates, prep, replaced decisions.","The board side of the scheduler."],
+ ["7","Smaller: one save that can overwrite a record on an odd error, a raw write on the queue, two time zone details in the time shift code (needs your OK to touch it), 51 maybe unused styles, records that only grow.","Housekeeping. None is hurting anything today."],
 ],[16,300,196]))
 
 S.append(Paragraph("8. Ideas that need more thought",H))
