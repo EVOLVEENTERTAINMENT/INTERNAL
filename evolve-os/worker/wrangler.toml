@@ -1,0 +1,24 @@
+name = "evolve-capture-line"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+# Run this once, then paste the id it prints in below:
+#   npx wrangler kv namespace create CAPTURES
+[[kv_namespaces]]
+binding = "CAPTURES"
+id = "PASTE_THE_KV_ID_HERE"
+
+[vars]
+# Your cell, in full international form. Only texts from this number
+# are allowed onto the board.
+OWNER = "+13344143215"
+# The exact https address Twilio posts to, so the signature check compares
+# against the same string Twilio signed. Fill this in after the first deploy.
+PUBLIC_SMS_URL = "https://evolve-capture-line.YOURNAME.workers.dev/sms"
+# Leave empty for no reply. Put a few words here and the number texts you
+# back every time, which costs a fraction of a cent each.
+ACK_TEXT = ""
+
+# Two secrets, set with wrangler, never written in this file:
+#   npx wrangler secret put TWILIO_AUTH_TOKEN
+#   npx wrangler secret put BOARD_KEY
