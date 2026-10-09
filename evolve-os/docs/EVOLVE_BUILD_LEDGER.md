@@ -902,3 +902,22 @@ two per page maximum, never per card.
   `https://example.com/myapp.php?foo=1&bar=2` giving `L/OH5YylLD5NRKLltdqwSvS0BnU=`.
 - Before recommending a build, check the live source for it, not just this
   ledger.
+
+## V148 (2026-10-09) one copy per project, routines are not projects
+- pCanon: every projects/ write goes to the hyphenated doc; dbDel removes every twin; PDOCS tracks doc ids per slugKey; twins fold deterministically (hyphenated last).
+- PALIAS: LAUREL OAKS and LOVC both map to LAUREL OAKS VETERINARY CENTER; an alias record (LOVC) folds into its target.
+- coProjects drops calendar-only names whose blocks are all recurring or on the routine calendar.
+- Mode question only when others>0, an outside organiser, or meeting/with in the title; answer stored per series (recId).
+- heldBy(): blocked_by starting Nobody/Him/Jackson is not a block. Rail count uses it.
+- Live-data harness: harness/live (live.js, twin.js, ny.js, build_mock.py).
+
+## V149 (2026-10-09) audit logic fixes
+- stageOf: values over 3 words read as Concept, never guessed (prose had filed six live projects as Delivery).
+- heldBy used everywhere blocked_by decided a status (health, kanban, KPIs, review, portal, project pages).
+- waitProject falls back to the project whose blocker starts with the waiting row's who; Needs You drops the project's blk- row when the wait row covers it.
+- markHeard keeps an edited reply (reply_prev holds the old one).
+- Projects snapshot removes S.pstate keys whose docs are gone.
+- closeCard filters ghost, ambient and routine blocks like its counts.
+- planStrip hidden until cash on hand is set.
+- projAdd and Won fill gaps on an existing same-slug record instead of replacing it.
+- Third audit PDF: docs/EvolveOS_Audit3_26-10-09.pdf.

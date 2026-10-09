@@ -243,3 +243,6 @@ it.
 Do not open with a plan or a status report. He will not read it. One short
 multiple choice question, each option with a one line preview of what it does.
 Then start.
+
+## Update 2026-10-09
+Live is V149. See ledger V148, V149 and docs/EvolveOS_Audit3_26-10-09.pdf for the open list (navigation words, team view, nightly merge, money feed, Money Engine M1).
