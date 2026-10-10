@@ -950,3 +950,10 @@ two per page maximum, never per card.
 - engine/me.js: ME block between /*ME-BEGIN*/ and /*ME-END*/, pure, per Money Engine plan REV2 B5.1 to B5.6: walk (billed with client lag, scheduled payplan, steady income, costs with starts/ends, payplan out, dated bills with duplicate guard, set aside, floor, 13 week roll up), winsNeeded with the three delays, levers from real records, goal, funnel rates with Wilson range, quota and selling time, promise date, what if.
 - engine/metest.js: B10 tests 1 to 18, 21 and 22, all pass. Deposit rules are an input (brain/rules), not written into the engine.
 - Page step (block, self test row, payplan and income, settings form, panel, 13 week table) waits on his B12 wording.
+
+## V153 (2026-10-10) This week, by person, words approved
+- Watches teambrief/ (written by the Monday team brief routine, trig_01BsZ1N9etsPF2UFPUvWKBSL). It was dropped as dead in N3 because nothing wrote it then; the routine writes it now.
+- People: "This week, by person" panel from the newest brief: the week line, the three that matter most, a button per person (crew then owner) with that person's list (text, date, the brief's own status word), and "For the sync" decisions behind Show them.
+- Home, crew lens only: "Your week" with that person's list.
+- Older than 8 days: "Last week's brief. This Monday's has not been written yet."
+- Live harness mock now carries teambrief.
