@@ -921,3 +921,15 @@ two per page maximum, never per card.
 - planStrip hidden until cash on hand is set.
 - projAdd and Won fill gaps on an existing same-slug record instead of replacing it.
 - Third audit PDF: docs/EvolveOS_Audit3_26-10-09.pdf.
+
+## V150 (2026-10-10) navigation round 1, words approved
+- Inbox opens on "Pulled out, not yet sorted", then the page, then the pull buttons; today's block list removed from Inbox. Empty line now says "the page below".
+- Top pill counts today's past blocks only: "N past, not ticked".
+- Board badge "N days to close".
+- Board checks log folds to one line ("N checks in the last two days, M found something") with Show them / Hide them (S.findsOpen); padded at phone width (.bfinds).
+- Home band "Carried" is "Catch up"; "Days with nothing ticked off" is "Days not closed yet".
+- "things need you" dropped from the Home hero pill (kept only when nothing needs you) and the Today subtitle.
+- Hint "space capture". Header "EVOLVE OS". Theme button "Light mode" / "Dark mode".
+- Calendar buttons show full names (nowrap).
+- Past blocks today read "past" in grey.
+- Settings: jump buttons, one per section heading.
