@@ -939,3 +939,14 @@ two per page maximum, never per card.
 - Board: "Close the day" button next to Recap (startCloseRun). Review screen title reads "Close the day" while closing. The Board rail badge opens the closing when days are open.
 - Capture bar: Note (was Dump), Save (was Catch), Speak (was Talk). Untyped caught lines show "Note".
 - Late deliverables still say carried, by his rule.
+
+## V152 (2026-10-10) no new words
+- isOwnerLens(): the owner lens is rolesList()[0], not the spelling "jackson". Hand off, the empty Today line and the who chip use it.
+- ambFor(): a crew member whose record has on-site windows (win) sees ASSISTANT HOURS on Home and in Today; the old hardcoded "grace" check never fired because callers dropped ambient blocks first.
+- stateFor(): exact name first; a prefix only counts when it fits exactly one project.
+- woNext(): with no launch date, the warranty runs from acceptance plus 60 days once that day has passed (agreement 9.1).
+
+## Money engine M1, step 1 (2026-10-10), not on the page yet
+- engine/me.js: ME block between /*ME-BEGIN*/ and /*ME-END*/, pure, per Money Engine plan REV2 B5.1 to B5.6: walk (billed with client lag, scheduled payplan, steady income, costs with starts/ends, payplan out, dated bills with duplicate guard, set aside, floor, 13 week roll up), winsNeeded with the three delays, levers from real records, goal, funnel rates with Wilson range, quota and selling time, promise date, what if.
+- engine/metest.js: B10 tests 1 to 18, 21 and 22, all pass. Deposit rules are an input (brain/rules), not written into the engine.
+- Page step (block, self test row, payplan and income, settings form, panel, 13 week table) waits on his B12 wording.
