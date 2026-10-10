@@ -933,3 +933,9 @@ two per page maximum, never per card.
 - Calendar buttons show full names (nowrap).
 - Past blocks today read "past" in grey.
 - Settings: jump buttons, one per section heading.
+
+## V151 (2026-10-10) navigation round 2, words approved
+- Project tabs, both views: Overview (was Command / Home), People (was Team), Log (was Activity / Project log). Side panel Playbook takes ppOpsName(kind) like the full page.
+- Board: "Close the day" button next to Recap (startCloseRun). Review screen title reads "Close the day" while closing. The Board rail badge opens the closing when days are open.
+- Capture bar: Note (was Dump), Save (was Catch), Speak (was Talk). Untyped caught lines show "Note".
+- Late deliverables still say carried, by his rule.
