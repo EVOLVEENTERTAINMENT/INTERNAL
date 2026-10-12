@@ -1085,3 +1085,9 @@ two per page maximum, never per card.
 - New tools: mark_done (project task or Inbox item by id) and remember (person, word or rule into memory/core, via memRemember).
 - stage() returns true or false; propose tools report queued false when refused; duplicate moves and cancels are refused like duplicate creates.
 - Suites green.
+
+## V174 (live as version 175) Home rows read as one line
+- Blocked rows: "Waiting on <first clause of blocked_by>" with "Your move: <next action>" under it, instead of the full stored paragraph.
+- Quiet waiting rows: first clause of what, then "quiet N days".
+- clause() helper. Suites green.
+- Still open: counts that disagree across screens, partial undo stranding events, Bill Abell shown as two rows, chat email-injection staging, chat timeout cancel, Board not showing tasks.
