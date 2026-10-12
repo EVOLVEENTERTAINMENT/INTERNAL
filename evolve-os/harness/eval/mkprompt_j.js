@@ -1,0 +1,13 @@
+const {chromium}=require('../h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const file=process.argv[2];const port=8871;
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+const txt=fs.readFileSync(__dirname+'/jackson.txt','utf8');
+const mem=JSON.parse(fs.readFileSync(__dirname+'/mem.json'));
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await (await b.newContext({viewport:{width:1440,height:900},timezoneId:'America/Chicago'})).newPage();
+ await p.addInitScript({path:__dirname+'/../hl/mocklive.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ const q=await p.evaluate(([cs,m])=>{S.mem=m;return bdPrompt(bdLines(cs));},[txt,mem]);
+ fs.writeFileSync(process.argv[3],q); console.log(q.length);
+ await b.close();srv.close();})();

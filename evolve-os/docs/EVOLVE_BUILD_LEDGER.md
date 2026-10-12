@@ -1045,3 +1045,12 @@ two per page maximum, never per card.
 - bdDest: sure to-do with a real project becomes a task on that project (pwTaskNew, due from his date words, notes keep his original line); sure waiting with a person goes straight to Waiting on; ideas to Someday; everything else to Inbox.
 - Each line shows where it goes. Button "File N". Toast "Filed 1 to projects, 1 to Waiting on, 3 to your Inbox." Undo removes scraps, tasks and waiting rows.
 - Wording approved from the screenshot. Suites green, sweep clean, startup writes unchanged. Live as version 165.
+
+## V169 (live as version 170, 2026-10-12) Brain dump plans the calendar
+- His first real dump (21 lines) went into the capture bar, which saved 21 raw scraps and never asked Claude. Fixed: 3+ lines in the capture bar Note lane open the brain dump and sort straight away.
+- Brain dump now reads length ("10 mins", "7am -12pm"), owner (GAVIN-), times, windows ("this week", "by next Thursday"), headings ("TONIGHT:" applies to lines under it). It gets his booked hours for 10 days and picks open time when he gave a length but no time.
+- File: dated+timed lines for Jackson go to the calendar approval list (stage create, nothing written until he approves); lines for a team member become a handoff (askCreate) or a project task owned by them; the rest as V165.
+- Review grouped by destination: On the calendar, For the team, Onto projects, Waiting on someone, To your Inbox, Someday, Already on your list, Drop.
+- Sort these on Inbox now runs raw Inbox items through the brain dump; filed ones are binned with "Filed by the brain dump", Inbox ones updated in place. Undo restores all.
+- Tested on his exact list via a stand-in model: 14 to calendar (Tue 7:00 to 12:00 community service, tonight's 10 minute orders), Gavin item to Gavin, 3 to Inbox.
+- Merged onto another session's V168 (Sales block, Kept ideas, no-answer tries). Suites green.
