@@ -1,0 +1,31 @@
+const {chromium}=require('/tmp/claude-0/-home-user-INTERNAL/a7daf43b-4152-56e0-97d5-60762b5270c4/scratchpad/h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const [file,W,tag]=[process.argv[2],+(process.argv[3]||1440),process.argv[4]||"x"];
+const OUT='/tmp/claude-0/-home-user-INTERNAL/a7daf43b-4152-56e0-97d5-60762b5270c4/scratchpad/hl/out/';const BR=JSON.parse(fs.readFileSync('/tmp/claude-0/-home-user-INTERNAL/a7daf43b-4152-56e0-97d5-60762b5270c4/scratchpad/live6/brief/2026-10-11.json'));
+const port=8820+(W%9);
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const ctx=await b.newContext({viewport:{width:W,height:900},timezoneId:'America/Chicago'});
+ const p=await ctx.newPage();const errs=[];
+ p.on('pageerror',e=>errs.push("PAGEERROR "+String(e).slice(0,300)));
+ await p.addInitScript({path:'/tmp/claude-0/-home-user-INTERNAL/a7daf43b-4152-56e0-97d5-60762b5270c4/scratchpad/hl/mocklive.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ const r=await p.evaluate(br=>{const o={};S.room=null;S.mode="dash";paint();
+   o.none=!!document.querySelector('.tdy');
+   S.briefs[dk(new Date())]=br; paint(); o.owner=document.querySelectorAll('.tdy').length;
+   const btn=[...document.querySelectorAll('.tdy .brow')][2]; btn.click();
+   o.openDet=document.querySelectorAll('.tdy .det').length; o.expanded=document.querySelectorAll('.tdy .brow')[2].getAttribute('aria-expanded');
+   o.rows=document.querySelectorAll('.tdy .brow').length;
+   S.briefs[dk(new Date())]={headline:7,blocks:"x"}; paint(); o.junk=document.querySelectorAll('.tdy').length;
+   S.briefs[dk(new Date())]=br; paint();
+   o.ow=document.documentElement.scrollWidth>innerWidth;
+   return o;},BR);
+ console.log(JSON.stringify(r));
+ {const el=await p.$('.tdy');const sec=await el.evaluateHandle(n=>n.closest('.dsec'));await sec.asElement().screenshot({path:OUT+tag+'-today-'+W+'.png'});}
+ // crew lens must not see it
+ const crew=await p.evaluate(()=>{const R=rolesList(); const k=R[1]&&R[1][0]; if(!k)return "no crew role";
+   try{setRole(k);}catch(x){S.role=k;} paint(); return {role:roleOf(),owner:isOwnerLens(),tdy:document.querySelectorAll('.tdy').length};});
+ console.log("crew",JSON.stringify(crew));
+ const meta=await p.evaluate(()=>({build:BUILD,writes:window.__WRITES.filter(w=>w[1].indexOf("diag/")!==0).slice(0,10)}));
+ console.log(JSON.stringify(meta));console.log(errs.slice(0,20).join("\n"));
+ await b.close();srv.close();})();

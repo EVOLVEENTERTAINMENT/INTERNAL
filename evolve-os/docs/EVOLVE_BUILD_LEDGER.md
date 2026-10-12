@@ -988,3 +988,9 @@ two per page maximum, never per card.
 ## V157 (2026-10-12) no new words
 - setIfAbsent(): dbMerge and dbMergeCritical fall back from a failed update to set only when the store says the record does not exist; when it exists, the write reports not saved instead of replacing every other field. Stores without doc().get() behave as before.
 - projCost counts accepted Work Order fees (S.wos, matched by project slug or name) as project cost, so margins include what Logicnova is owed.
+
+## V158 (2026-10-12)
+- Home, owner only: Today card from brief/<today> written by the 5:30 Morning project state task. Headline, The one thing, Today's blocks; tap a block for Done looks like and Before you start.
+- Wording approved by Jackson from the picture (Yes, owner only).
+- Only today's brief shows. None written yet means nothing shows. Crew lens never sees it (the brief holds personal items).
+- No new writes. Suites green, sweep 1176 clicks at 1440 and 390, no overflow.
