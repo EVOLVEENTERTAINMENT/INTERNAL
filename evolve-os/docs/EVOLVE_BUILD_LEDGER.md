@@ -1066,3 +1066,9 @@ two per page maximum, never per card.
   - Now panel "Open today" opens Board, not Inbox.
   - Last week's team brief now counts as old on Monday.
 - Open, not yet fixed: chat cannot move events, mark done or remember; chat lacks time, Inbox and next steps; overlaps and past slots not flagged in the approval list; partial undo strands events; Home never shows project tasks or handoffs; counts disagree across screens; stored prose shown as current; false "no next move" from calendar tags; Bill Abell shown twice.
+
+## V171 (live as version 172) Home shows what he adds
+- Home list gets a "To do" group: his open project tasks due today or carried (tick marks done), and Inbox items the brain dump dated today or earlier.
+- No "has no next move" row for a calendar tag with no project record.
+- Blocked rows say when the words were written when they are 2+ days old.
+- Jackson said "FIX!!!" while it was in test, taken as go. Suites green.
