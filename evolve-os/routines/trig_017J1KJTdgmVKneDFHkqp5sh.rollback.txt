@@ -1,0 +1,3 @@
+Check B, money watch (sweepId "s-money"):
+The artifact's "invoices" collection is empty, so the money picture lives in Gmail. Search Gmail for invoice and payment threads from the last 21 days (queries like invoice, payment, past due, remittance, paid). Report anything Evolve has sent that has not been paid and anything past its due date, naming the real client, the real amount and the real date exactly as the email states them. If nothing is outstanding, write exactly "nothing". Read only: do not send, draft, reply to, label, archive or trash any email.
+(only Check B changed on 2026-10-12; the rest of the prompt is unchanged, see the new file)

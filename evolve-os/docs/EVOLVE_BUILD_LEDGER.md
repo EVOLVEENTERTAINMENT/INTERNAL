@@ -957,3 +957,14 @@ two per page maximum, never per card.
 - Home, crew lens only: "Your week" with that person's list.
 - Older than 8 days: "Last week's brief. This Monday's has not been written yet."
 - Live harness mock now carries teambrief.
+
+## 2026-10-12 data and routines, on his word
+- projects/wec-documentary archived (he said the project is done and the WEC invoices are paid).
+- money/settled created: WEC $1,050 paid; Harold Lloyd Monroe softwares $1,086 settled. Checks read it and never report those as owed.
+- Name stays Inline Lighting.
+- Morning project state (trig_01G7SsTFGkFAmWok1uMNTS1t) prompt updated: reads money/settled; one document per project, the hyphenated id, never the run together copies; never renames; leaves archived projects alone; writes stage_key (one of the five or blank), next_action_owner (only when named), next_date as YYYY-MM-DD or blank with next_date_note, blocked_by only for someone outside Jackson. Rollback: routines/trig_01G7SsTFGkFAmWok1uMNTS1t.rollback.txt.
+- Evolve OS morning refresh (trig_017J1KJTdgmVKneDFHkqp5sh) money check reads money/settled and paid or void invoices first. Rollback of the changed section in routines/.
+
+## V154 (2026-10-12) no new words
+- stageOf takes an exact stage name as is; coProjects reads stage_key before stage.
+- Known, not changed: a one-off calendar block "PLAN · College commercial outreach" shows as its own calendar project beside College and Greek outreach.
