@@ -1035,3 +1035,8 @@ two per page maximum, never per card.
 - Added a "MEMORY FIRST" block at the top of: Morning project state, Inbox sweep, Sunday planning pass, Monday team brief. Read only; anything new goes in the run document as "Worth remembering:". The rest of each prompt is unchanged, so rollback = delete that first paragraph.
 - Not changed, needs Jackson's approval on his Mac: "Read what Jackson texted back" and "Morning text sweep" (device-bound tasks).
 - Leads: 268 in prospects. 5 on_sheet (shown in Calls), 78 queued, 129 pool, 23 needs_phone, 22 parked, 11 dead. Only the 5 are visible on the board.
+
+## V164 (2026-10-12) All leads
+- Pipeline, under Calls: All leads, every saved prospect grouped (Queued, Not checked yet, Need a phone, Parked, Called, Talking, Moved to Pipeline, Dead), search by name, type or town, 25 at a time.
+- Tap a lead: their one problem, why the site looks old, how to open, who decides. Buttons: Call, Site, Put on the sheet (queued or pool with a phone), Unpark. Moves go through prSave with Undo.
+- Wording approved from the phone screenshot. Suites green, sweep clean, startup writes unchanged. Live as version 164.
