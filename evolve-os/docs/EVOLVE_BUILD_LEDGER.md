@@ -1040,3 +1040,8 @@ two per page maximum, never per card.
 - Pipeline, under Calls: All leads, every saved prospect grouped (Queued, Not checked yet, Need a phone, Parked, Called, Talking, Moved to Pipeline, Dead), search by name, type or town, 25 at a time.
 - Tap a lead: their one problem, why the site looks old, how to open, who decides. Buttons: Call, Site, Put on the sheet (queued or pool with a phone), Unpark. Moves go through prSave with Undo.
 - Wording approved from the phone screenshot. Suites green, sweep clean, startup writes unchanged. Live as version 164.
+
+## V165 (2026-10-12) Brain dump files sure items
+- bdDest: sure to-do with a real project becomes a task on that project (pwTaskNew, due from his date words, notes keep his original line); sure waiting with a person goes straight to Waiting on; ideas to Someday; everything else to Inbox.
+- Each line shows where it goes. Button "File N". Toast "Filed 1 to projects, 1 to Waiting on, 3 to your Inbox." Undo removes scraps, tasks and waiting rows.
+- Wording approved from the screenshot. Suites green, sweep clean, startup writes unchanged. Live as version 165.
