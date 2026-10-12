@@ -35,7 +35,7 @@ Ask for: buyer_type, buyer_reason, one_problem, pitch_angle, confidence, unknown
 Run at most caps.subagents_at_once at a time.
 
 STEP 6. BUILD TOMORROW'S SHEET
-Take the top 5 queued leads in queue order. Set each to status on_sheet.
+Count the leads already at status on_sheet. Those are calls Jackson has not made yet, and they stay. Add queued leads in queue order only until there are calls_per_sheet on the sheet in total. If the sheet is already full, add none, and step 7 only finishes any lead on the sheet still missing its copy, concept or brief.
 Skip anything with status dead, dnc, parked or needs_phone. Skip anything whose doc already has a promoted_opportunity_id.
 During the first 100 calls, owner operators with pay30 of 25 or 30 only. Committee buyers stay parked.
 

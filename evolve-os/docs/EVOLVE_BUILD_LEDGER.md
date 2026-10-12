@@ -982,3 +982,4 @@ two per page maximum, never per card.
 - The 5 concept HTML pages pulled from Drive and written into prospects/<id>.concept.html, state built.
 - Night Lead Engine step 7c: the concept is the HTML in concept.html (under 20 KB, no scripts or external assets), Drive copy as source_html_url, PDF optional.
 - V156: Open the concept shows concept.html in a sandboxed iframe (sandbox="", no scripts) at phone width; the brief's offer object reads as a sentence.
+- 12 Oct, on his word "Just tomorrow's 5": leadops/settings caps sites_checked 60 to 10, enriched 16 to 5, concepts 5. Engine step 6 now tops the sheet up to calls_per_sheet instead of adding 5 more each night. Engine stays off until he switches it on.
