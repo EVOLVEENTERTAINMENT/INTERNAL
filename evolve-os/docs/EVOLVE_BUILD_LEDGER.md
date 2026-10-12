@@ -974,5 +974,5 @@ two per page maximum, never per card.
 - leadops/settings caps.concepts 3 to 5. leadops/schema gains prospects.copy and prospects.brief.
 - This session's network cannot reach outside sites (proxy 403), so no real brief could be made here; the engine's own environment reached them on 8 Oct.
 
-## V155 (built, not published, words waiting) Calls on Pipeline
+## V155 (2026-10-12, live, words approved) Calls on Pipeline
 - Watches prospects/ and leadops/settings. Calls panel: tonight's on_sheet leads, or the next calls_per_sheet queued leads in queue_pos order while the engine is off. Per lead: Call (tel link), Site, Open the concept or Concept not made yet, Read the brief (expands the brief) or Brief not made yet, No answer, Talked (what came of it, call back date, note), Not a fit. Talking to list with Talked again, Move to Pipeline (schema promotion row, source Night Lead Engine), Not a fit. Undo on every outcome. coldRate counts source Night Lead Engine as cold.
