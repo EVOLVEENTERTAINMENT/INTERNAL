@@ -1020,3 +1020,7 @@ two per page maximum, never per card.
 - Review: count line, up to 3 questions as buttons, Remember chips (write memory/core people, words or rules only on Remember), groups (To do, Waiting on someone, On the calendar, Ideas and notes, Already on your list, Drop), Keep or Skip per line, reply box to correct it. A reply keeps earlier sorting for lines Claude did not resend.
 - Add N to Inbox: scraps carry the sort (type, day, who, why, project) so the existing triage files them; ideas go to Someday; waiting lines also make a waiting row. Undo removes the whole batch.
 - Wording approved by Jackson from the phone screenshots. Suites green, sweep 1177 at 1440 and 390, startup writes unchanged.
+
+## V163 (2026-10-12) Live
+- Another session published its own V162 at 17:47Z (write receipts to diag/writes). My V162 never went live; kept as src/EvolveOS_V162_unpublished.html.
+- V163 = that live V162 (src/EvolveOS_V162_live_receipts.html) + patches/v163.py (the brain dump). Suites green, sweep clean, brain dump test passes. Live as version 163.
