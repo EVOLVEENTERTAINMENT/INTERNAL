@@ -1091,3 +1091,8 @@ two per page maximum, never per card.
 - Quiet waiting rows: first clause of what, then "quiet N days".
 - clause() helper. Suites green.
 - Still open: counts that disagree across screens, partial undo stranding events, Bill Abell shown as two rows, chat email-injection staging, chat timeout cancel, Board not showing tasks.
+
+## V175 (live as version 176) Chat safety
+- Once a chat turn has read mail or messages, catch_note and add_waiting stage for his OK (modelStagedCard on Inbox) instead of writing.
+- askModel cancels the call on timeout (AbortController signal), and a cancelled chat turn's tools refuse to run. Timeout says so plainly.
+- Suites green.
