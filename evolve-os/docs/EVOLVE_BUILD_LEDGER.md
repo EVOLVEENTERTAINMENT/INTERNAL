@@ -983,3 +983,4 @@ two per page maximum, never per card.
 - Night Lead Engine step 7c: the concept is the HTML in concept.html (under 20 KB, no scripts or external assets), Drive copy as source_html_url, PDF optional.
 - V156: Open the concept shows concept.html in a sandboxed iframe (sandbox="", no scripts) at phone width; the brief's offer object reads as a sentence.
 - 12 Oct, on his word "Just tomorrow's 5": leadops/settings caps sites_checked 60 to 10, enriched 16 to 5, concepts 5. Engine step 6 now tops the sheet up to calls_per_sheet instead of adding 5 more each night. Engine stays off until he switches it on.
+- 12 Oct, on his word "Yes, from tonight": leadops/settings.on true for nightly runs, calendar_writes and email_drafts still false. Check scheduled for 07:45Z after the first run: tokens, sheet stayed at 5, no calendar or email writes; switch off if over about 10 million tokens or the sheet grew past 5.
