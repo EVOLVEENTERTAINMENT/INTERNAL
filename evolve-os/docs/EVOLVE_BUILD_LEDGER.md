@@ -1030,3 +1030,8 @@ two per page maximum, never per card.
 - With memory: 99%, 100% (two mid-size runs), 100% (smallest model). Without memory: 82%, projects 1 of 15. The memory is what makes it file things to the right project.
 - Unknown people (Mary E, Tyler) were flagged and asked about every time. No invented dates in any run.
 - Limits: the test lines were written by me, not Jackson; the page's default tier model was stood in for by subagents.
+
+## Routines read the memory (2026-10-12)
+- Added a "MEMORY FIRST" block at the top of: Morning project state, Inbox sweep, Sunday planning pass, Monday team brief. Read only; anything new goes in the run document as "Worth remembering:". The rest of each prompt is unchanged, so rollback = delete that first paragraph.
+- Not changed, needs Jackson's approval on his Mac: "Read what Jackson texted back" and "Morning text sweep" (device-bound tasks).
+- Leads: 268 in prospects. 5 on_sheet (shown in Calls), 78 queued, 129 pool, 23 needs_phone, 22 parked, 11 dead. Only the 5 are visible on the board.
