@@ -976,3 +976,9 @@ two per page maximum, never per card.
 
 ## V155 (2026-10-12, live, words approved) Calls on Pipeline
 - Watches prospects/ and leadops/settings. Calls panel: tonight's on_sheet leads, or the next calls_per_sheet queued leads in queue_pos order while the engine is off. Per lead: Call (tel link), Site, Open the concept or Concept not made yet, Read the brief (expands the brief) or Brief not made yet, No answer, Talked (what came of it, call back date, note), Not a fit. Talking to list with Talked again, Move to Pipeline (schema promotion row, source Night Lead Engine), Not a fit. Undo on every outcome. coldRate counts source Night Lead Engine as cold.
+
+## 2026-10-12 lead engine hand run and V156
+- Hand run (session cse_013GoJKWRpP4wue2amXnGCc8) done at 02:58Z: 60 sites re-checked, 5 on the sheet (Joe's Landing, Augusta Ready Mix, Cost Cast, Direct Wood Products, Good Times Motel & Marina), each with copy and a pitch brief. Concept PDFs would not upload to Drive (inline upload limit); the HTML went to Drive. Tokens reported: 48,353,478. The run did not switch itself off; set leadops/settings.on false and removed hand_run by hand.
+- The 5 concept HTML pages pulled from Drive and written into prospects/<id>.concept.html, state built.
+- Night Lead Engine step 7c: the concept is the HTML in concept.html (under 20 KB, no scripts or external assets), Drive copy as source_html_url, PDF optional.
+- V156: Open the concept shows concept.html in a sandboxed iframe (sandbox="", no scripts) at phone width; the brief's offer object reads as a sentence.
