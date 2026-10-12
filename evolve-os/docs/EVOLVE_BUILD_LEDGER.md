@@ -1003,3 +1003,7 @@ two per page maximum, never per card.
 - catchIt no longer gets the array index as a source.
 - No new visible wording. Suites green, sweep 1176 at 1440 and 390, startup writes unchanged.
 - Plan PDF: docs/EvolveOS_BrainPlan_26-10-12.pdf
+
+## V160 (2026-10-12)
+- Another session published its own V159 at 17:23Z (mark() saves the close before repainting, diag/paintfail). My V159 never went live; it is kept as src/EvolveOS_V159_unpublished.html.
+- V160 = the live V159 (src/EvolveOS_V159_live_markfix.html) + patches/v160.py (same changes as my v159.py). Suites green, sweep clean. Live.
