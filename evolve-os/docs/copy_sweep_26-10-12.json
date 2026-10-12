@@ -1,0 +1,1039 @@
+[
+ {
+  "line": 4886,
+  "old": "Your change is still on this screen only. The saved record did not update.",
+  "new": "Not saved. This change only shows here.",
+  "why": "Wordy, explains the record logic"
+ },
+ {
+  "line": 5839,
+  "old": "Written, but this board may be showing the old view for a minute.",
+  "new": "Saved. The board may take a minute to update.",
+  "why": "\"Written\" is odd, wordy"
+ },
+ {
+  "line": 6285,
+  "old": "No one thing named for this day. Pick it before the day picks for you.",
+  "new": "No one thing set for this day. Pick one.",
+  "why": "Riddling, slightly preachy line"
+ },
+ {
+  "line": 6462,
+  "old": "This page cannot reach the weather service directly, and no forecast ",
+  "new": "The weather service is not reachable, and no forecast ",
+  "why": "Talks about its own internals",
+  "note": "Tooltip fragment; code appends \"has been written to its own store yet. Ask Claude to refresh it.\" Trailing space kept."
+ },
+ {
+  "line": 6778,
+  "old": "Move it along",
+  "new": "Change status",
+  "why": "Folksy button, unclear action",
+  "note": "Button cycles the project's status to the next value."
+ },
+ {
+  "line": 6930,
+  "old": "This only changes how the Dashboard splits your week into two. Nothing here touches Google Calendar.",
+  "new": "Only changes how the Dashboard splits your week. Google Calendar is not affected.",
+  "why": "Wordy, explains itself"
+ },
+ {
+  "line": 7223,
+  "old": "Say it the way you would say it out loud",
+  "new": "Write it in your own words",
+  "why": "Stilted placeholder"
+ },
+ {
+  "line": 7257,
+  "old": "Quiet for a week.",
+  "new": "Hidden for a week.",
+  "why": "\"Quiet\" is vague, internal"
+ },
+ {
+  "line": 7288,
+  "old": "Nothing changed, that date did not read.",
+  "new": "Nothing changed. That date was not recognized.",
+  "why": "\"did not read\" is odd"
+ },
+ {
+  "line": 7668,
+  "old": "Here is the whole of it",
+  "new": "Here's where things stand",
+  "why": "Stilted, the exact complaint",
+  "note": "Heading under \"You have been away N days\"."
+ },
+ {
+  "line": 7677,
+  "old": "It was all carried. Clear the small stuff and start from what is real.",
+  "new": "Everything was carried. Clear the small stuff and start fresh.",
+  "why": "\"what is real\" sounds judgy"
+ },
+ {
+  "line": 7935,
+  "old": "Nothing is stuck on anybody.",
+  "new": "Nothing is waiting on anyone.",
+  "why": "Awkward phrasing"
+ },
+ {
+  "line": 8595,
+  "old": "Recorded. That reason is what the win history is built from.",
+  "new": "Saved. It feeds your win history.",
+  "why": "Explains its own logic"
+ },
+ {
+  "line": 8789,
+  "old": "Nothing marked paid in the last six months, so there is nothing to draw.",
+  "new": "No payments marked in the last six months.",
+  "why": "Talks about drawing the chart"
+ },
+ {
+  "line": 8886,
+  "old": "Nothing marked off yet, so there is nothing to plot.",
+  "new": "Nothing marked off yet.",
+  "why": "Talks about plotting the chart"
+ },
+ {
+  "line": 8896,
+  "old": "Six weeks. Orange landed, blue carried, grey never closed out.",
+  "new": "Last six weeks. Orange done, blue carried, grey not closed.",
+  "why": "\"landed\", \"never\" odd and judgy"
+ },
+ {
+  "line": 9157,
+  "old": "Nothing is stored about them yet, only their name off the calendar",
+  "new": "Only their name from the calendar so far",
+  "why": "Wordy, talks about storage"
+ },
+ {
+  "line": 9257,
+  "old": "Nothing archived. Archive a project from its own Edit prompt when it is finished with.",
+  "new": "Nothing archived. To archive a project, open Edit on it.",
+  "why": "Wordy, stilted \"finished with\""
+ },
+ {
+  "line": 9595,
+  "old": "Noted. The run up will show.",
+  "new": "Noted. Prep and travel time will show.",
+  "why": "\"run up\" is internal jargon",
+  "note": "\"Run up\" in code means prep, journey and buffer before a fixed event."
+ },
+ {
+  "line": 9597,
+  "old": "Noted. You will get a join nudge.",
+  "new": "Noted. You will get a reminder to join.",
+  "why": "\"join nudge\" is jargon"
+ },
+ {
+  "line": 9817,
+  "old": "Stop counting this. It comes back if the condition returns after a week.",
+  "new": "Hide this for a week. It comes back if it happens again.",
+  "why": "Talks about counting and conditions",
+  "note": "Tooltip on the Handled button."
+ },
+ {
+  "line": 10353,
+  "old": "If it collapses: ",
+  "new": "Small version: ",
+  "why": "\"collapses\" is dramatic",
+  "note": "Prefix joined to the small fallback version of the one thing. Trailing space kept."
+ },
+ {
+  "line": 10389,
+  "old": "The day blew up",
+  "new": "Replan the day",
+  "why": "Dramatic, not a verb",
+  "note": "Button that reflows the day."
+ },
+ {
+  "line": 10486,
+  "old": "The page you walk into the sync with",
+  "new": "Bring this to the team sync",
+  "why": "Stilted tooltip"
+ },
+ {
+  "line": 10785,
+  "old": "Brief copied. Paste it wherever the team reads.",
+  "new": "Brief copied.",
+  "why": "Extra instruction not needed"
+ },
+ {
+  "line": 10786,
+  "old": "Could not reach the clipboard from inside this page.",
+  "new": "Could not copy to the clipboard.",
+  "why": "Talks about page internals"
+ },
+ {
+  "line": 10813,
+  "old": "Auburn, for the week you are looking at. The week ahead, from today, is on Home.",
+  "new": "Auburn, for the selected week. The week ahead from today is on Home.",
+  "why": "Wordy, awkward commas"
+ },
+ {
+  "line": 10833,
+  "old": "The forecast is not reachable from inside this page, so only the load is shown.",
+  "new": "Forecast unavailable. Showing load only.",
+  "why": "Talks about page internals"
+ },
+ {
+  "line": 10952,
+  "old": "What the checks turned up",
+  "new": "Check results",
+  "why": "Folksy section label"
+ },
+ {
+  "line": 10986,
+  "old": "If it collapses",
+  "new": "Small version",
+  "why": "\"collapses\" is dramatic",
+  "note": "Bold label before the fallback text; matches line 10353."
+ },
+ {
+  "line": 11006,
+  "old": "Put this away",
+  "new": "Dismiss",
+  "why": "Odd aria label for close",
+  "note": "aria-label on the x button."
+ },
+ {
+  "line": 11044,
+  "old": "How the week actually went",
+  "new": "How the week went",
+  "why": "\"actually\" sounds judgy"
+ },
+ {
+  "line": 11436,
+  "old": "These are the dates you marked. Nothing here is reconciled against an account.",
+  "new": "Dates you marked. Not checked against any account.",
+  "why": "Wordy, \"reconciled\" jargon"
+ },
+ {
+  "line": 11843,
+  "old": "Swap the row between pushing it later and pulling it earlier",
+  "new": "Switch between later and earlier",
+  "why": "Wordy tooltip"
+ },
+ {
+  "line": 11990,
+  "old": "That is more blocks than this moves at once. Try it without everything after it.",
+  "new": "Too many blocks to move at once. Try it without the blocks after it.",
+  "why": "Talks about its own limits"
+ },
+ {
+  "line": 12016,
+  "old": "That did not go through, so everything was put back where it was. ",
+  "new": "That did not go through. Everything is back where it was. ",
+  "why": "Run-on, slightly wordy",
+  "note": "Code appends the error text. Trailing space kept."
+ },
+ {
+  "line": 12034,
+  "old": "There is nowhere to leave for on that one.",
+  "new": "That one has no place to leave for.",
+  "why": "Awkward phrasing"
+ },
+ {
+  "line": 12041,
+  "old": "There is no room in front of that one for a leave by block.",
+  "new": "No room before that one for a leave-by block.",
+  "why": "Awkward \"in front of\""
+ },
+ {
+  "line": 12348,
+  "old": "Google Calendar is not answering, so nothing can be worked out right now.",
+  "new": "Google Calendar is not responding, so this cannot be planned right now.",
+  "why": "\"worked out\" is vague"
+ },
+ {
+  "line": 12355,
+  "old": "Nothing to move. The day already sits right.",
+  "new": "Nothing to move. The day already fits.",
+  "why": "\"sits right\" is folksy"
+ },
+ {
+  "line": 12395,
+  "old": "Google last answered ",
+  "new": "Google last responded ",
+  "why": "\"answered\" reads oddly",
+  "note": "Code appends N plus \" minutes ago, so this is worked out on what the board last saw.\" That tail is in a later chunk or unflagged. Trailing space kept."
+ },
+ {
+  "line": 12470,
+  "old": "One thing to tell me",
+  "new": "One thing to check",
+  "why": "Odd, talks about itself"
+ },
+ {
+  "line": 12490,
+  "old": "Already gone by this morning: ",
+  "new": "Already passed this morning: ",
+  "why": "\"gone by\" is folksy",
+  "note": "Code appends titles joined by \"; \". Trailing space kept."
+ },
+ {
+  "line": 12874,
+  "old": "Google Calendar stopped answering while that was open. Nothing moved.",
+  "new": "Google Calendar stopped responding while that was open. Nothing moved.",
+  "why": "\"answering\" reads oddly"
+ },
+ {
+  "line": 12881,
+  "old": "That had been open a while, so it is worked out again on the day as it is now. Nothing moved.",
+  "new": "That was open a while, so it has been updated for the day as it is now. Nothing moved.",
+  "why": "Wordy, \"worked out again\""
+ },
+ {
+  "line": 13193,
+  "old": "Nothing fighting. Go.",
+  "new": "No conflicts.",
+  "why": "Cute, \"Go\" is odd"
+ },
+ {
+  "line": 13288,
+  "old": "Counted from blocks that name them. Whatever they do that is not on your board is not in here.",
+  "new": "Counted from blocks that name them. Work off the board is not included.",
+  "why": "Wordy second sentence"
+ },
+ {
+  "line": 13329,
+  "old": "Write anything here as it lands. It saves itself. Come back and pull the lines out when you have the head for it.",
+  "new": "Write anything here. It saves automatically. Pull the lines out when you are ready.",
+  "why": "Folksy, \"have the head for it\""
+ },
+ {
+  "line": 13568,
+  "old": "On the waiting list under ",
+  "new": "Waiting on ",
+  "why": "Stilted phrasing for a waiting item",
+  "note": "Joined to who + \".\""
+ },
+ {
+  "line": 13587,
+  "old": "That would not save.",
+  "new": "Could not save that.",
+  "why": "Odd phrasing for an error"
+ },
+ {
+  "line": 13590,
+  "old": "There are no projects on the board to hang it on yet.",
+  "new": "No projects yet to add it to.",
+  "why": "Folksy, wordy"
+ },
+ {
+  "line": 13641,
+  "old": "Linked, open the source",
+  "new": "Open the original",
+  "why": "Awkward comma-spliced label"
+ },
+ {
+  "line": 13675,
+  "old": "It is a waiting on",
+  "new": "Waiting on someone",
+  "why": "Ungrammatical button label"
+ },
+ {
+  "line": 13720,
+  "old": "Trimmed to 90. That is the rule.",
+  "new": "Trimmed to the 90 minute limit.",
+  "why": "Preachy \"that is the rule\"",
+  "note": "90 is minutes per code (mins)"
+ },
+ {
+  "line": 13806,
+  "old": "Messages is not wired into this page yet. Ask me from the Claude desktop app on your Mac.",
+  "new": "Messages is not connected here yet. Ask from the Claude desktop app on your Mac.",
+  "why": "Internal \"wired\" jargon"
+ },
+ {
+  "line": 13906,
+  "old": "Nothing came back cleanly. Try again.",
+  "new": "Something went wrong. Try again.",
+  "why": "Vague, odd phrasing"
+ },
+ {
+  "line": 13998,
+  "old": "All of it landed",
+  "new": "Mark all done",
+  "why": "Odd \"landed\" wording on button"
+ },
+ {
+  "line": 14060,
+  "old": "Did not happen",
+  "new": "Not done",
+  "why": "Judging tone; button, keep neutral",
+  "note": "Paired with \"Part of it\" button"
+ },
+ {
+  "line": 14470,
+  "old": "That is every open day closed.",
+  "new": "All open days closed.",
+  "why": "Stilted sentence"
+ },
+ {
+  "line": 14639,
+  "old": "Draft a chase",
+  "new": "Draft a follow-up",
+  "why": "Jargon \"chase\""
+ },
+ {
+  "line": 14646,
+  "old": "They got back to me",
+  "new": "They replied",
+  "why": "Wordy button label"
+ },
+ {
+  "line": 14712,
+  "old": "Nothing here is a grade. It is the only way the audit knows what really happened.",
+  "new": "This just records what happened.",
+  "why": "Explains its own logic, mentions audit"
+ },
+ {
+  "line": 14732,
+  "old": "Mark the rest as landed",
+  "new": "Mark the rest done",
+  "why": "Odd \"landed\" wording"
+ },
+ {
+  "line": 14795,
+  "old": "That is saved. The screen did not redraw, so reload when you can.",
+  "new": "Saved. Reload to see the change.",
+  "why": "Talks about its own redraw"
+ },
+ {
+  "line": 14833,
+  "old": "The audit did not come back. Try again.",
+  "new": "That did not load. Try again.",
+  "why": "Internal \"audit\" name"
+ },
+ {
+  "line": 14880,
+  "old": "Actually done",
+  "new": "Done after all",
+  "why": "Awkward button wording"
+ },
+ {
+  "line": 14898,
+  "old": "Stop the audit",
+  "new": "End review",
+  "why": "Internal \"audit\" name"
+ },
+ {
+  "line": 14944,
+  "old": "Times nobody has confirmed",
+  "new": "Unconfirmed times",
+  "why": "Wordy heading"
+ },
+ {
+  "line": 14963,
+  "old": "Dates that do not move",
+  "new": "Fixed dates",
+  "why": "Stilted heading"
+ },
+ {
+  "line": 15216,
+  "old": "Logged. The ladder moves on.",
+  "new": "Logged. On to the next follow-up.",
+  "why": "Jargon \"ladder\""
+ },
+ {
+  "line": 15222,
+  "old": "No more chases on ",
+  "new": "No more follow-ups for ",
+  "why": "Jargon \"chases\"",
+  "note": "Joined to r.name + \". It stays in the pipeline.\""
+ },
+ {
+  "line": 15291,
+  "old": "Nothing has closed yet. The first lead you mark won or lost starts this off.",
+  "new": "No closed leads yet. Mark one won or lost to start.",
+  "why": "Wordy, stilted"
+ },
+ {
+  "line": 15646,
+  "old": "You called this one ",
+  "new": "You marked this ",
+  "why": "Odd phrasing for a tooltip",
+  "note": "Joined to temperature, reads \"Marked hot\""
+ },
+ {
+  "line": 15677,
+  "old": "How you actually do",
+  "new": "Your track record",
+  "why": "Odd folksy heading"
+ },
+ {
+  "line": 15831,
+  "old": "These two are on top of each other",
+  "new": "These two overlap",
+  "why": "Wordy"
+ },
+ {
+  "line": 15844,
+  "old": "No gap big enough this week. Open the day and decide which one gives.",
+  "new": "No open slot this week. Open the day to choose which one moves.",
+  "why": "Folksy \"which one gives\""
+ },
+ {
+  "line": 15852,
+  "old": "Staged. Approve it in the queue and it goes on the calendar.",
+  "new": "Added to the queue. Approve it to put it on the calendar.",
+  "why": "Jargon \"Staged\""
+ },
+ {
+  "line": 15887,
+  "old": "What a day of yours is worth. Blank and your time costs nothing.",
+  "new": "Your day rate. Leave blank to count time as free.",
+  "why": "Stilted, riddling"
+ },
+ {
+  "line": 15894,
+  "old": "Rent, software, phone. Blank leaves every margin gross.",
+  "new": "Rent, software, phone. Leave blank to show gross margins.",
+  "why": "Stilted phrasing"
+ },
+ {
+  "line": 15896,
+  "old": "One per line. Blank if nothing may.",
+  "new": "One per line. Leave blank for none.",
+  "why": "Riddling phrasing"
+ },
+ {
+  "line": 15935,
+  "old": "hints, not rules",
+  "new": "Suggestions only",
+  "why": "Clipped, preachy subtitle"
+ },
+ {
+  "line": 15967,
+  "old": "These change what gets suggested and what the recap notices. Nothing here raises an alert on its own.",
+  "new": "These shape suggestions and the recap. They never trigger alerts.",
+  "why": "Wordy, explains itself"
+ },
+ {
+  "line": 16020,
+  "old": "Nothing saved, no rock given.",
+  "new": "Nothing saved. No rock entered.",
+  "why": "Stilted phrasing"
+ },
+ {
+  "line": 16081,
+  "old": "No rocks set. Three at most, and only the ones that actually have to be true.",
+  "new": "No rocks yet. Set up to three.",
+  "why": "Preachy"
+ },
+ {
+  "line": 16096,
+  "old": "Booked is won work. Collected is money recorded as received. Neither one is what is in the account, and Evolve does not keep your books.",
+  "new": "Booked is won work. Collected is payments recorded. Neither is your bank balance, and Evolve does not do your bookkeeping.",
+  "why": "Wordy, preachy"
+ },
+ {
+  "line": 16108,
+  "old": "How this thing is wired",
+  "new": "How it works",
+  "why": "Folksy \"this thing is wired\"",
+  "note": "Heading under \"Settings\" caption"
+ },
+ {
+  "line": 16109,
+  "old": "The standing checks moved in here. They run on their own and what they find shows up in Need You, not on a page you have to visit.",
+  "new": "Standing checks now live here. They run on their own, and anything they find shows up in Needs you.",
+  "why": "Wordy; wrong name \"Need You\""
+ },
+ {
+  "line": 16202,
+  "old": "Why a connector is not answering",
+  "new": "Connector troubleshooting",
+  "why": "Wordy heading"
+ },
+ {
+  "line": 16240,
+  "old": "The capture line",
+  "new": "Quick capture",
+  "why": "Internal \"line\" jargon"
+ },
+ {
+  "line": 16279,
+  "old": "Does the writer actually write",
+  "new": "Calendar write test",
+  "why": "Riddling heading, internal \"writer\""
+ },
+ {
+  "line": 16298,
+  "old": "The rules this board runs by",
+  "new": "Board rules",
+  "why": "Wordy heading"
+ },
+ {
+  "line": 16461,
+  "old": "The dates that do not move, which this reads",
+  "new": "Fixed dates this check uses",
+  "why": "Stilted tooltip"
+ },
+ {
+  "line": 16475,
+  "old": "That time is not set up anywhere yet. Nothing in this page keeps a clock, so it runs only when you run it.",
+  "new": "No schedule set up yet. It only runs when you run it.",
+  "why": "Talks about its own internals"
+ },
+ {
+  "line": 16866,
+  "old": "The line answered in a shape this page does not know how to read.",
+  "new": "Got a reply this page could not read.",
+  "why": "Odd, internal \"line\" jargon"
+ },
+ {
+  "line": 16872,
+  "old": "Nothing waiting on the line.",
+  "new": "No new captures.",
+  "why": "Internal \"line\" jargon"
+ },
+ {
+  "line": 17157,
+  "old": "Ask about the week, or tell me what to move. I read all six calendars, do the time zone maths, and hand back dated blocks for you to approve. Nothing reaches Google until you press approve.",
+  "new": "Ask about the week, or tell me what to move. I read all six calendars, handle time zones, and suggest dated blocks for you to approve. Nothing goes to Google until you approve it.",
+  "why": "British \"maths\", wordy"
+ },
+ {
+  "line": 17289,
+  "old": "Everything this board has written",
+  "new": "Changes made to your calendar",
+  "why": "Odd, self-referential heading",
+  "note": "Modal title for calendar write history"
+ },
+ {
+  "line": 17298,
+  "old": "Nothing has been written to your calendar from this board yet. When something is, it lands here with a way to put it back.",
+  "new": "Nothing from here has been added to your calendar yet. When it is, it shows here with a way to undo it.",
+  "why": "Wordy, \"lands\" phrasing"
+ },
+ {
+  "line": 17607,
+  "old": "Nothing saved, nothing to do.",
+  "new": "Nothing saved.",
+  "why": "Odd redundant phrasing"
+ },
+ {
+  "line": 18245,
+  "old": "Paid comes from recording a payment. State left as ",
+  "new": "To mark it paid, record a payment. Status left as ",
+  "why": "Stilted, internal \"State\"",
+  "note": "Joined to status + \".\""
+ },
+ {
+  "line": 18537,
+  "old": "When the next project has to land",
+  "new": "When you need the next project",
+  "why": "Odd \"has to land\""
+ },
+ {
+  "line": 18545,
+  "old": "Add what it costs to run, business and personal, and this works out when the next project has to land.",
+  "new": "Add what it costs to run, business and personal, to see when you need the next project.",
+  "why": "Odd \"has to land\""
+ },
+ {
+  "line": 18611,
+  "old": "What is owed and what has landed",
+  "new": "Owed and received",
+  "why": "Wordy, \"landed\" phrasing"
+ },
+ {
+  "line": 18640,
+  "old": "Out and not paid",
+  "new": "Sent, not paid",
+  "why": "Awkward heading"
+ },
+ {
+  "line": 18684,
+  "old": "against what you invoiced. Thinnest first. No overhead in any of these.",
+  "new": "vs. invoiced, lowest margin first. Overhead not included.",
+  "why": "Clipped, odd \"thinnest\"",
+  "note": "Subtitle under \"What each job made\""
+ },
+ {
+  "line": 18687,
+  "old": "Nothing to compare yet. A job needs either logged time with a rate behind it, or an expense, or an invoice.",
+  "new": "Nothing to compare yet. Add logged time with a rate, an expense, or an invoice to a job.",
+  "why": "Wordy"
+ },
+ {
+  "line": 18713,
+  "old": "These are the numbers you type in. Nothing here reads your bank or your accounting, so it is only as right as the last time you updated it.",
+  "new": "Based on what you enter. Nothing here reads your bank or accounting, so it is only as current as your last update.",
+  "why": "Wordy, explains itself"
+ },
+ {
+  "line": 19396,
+  "old": "Nothing matches this view today. That is usually good news.",
+  "new": "Nothing matches this view today.",
+  "why": "Cute, judgy aside"
+ },
+ {
+  "line": 19581,
+  "old": "Work Orders, what is due from you and when",
+  "new": "Work Orders due from you",
+  "why": "Wordy heading"
+ },
+ {
+  "line": 19927,
+  "old": "Mark this move done and name the next one",
+  "new": "Done, set the next move",
+  "why": "Too long for a button"
+ },
+ {
+  "line": 20362,
+  "old": "A template needs a project name to hang the tasks off.",
+  "new": "Add a project name to use this template.",
+  "why": "Folksy phrasing, \"hang the tasks off\""
+ },
+ {
+  "line": 20364,
+  "old": "That delivery date did not read as a date, so nothing was created.",
+  "new": "Couldn't read that delivery date. Nothing was created.",
+  "why": "Stilted \"did not read as\""
+ },
+ {
+  "line": 20386,
+  "old": "That project has no dated deliverables, so there is no shape to save.",
+  "new": "This project has no dated deliverables to save.",
+  "why": "\"shape\" is internal jargon"
+ },
+ {
+  "line": 20405,
+  "old": "There is no project to copy a shape from yet.",
+  "new": "No projects to copy from yet.",
+  "why": "\"shape\" is internal jargon"
+ },
+ {
+  "line": 20469,
+  "old": "The three that matter most",
+  "new": "Top three",
+  "why": "Wordy heading"
+ },
+ {
+  "line": 20560,
+  "old": "Who is around, what is out with them",
+  "new": "Who's around and what they have",
+  "why": "Awkward, riddling heading"
+ },
+ {
+  "line": 20562,
+  "old": "Capacity is counted off the hours they actually work, never guessed. Nothing they do away from your board is in here.",
+  "new": "Capacity is based on the hours they actually work. Work outside this board isn't included.",
+  "why": "Explains its own logic, stilted"
+ },
+ {
+  "line": 20622,
+  "old": "asks, by who has them",
+  "new": "Requests by person",
+  "why": "Awkward subtitle phrasing",
+  "note": "Subtitle under \"Out with people\"; original is lowercase"
+ },
+ {
+  "line": 20743,
+  "old": "A save is already waiting on you.",
+  "new": "One save is already waiting for your OK.",
+  "why": "Odd phrasing, vaguely blaming",
+  "note": "Shown on a rate_limited error"
+ },
+ {
+  "line": 21726,
+  "old": "Nothing here goes on the calendar. Nothing is sent.",
+  "new": "This won't add to your calendar or send anything.",
+  "why": "Stilted repetition"
+ },
+ {
+  "line": 21840,
+  "old": "No fields read from this. It gets caught exactly as written.",
+  "new": "No fields found. It will be saved exactly as written.",
+  "why": "Talks about its own parsing"
+ },
+ {
+  "line": 21854,
+  "old": "That one is needed. Change the line instead.",
+  "new": "This one is required. Edit the line instead.",
+  "why": "Vague, odd phrasing"
+ },
+ {
+  "line": 21948,
+  "old": "Anything in your head. One thing per line, it all gets caught and sorted later.",
+  "new": "Whatever's on your mind. One item per line. Sort it later.",
+  "why": "Slightly folksy, run-on"
+ },
+ {
+  "line": 21951,
+  "old": "A line can also start with lead, waiting, invoice, next, task, schedule or outcome, or idea:, note:, link:, remember:. A day and a time with nothing else in front, like \u201cdentist tomorrow at 2\u201d, proposes a calendar event. What it reads shows up underneath as chips, and only what you can see there gets saved.",
+  "new": "Start a line with lead, waiting, invoice, next, task, schedule or outcome, or with idea:, note:, link: or remember:. A day and time on their own, like \u201cdentist tomorrow at 2\u201d, suggest a calendar event. Anything detected shows below as chips, and only what shows there is saved.",
+  "why": "Wordy help, explains its logic"
+ },
+ {
+  "line": 21968,
+  "old": "That is a long one. It gets caught exactly as written. Nothing reads it unless you ask.",
+  "new": "Long entry. It will be saved exactly as written and left alone unless you ask.",
+  "why": "Folksy, talks about itself"
+ },
+ {
+  "line": 21981,
+  "old": "That one is a change to the day. It opens as something to look at, and nothing is written from here.",
+  "new": "This looks like a schedule change. It opens for review, and nothing is saved from here.",
+  "why": "Stilted, explains its own logic"
+ },
+ {
+  "line": 21985,
+  "old": "That reads as a timer command. It runs right away when you catch it.",
+  "new": "This looks like a timer command. It runs as soon as you catch it.",
+  "why": "\"reads as\" sounds stilted",
+  "note": "\"catch\" kept, matches the Catch it button"
+ },
+ {
+  "line": 21987,
+  "old": "That could be a calendar change or a timer command. You will be asked which when you catch it.",
+  "new": "This could be a calendar change or a timer command. You'll choose when you catch it.",
+  "why": "Wordy, passive"
+ },
+ {
+  "line": 22015,
+  "old": "Caught, exactly as written.",
+  "new": "Saved exactly as written.",
+  "why": "Odd, literary confirmation",
+  "note": "Toast after Catch it"
+ },
+ {
+  "line": 22572,
+  "old": "An entry was left running",
+  "new": "A timer is still running",
+  "why": "Implies he left it on"
+ },
+ {
+  "line": 22581,
+  "old": "That was a mistake",
+  "new": "Delete it",
+  "why": "Button should be a verb",
+  "note": "Button calls delete on the entry"
+ },
+ {
+  "line": 22638,
+  "old": "When did it actually end",
+  "new": "When did it end?",
+  "why": "\"actually\" sounds doubting"
+ },
+ {
+  "line": 22892,
+  "old": "Nothing to continue. Nothing has been stopped yet.",
+  "new": "No stopped timer to resume.",
+  "why": "Stilted double sentence"
+ },
+ {
+  "line": 22945,
+  "old": "The calendar, or the timer",
+  "new": "Calendar or timer?",
+  "why": "Literary heading"
+ },
+ {
+  "line": 23053,
+  "old": "That overlap is not a simple trim. Adjust one of the two by hand.",
+  "new": "This overlap can't be trimmed automatically. Adjust one entry by hand.",
+  "why": "Awkward, talks about its logic"
+ },
+ {
+  "line": 23221,
+  "old": "how long before a running timer gets asked about",
+  "new": "when to check on a long timer",
+  "why": "Awkward phrasing",
+  "note": "Lowercase subtitle under \"Long timer check\""
+ },
+ {
+  "line": 23234,
+  "old": "Past this many hours, or once it crosses 3 in the morning, a running timer asks if it should keep going, get adjusted, or stop. It asks at most twice for the same entry.",
+  "new": "After this many hours, or after 3 AM, a running timer asks whether to keep going, adjust or stop. It asks at most twice per entry.",
+  "why": "Wordy explanation"
+ },
+ {
+  "line": 23839,
+  "old": "Could not load your projects. This is a failed read, not an empty board.",
+  "new": "Couldn't load your projects. They are not gone. Reload to try again.",
+  "why": "Talks about its own logic"
+ },
+ {
+  "line": 23844,
+  "old": "Nothing on the board yet. Add a project, or tag a calendar block PROJECT followed by a middot.",
+  "new": "No projects yet. Add one, or start a calendar block with \u201cPROJECT \u00b7\u201d.",
+  "why": "\"middot\" is jargon"
+ },
+ {
+  "line": 23897,
+  "old": "Record who this is for",
+  "new": "Add client",
+  "why": "Wordy label",
+  "note": "Line 23897 also has \"No client recorded\", left alone"
+ },
+ {
+  "line": 24023,
+  "old": "Open the board to put a block down",
+  "new": "Open the board to add a block",
+  "why": "Folksy \"put a block down\"",
+  "note": "Tooltip on Block time button"
+ },
+ {
+  "line": 24035,
+  "old": "Nothing is late, blocked or waiting past a week on this one.",
+  "new": "Nothing blocked or waiting over a week.",
+  "why": "Uses \"late\", breaks his rule"
+ },
+ {
+  "line": 24180,
+  "old": "The playbook follows the kind of job. Pick one in the header above and its phases and checklists load here. Until then this is the general four step version.",
+  "new": "Pick a job type above to load its phases and checklists. Until then, this is the general four-step version.",
+  "why": "Wordy, explains itself"
+ },
+ {
+  "line": 24237,
+  "old": "It is not built yet.",
+  "new": "Not available yet.",
+  "why": "Talks about its own build",
+  "note": "Bold sentence inside a longer paragraph; surrounding fragments also explain themselves"
+ },
+ {
+  "line": 24248,
+  "old": "Who signs, who reviews and who pays are all blank.",
+  "new": "No signer, reviewer or payer set.",
+  "why": "Wordy empty state"
+ },
+ {
+  "line": 24304,
+  "old": "No open tasks, so nobody is holding anything here.",
+  "new": "No open tasks.",
+  "why": "Explains itself needlessly"
+ },
+ {
+  "line": 24332,
+  "old": "Nothing logged. A decision written here stops getting reopened.",
+  "new": "No decisions logged yet.",
+  "why": "Preachy"
+ },
+ {
+  "line": 24340,
+  "old": "Nothing recorded yet. Moves you make on this project land here.",
+  "new": "No activity yet. Changes you make to this project show up here.",
+  "why": "\"Moves land here\" is folksy"
+ },
+ {
+  "line": 24342,
+  "old": "   from the nightly read",
+  "new": "   from the nightly review",
+  "why": "\"nightly read\" is internal name",
+  "note": "Leading spaces kept; appended after an activity line. Use whatever name you settle on for the nightly read everywhere"
+ },
+ {
+  "line": 24385,
+  "old": "This is a line the nightly read wrote, not a task yet. It has no owner, no date and no status until you make it one.",
+  "new": "This came from the nightly review. Make it a task to give it an owner, date and status.",
+  "why": "Internal name, explains itself"
+ },
+ {
+  "line": 24810,
+  "old": "Nothing is late, blocked or waiting past a week.",
+  "new": "Nothing blocked or waiting over a week.",
+  "why": "Uses \"late\", breaks his rule"
+ },
+ {
+  "line": 24816,
+  "old": "Nothing on this project carries a date inside the next week.",
+  "new": "Nothing on this project is dated in the next week.",
+  "why": "Stilted \"carries a date\""
+ },
+ {
+  "line": 24850,
+  "old": "Nothing has moved on the record yet.",
+  "new": "No activity yet.",
+  "why": "Literary phrasing"
+ },
+ {
+  "line": 24875,
+  "old": "Nothing added, it had no name.",
+  "new": "Nothing added. Give it a name first.",
+  "why": "Awkward comma splice"
+ },
+ {
+  "line": 24876,
+  "old": "That date did not read, so nothing was added.",
+  "new": "Couldn't read that date. Nothing was added.",
+  "why": "Stilted \"did not read\""
+ },
+ {
+  "line": 24903,
+  "old": "The nightly read lists ",
+  "new": "The nightly review lists ",
+  "why": "\"nightly read\" is internal name",
+  "note": "Joins to a count + \" left on this project. They are prose, not tasks, so the plan has nothing to draw yet. Make them tasks, then give each one dates.\" That tail is also stilted but is a separate literal not in this chunk"
+ },
+ {
+  "line": 25119,
+  "old": "Nothing to draw yet. Add a task or a milestone above and it lands here, in Calendar, on Home and in Work at once.",
+  "new": "No tasks or milestones yet. Add one above and it shows here, in Calendar, on Home and in Work.",
+  "why": "Talks about drawing, folksy"
+ },
+ {
+  "line": 25174,
+  "old": "A suggestion, not a plan: the ",
+  "new": "Suggested: the ",
+  "why": "Preachy framing",
+  "note": "Joins to \"N milestones a <kind> job usually turns on (...). They are added with no dates, and you set each one.\""
+ },
+ {
+  "line": 25180,
+  "old": "No milestones yet. A milestone is one record. It shows on the timeline, the calendar, Home and any deliverable it belongs to.",
+  "new": "No milestones yet. Each one shows on the timeline, the calendar, Home and its deliverable.",
+  "why": "Explains its data model"
+ },
+ {
+  "line": 25255,
+  "old": "No tasks on this project yet. Type one above. A task carries an owner, a start and a due date, what it waits on, and the deliverable and milestone it serves.",
+  "new": "No tasks yet. Add one above to set an owner, dates, what it waits on, and its deliverable and milestone.",
+  "why": "Explains its data model"
+ },
+ {
+  "line": 25361,
+  "old": "Nothing is listed yet. Each deliverable is its own record with a brief, its tasks, every version that went to the client, the feedback and the sign off.",
+  "new": "No deliverables yet. Each one holds its brief, tasks, client versions, feedback and sign off.",
+  "why": "Explains its data model"
+ },
+ {
+  "line": 25397,
+  "old": "No deliverables are listed, so there is no scope on record for this project.",
+  "new": "No deliverables yet, so this project has no scope on record.",
+  "why": "Slightly stilted"
+ },
+ {
+  "line": 25566,
+  "old": "Files are not built yet. Paste a link in the notes above and it stays with this task.",
+  "new": "File uploads aren't available yet. Paste a link in the notes above instead.",
+  "why": "Talks about its own build"
+ },
+ {
+  "line": 25672,
+  "old": "Every time this goes to the client is a version. ",
+  "new": "Each send to the client is a version. ",
+  "why": "Awkward phrasing",
+  "note": "Trailing space kept; joins to \"N round(s) is/are included in the price.\""
+ },
+ {
+  "line": 25701,
+  "old": "That is not built yet.",
+  "new": "Not available yet.",
+  "why": "Talks about its own build"
+ },
+ {
+  "line": 25716,
+  "old": "Nothing recorded yet. State changes, versions and sign off land here.",
+  "new": "No activity yet. Status changes, versions and sign off show up here.",
+  "why": "\"land here\" folksy, \"State\" jargon"
+ },
+ {
+  "line": 25721,
+  "old": "Every field, and delete",
+  "new": "Edit all fields or delete",
+  "why": "Unclear tooltip",
+  "note": "Tooltip on Full editor button"
+ }
+]
