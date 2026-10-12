@@ -984,3 +984,7 @@ two per page maximum, never per card.
 - V156: Open the concept shows concept.html in a sandboxed iframe (sandbox="", no scripts) at phone width; the brief's offer object reads as a sentence.
 - 12 Oct, on his word "Just tomorrow's 5": leadops/settings caps sites_checked 60 to 10, enriched 16 to 5, concepts 5. Engine step 6 now tops the sheet up to calls_per_sheet instead of adding 5 more each night. Engine stays off until he switches it on.
 - 12 Oct, on his word "Yes, from tonight": leadops/settings.on true for nightly runs, calendar_writes and email_drafts still false. Check scheduled for 07:45Z after the first run: tokens, sheet stayed at 5, no calendar or email writes; switch off if over about 10 million tokens or the sheet grew past 5.
+
+## V157 (2026-10-12) no new words
+- setIfAbsent(): dbMerge and dbMergeCritical fall back from a failed update to set only when the store says the record does not exist; when it exists, the write reports not saved instead of replacing every other field. Stores without doc().get() behave as before.
+- projCost counts accepted Work Order fees (S.wos, matched by project slug or name) as project cost, so margins include what Logicnova is owed.
