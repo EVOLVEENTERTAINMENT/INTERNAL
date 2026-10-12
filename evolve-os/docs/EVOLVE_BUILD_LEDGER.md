@@ -994,3 +994,12 @@ two per page maximum, never per card.
 - Wording approved by Jackson from the picture (Yes, owner only).
 - Only today's brief shows. None written yet means nothing shows. Crew lens never sees it (the brief holds personal items).
 - No new writes. Suites green, sweep 1176 clicks at 1440 and 390, no overflow.
+
+## V159 (2026-10-12) Brain step 1
+- memDigest(): every Claude call now gets his people, words, rules (memory/core), context/core people and glossary, live project names and client contacts. Unknown names must be flagged, never guessed.
+- memory/core seeded (people, words, empty rules) from facts already on the board.
+- Ask chat saves after every good answer (was only after an error).
+- A pasted list of 3+ short lines becomes one inbox item per line, bullets and numbers stripped.
+- catchIt no longer gets the array index as a source.
+- No new visible wording. Suites green, sweep 1176 at 1440 and 390, startup writes unchanged.
+- Plan PDF: docs/EvolveOS_BrainPlan_26-10-12.pdf
