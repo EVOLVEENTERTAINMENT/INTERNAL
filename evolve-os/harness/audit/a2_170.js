@@ -1,0 +1,27 @@
+const {chromium}=require('../h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const file=__dirname+'/../v170.html';const port=8912;const W=+process.argv[2]||390;
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const ctx=await b.newContext({viewport:{width:W,height:900},timezoneId:'America/Chicago'});
+ const p=await ctx.newPage();
+ await p.addInitScript(()=>{window.SpeechRecognition=function(){const me=this;this.start=()=>{setTimeout(()=>{me.onresult({results:[[{transcript:"order jeans tonight 10 minutes"}],[{transcript:" dentist tuesday at 3pm"}],[{transcript:" tell Gavin to send selects friday"}]]});setTimeout(()=>me.onend(),50);},50);};this.stop=()=>me.onend();};});
+ await p.addInitScript({path:__dirname+'/../hl/mocklive.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ const r=await p.evaluate(async()=>{const o={};const wait=ms=>new Promise(r=>setTimeout(r,ms));
+   sample=Object.assign(async()=>({}),{json:async()=>({})});
+   S.mode="dump";S.room=null;paint();await wait(100);
+   const btn=[...document.querySelectorAll('.srcrow button')].find(x=>x.textContent==='Dictate');
+   btn.click(); await wait(300);
+   const ta=document.getElementById('cmd');
+   o.cmdVal=ta.value; o.barHidden=document.getElementById('cmdbar').hidden;
+   o.cmdVisible=!!(ta.offsetWidth||ta.offsetHeight);
+   o.padVal=document.getElementById('padta').value.slice(0,80);
+   o.active=document.activeElement&&document.activeElement.id;
+   o.textVisibleInPage=document.body.innerText.includes("order jeans tonight");
+   o.cmdtab=!!document.getElementById('cmdtab')&&!document.getElementById('cmdtab').hidden;
+   // now Note lane fire with dictated text
+   S.lane="dump";const n0=S.scraps.length,p0=S.pending.length; fire(); await wait(300);
+   o.fire={added:S.scraps.length-n0,pend:S.pending.length-p0,last:S.scraps.slice(n0).map(x=>x.text)};
+   return o;});
+ console.log(JSON.stringify(r,null,1));await b.close();srv.close();})();

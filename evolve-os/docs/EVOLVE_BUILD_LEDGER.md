@@ -1054,3 +1054,15 @@ two per page maximum, never per card.
 - Sort these on Inbox now runs raw Inbox items through the brain dump; filed ones are binned with "Filed by the brain dump", Inbox ones updated in place. Undo restores all.
 - Tested on his exact list via a stand-in model: 14 to calendar (Tue 7:00 to 12:00 community service, tonight's 10 minute orders), Gavin item to Gavin, 3 to Inbox.
 - Merged onto another session's V168 (Sales block, Kept ideas, no-answer tries). Suites green.
+
+## V170 (live as version 171, 2026-10-12) Every way in reaches Claude
+- Audit by four agents (capture paths, approval list, daily loop, Ask chat). Scripts in harness/audit.
+- Fixed now, no new wording:
+  - + Capture sheet, Break this down, Today's page "Pull the lines out", bottom bar: 2+ lines, or one line naming a day, a time, a length or a team member, open the brain dump (bdOpenWith). Timer commands, day changes and "at" events keep their own paths.
+  - Dictation on a phone goes into the brain dump box (the bar is hidden there).
+  - Phone capture line reads up to 8000 characters (was 2000).
+  - Approval list: the floating Capture and Ask tab no longer covers Approve all; rows sort by time; dropping a brain dump item puts the original note back in Inbox.
+  - Board "Close the day" closes earlier open days then today (it said nothing was open).
+  - Now panel "Open today" opens Board, not Inbox.
+  - Last week's team brief now counts as old on Monday.
+- Open, not yet fixed: chat cannot move events, mark done or remember; chat lacks time, Inbox and next steps; overlaps and past slots not flagged in the approval list; partial undo strands events; Home never shows project tasks or handoffs; counts disagree across screens; stored prose shown as current; false "no next move" from calendar tags; Bill Abell shown twice.

@@ -1,0 +1,58 @@
+const {chromium}=require('../h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const file=process.argv[2];const port=8894;const D=__dirname+'/../';
+const OUTJ=JSON.parse(fs.readFileSync(D+'eval/out_j2.json','utf8').match(/\{[\s\S]*\}/)[0]);
+const TXT=fs.readFileSync(D+'eval/jackson.txt','utf8');
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const ctx=await b.newContext({viewport:{width:390,height:844},deviceScaleFactor:2,timezoneId:'America/Chicago'});
+ const p=await ctx.newPage();const errs=[];
+ p.on('pageerror',e=>errs.push("PAGEERROR "+String(e).slice(0,300)));
+ await p.addInitScript({path:D+'hl/mocklive.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ const r=await p.evaluate(async([out,txt])=>{const o={};
+   sample=Object.assign(async()=>({}),{json:async()=>JSON.parse(JSON.stringify(out))});
+   S.room=null;S.mode="board";paint();
+   S.lane="dump"; const ta=document.getElementById("cmd"); ta.value=txt; fire();
+   await new Promise(r=>setTimeout(r,400));
+   const btn=[...document.querySelectorAll('.bd button')].filter(x=>/^File/.test(x.textContent))[0]; btn.click();
+   await new Promise(r=>setTimeout(r,400));
+   o.toasts=[...document.querySelectorAll('#toast .tst')].map(t=>t.textContent);
+   o.queueOpen=S.queueOpen; o.n=S.pending.length;
+   const now=Date.now();
+   o.items=S.pending.map(c=>{const ov=S.events.filter(v=>!v.all&&+v.s<c.toE&&+v.e>c.toS).map(v=>v.cal+":"+v.title.slice(0,25));
+     return c.cal+" | "+new Date(c.toS).toString().slice(0,21)+" "+Math.round((c.toE-c.toS)/60000)+"m | "+c.title.slice(0,40)+(c.toS<now?" PAST":"")+(ov.length?" OVERLAPS "+ov.join("; "):"");});
+   const q=document.getElementById('queue');
+   o.queueRect=q&&JSON.stringify(q.getBoundingClientRect());
+   o.lsScroll=q&&q.querySelector('.ls').scrollHeight+"/"+q.querySelector('.ls').clientHeight;
+   o.rows=q&&q.querySelectorAll('.li').length;
+   o.qbtn=document.getElementById('qbtn').textContent+" hidden="+document.getElementById('qbtn').hidden;
+   o.qbtnRect=JSON.stringify(document.getElementById('qbtn').getBoundingClientRect());
+   o.pendDom=document.querySelectorAll('.pend').length;
+   o.view=S.view; o.anchor=String(S.anchor);
+   return o;},[OUTJ,TXT]);
+ console.log(JSON.stringify(r,null,1));
+ await p.screenshot({path:__dirname+'/q_open.png'});
+ await p.waitForTimeout(9000);
+ const z=await p.evaluate(()=>{const o={};const b=document.getElementById('qall');const r=b.getBoundingClientRect();
+   const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);o.qall=JSON.stringify(r);o.hit=hit&&(hit.id+"|"+hit.className+"|"+hit.textContent.slice(0,30));
+   const d=[...document.querySelectorAll('#queue .ft button')][0];const r2=d.getBoundingClientRect();const h2=document.elementFromPoint(r2.x+10,r2.y+r2.height/2);o.drop=h2&&h2.textContent.slice(0,30);
+   S.queueOpen=false;S.mode="board";S.view="day";paint();o.pendDay=document.querySelectorAll('.pend').length;
+   o.pendTxt=[...document.querySelectorAll('.pend')].map(x=>x.textContent.slice(0,30)).slice(0,6);
+   S.view="week";paint();o.pendWeek=document.querySelectorAll('.pend').length;S.view="day";paint();
+   return o;});
+ console.log(JSON.stringify(z,null,1));
+ await p.screenshot({path:__dirname+'/board.png',fullPage:true});
+ // partial undo
+ const u=await p.evaluate(async()=>{const o={};let n=0;const orig=mcp.callTool;
+   mcp.callTool=async(sv,t,a)=>{ if(t==="create_event"){n++;return {payload:{id:"event"+n}};}
+     if(t==="get_event"&&/^event\d/.test(a.eventId)){const p0=window.__pp[a.eventId];return {payload:{id:a.eventId,start:{dateTime:new Date(p0.toS).toISOString()},end:{dateTime:new Date(p0.toE).toISOString()},updated:"x"}};}
+     if(t==="delete_event"){if(a.eventId==="event2")throw {code:"upstream_error"};return {};}
+     return orig(sv,t,a);};
+   window.__pp={}; S.pending.forEach((p,i)=>{window.__pp["event"+(i+1)]=p;});
+   await approve(S.pending.slice(0,3)); const h=S.hist[0]; o.label=h.label;
+   await undoBatch(h); o.undone=h.undone; o.toasts=[...document.querySelectorAll('#toast .tst')].map(t=>t.textContent).slice(-3);
+   o.histBtn=S.hist[0].undone; return o;});
+ console.log(JSON.stringify(u,null,1));
+ console.log(errs.join("\n"));
+ await b.close();srv.close();})();
