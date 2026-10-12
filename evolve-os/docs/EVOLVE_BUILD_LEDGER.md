@@ -1072,3 +1072,9 @@ two per page maximum, never per card.
 - No "has no next move" row for a calendar tag with no project record.
 - Blocked rows say when the words were written when they are 2+ days old.
 - Jackson said "FIX!!!" while it was in test, taken as go. Suites green.
+
+## V172 (live as version 173) Approval list warns before it writes
+- Each row shows "Overlaps <title>, <time>" against loaded events (ambient calendars, all day and the item itself excluded; personal titles masked).
+- Past slots say "This time has already passed. Approve all leaves it for you." and Approve all skips them with a note; Write it still works per row.
+- Drop them all asks first. Per-item past toasts removed. Header reads "Waiting for your OK".
+- Tested on his 21-line list: community service Tue 7 to 12 flags overlaps with Check the plan and the Sales block. Suites green.
