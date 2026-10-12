@@ -1013,3 +1013,10 @@ two per page maximum, never per card.
 - Example: "Here is the whole of it" is now "Here's where things stand". "Did not happen" is now "Not done". "The day blew up" is now "Replan the day".
 - plantest.js updated for the new money heading. All suites green, sweep 1176 at 1440 and 390, startup writes unchanged.
 - Not covered: sentences the code assembles from several pieces (win rate explanation, some project notes), and wording the morning tasks write.
+
+## V162 (2026-10-12) Brain step 2: brain dump
+- Inbox top: Brain dump box. Paste a list, Sort it. One sample.json call (default tier, cache off, Stop button) with brain() + memory digest + today's date + raw inbox items for repeat spotting.
+- Every line comes back (a skipped line is kept as written). Dates only when his line had date words. Projects only when they match a real one (exact, PALIAS alias, or unique prefix).
+- Review: count line, up to 3 questions as buttons, Remember chips (write memory/core people, words or rules only on Remember), groups (To do, Waiting on someone, On the calendar, Ideas and notes, Already on your list, Drop), Keep or Skip per line, reply box to correct it. A reply keeps earlier sorting for lines Claude did not resend.
+- Add N to Inbox: scraps carry the sort (type, day, who, why, project) so the existing triage files them; ideas go to Someday; waiting lines also make a waiting row. Undo removes the whole batch.
+- Wording approved by Jackson from the phone screenshots. Suites green, sweep 1177 at 1440 and 390, startup writes unchanged.

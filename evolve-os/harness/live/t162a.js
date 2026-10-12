@@ -1,0 +1,11 @@
+const {chromium}=require('../h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const file=process.argv[2];const port=8861;
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await (await b.newContext({viewport:{width:390,height:900},timezoneId:'America/Chicago'})).newPage();
+ await p.addInitScript({path:__dirname+'/mocklive.js'});
+ await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ await p.evaluate(()=>{sample=Object.assign(async()=>({}),{json:async()=>({})});S.room=null;S.mode="dump";paint();});
+ const sec=await p.$('.bd');const h=await sec.evaluateHandle(n=>n.closest('.dsec'));await h.asElement().screenshot({path:__dirname+'/out/v162-input-390.png'});
+ await b.close();srv.close();})();
