@@ -968,3 +968,11 @@ two per page maximum, never per card.
 ## V154 (2026-10-12) no new words
 - stageOf takes an exact stage name as is; coProjects reads stage_key before stage.
 - Known, not changed: a one-off calendar block "PLAN · College commercial outreach" shows as its own calendar project beside College and Greek outreach.
+
+## 2026-10-12 lead prep, on his word ("Yes, for 5 a night")
+- Night Lead Engine (trig_012vpVdF8GNkPyLhW74aEHNG) step 7 rewritten: for every lead set on_sheet, up to caps.concepts: 7a facts from their own site only, 7b copy (headline, intro, cta) in trade voice with no AI tells, 7c concept PDF of the top of the homepage with the watermark line, 7d pitch brief (who, their site now, one problem, open with, show them, the offer from leadops/settings.offer, if they say, ask for, unknowns). Rollback: routines/trig_012vpVdF8GNkPyLhW74aEHNG.rollback.txt. Engine still off.
+- leadops/settings caps.concepts 3 to 5. leadops/schema gains prospects.copy and prospects.brief.
+- This session's network cannot reach outside sites (proxy 403), so no real brief could be made here; the engine's own environment reached them on 8 Oct.
+
+## V155 (built, not published, words waiting) Calls on Pipeline
+- Watches prospects/ and leadops/settings. Calls panel: tonight's on_sheet leads, or the next calls_per_sheet queued leads in queue_pos order while the engine is off. Per lead: Call (tel link), Site, Open the concept or Concept not made yet, Read the brief (expands the brief) or Brief not made yet, No answer, Talked (what came of it, call back date, note), Not a fit. Talking to list with Talked again, Move to Pipeline (schema promotion row, source Night Lead Engine), Not a fit. Undo on every outcome. coldRate counts source Night Lead Engine as cold.
