@@ -28,7 +28,7 @@ const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'}
   ok("guess rate used",P.rate&&!P.rate.real&&P.rate.pct===5);
   ok("reach outs = ceil(winsWk/0.05) ("+P.reachWk+")",P.reachWk===Math.ceil(P.winsWk/0.05));
   S.room=null;S.mode="money";paint();await new Promise(r=>setTimeout(r,300));
-  const pan=[...document.querySelectorAll('.pan')].filter(n=>/When the next project has to land/.test(n.textContent))[0];
+  const pan=[...document.querySelectorAll('.pan')].filter(n=>/When you need the next project|When the next project has to land/.test(n.textContent))[0];
   ok("panel drawn",!!pan);
   ok("calendar has in and out chips",document.querySelectorAll('.pcal .pin').length>0&&document.querySelectorAll('.pcal .pout').length>0);
   ok("personal chips marked",document.querySelectorAll('.pcal .pout.me').length>0);

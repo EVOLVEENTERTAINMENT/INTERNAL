@@ -1007,3 +1007,9 @@ two per page maximum, never per card.
 ## V160 (2026-10-12)
 - Another session published its own V159 at 17:23Z (mark() saves the close before repainting, diag/paintfail). My V159 never went live; it is kept as src/EvolveOS_V159_unpublished.html.
 - V160 = the live V159 (src/EvolveOS_V159_live_markfix.html) + patches/v160.py (same changes as my v159.py). Suites green, sweep clean. Live.
+
+## V161 (2026-10-12) Copy sweep
+- 167 on-screen strings rewritten (200 occurrences), approved by Jackson as a set ("Use all 167"). List: patches/v161_copy.json, PDF docs/EvolveOS_CopySweep_26-10-12.pdf.
+- Example: "Here is the whole of it" is now "Here's where things stand". "Did not happen" is now "Not done". "The day blew up" is now "Replan the day".
+- plantest.js updated for the new money heading. All suites green, sweep 1176 at 1440 and 390, startup writes unchanged.
+- Not covered: sentences the code assembles from several pieces (win rate explanation, some project notes), and wording the morning tasks write.
