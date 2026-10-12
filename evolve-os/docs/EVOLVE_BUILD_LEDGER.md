@@ -1101,7 +1101,7 @@ two per page maximum, never per card.
 - undoBatch keeps the items that did not go back as the open change, so Put it back stays for them. Toast: "2 put back. 1 could not be reversed. <reason>. Press Put it back again to try it."
 - Suites green.
 
-## V177 Counts agree, tasks on Board, one row per blocked project
+## V177 (live as version 178) Counts agree, tasks on Board, one row per blocked project
 - One set of blocks asks for a tick: dayRoll.work now leaves out soft rhythm blocks (Work Week Flow) and free or declined ones. The Now pill, Home "N of M done", the untick follow ups, Close the day and unclosedDays all read it. On the live mock: pill 5 to 2, matching Home "0 of 2"; the phantom "Sunday was never closed" follow up is gone.
 - Home counts live projects with isLive, same as Projects (21 to 20; the 21st was archived).
 - waitProject links a wait to a project when one person or firm word on it (5+ letters, not a generic word) is in exactly one project's name or blocker. "Cheryl Bullard / Mr. Abell, Abell & Associates" now belongs to Bill Abell, so the blocker row folds into the wait row: Bill Abell shows once (needs you 7 to 6).
@@ -1109,3 +1109,4 @@ two per page maximum, never per card.
 - Projects reads the same needs-you rows as Home (blk, wait, wexp, cand by slug). Header 1 need you to 5; the Bill Abell page now shows the wait under Attention instead of "Nothing blocked".
 - Board day view: a "To do" list above the hours with his own dated tasks and dated Inbox items, from the same myTodos() Home uses. Today takes carried ones; other days show "due"; past days show none.
 - Test: harness/live/t177.js. Suites green, startup writes unchanged. Shot: docs/shots/V177_board_todo_phone.png.
+- Sweeps at 1440 and 390: 19 screens, 1179 clicks, no errors, no overflow.
