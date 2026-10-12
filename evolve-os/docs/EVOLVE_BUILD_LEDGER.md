@@ -1078,3 +1078,10 @@ two per page maximum, never per card.
 - Past slots say "This time has already passed. Approve all leaves it for you." and Approve all skips them with a note; Write it still works per row.
 - Drop them all asks first. Per-item past toasts removed. Header reads "Waiting for your OK".
 - Tested on his 21-line list: community service Tue 7 to 12 flags overlaps with Check the plan and the Sales block. Suites green.
+
+## V173 (live as version 174) The chat can act
+- Ask chat prompt now has the current time, open tasks with ids, the last 30 Inbox items with ids and every project's next step and blocker (prompt about 28 KB of 64).
+- Told to move with read_calendar plus propose_move, cancel with propose_cancel, never add a new block when asked to move.
+- New tools: mark_done (project task or Inbox item by id) and remember (person, word or rule into memory/core, via memRemember).
+- stage() returns true or false; propose tools report queued false when refused; duplicate moves and cancels are refused like duplicate creates.
+- Suites green.
