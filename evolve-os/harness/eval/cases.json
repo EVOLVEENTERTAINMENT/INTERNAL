@@ -1,0 +1,327 @@
+[
+[
+"call sue about the HLE quote",
+{
+"kind": [
+"task"
+],
+"project": "Harold Lloyd Entertainment website",
+"person": true,
+"date": "",
+"sure": true
+}
+],
+[
+"pay the vue rent friday",
+{
+"kind": [
+"task",
+"event"
+],
+"date": "2026-10-16"
+}
+],
+[
+"text mary e about dinner",
+{
+"kind": [
+"task"
+],
+"person": true,
+"date": "",
+"sure": false
+}
+],
+[
+"gavin still owes me the dog budget number",
+{
+"kind": [
+"waiting"
+],
+"person": true,
+"project_any": [
+"Laurel Oaks Veterinary Center",
+""
+]
+}
+],
+[
+"send mom the audible link",
+{
+"kind": [
+"dup"
+],
+"dup": "s-txt-20260928T0850-2"
+}
+],
+[
+"move indie film account off moms card",
+{
+"kind": [
+"dup"
+],
+"dup": "s-txt-20260929T1055-3"
+}
+],
+[
+"asdf",
+{
+"kind": [
+"drop"
+]
+}
+],
+[
+"maybe start a podcast about local businesses",
+{
+"kind": [
+"idea"
+],
+"date": ""
+}
+],
+[
+"LOVC shot list to Jennifer by the 20th",
+{
+"kind": [
+"task"
+],
+"project": "Laurel Oaks Veterinary Center",
+"date": "2026-10-20"
+}
+],
+[
+"boos and brews invites",
+{
+"kind": [
+"task"
+],
+"project": "BOOS and BREWS",
+"date": ""
+}
+],
+[
+"HHC poster format question for mom",
+{
+"kind": [
+"task"
+],
+"project": "HHC mediation impact poster"
+}
+],
+[
+"countersign logicnova work order",
+{
+"kind": [
+"task"
+],
+"project": "Webb build with Logicnova"
+}
+],
+[
+"follow up inline lighting",
+{
+"kind": [
+"task"
+],
+"project": "Inline Lighting"
+}
+],
+[
+"grace organize pantry",
+{
+"kind": [
+"dup"
+],
+"person": true
+}
+],
+[
+"dentist tuesday 3pm",
+{
+"kind": [
+"event"
+],
+"date": "2026-10-13"
+}
+],
+[
+"tyler wants the camera back",
+{
+"kind": [
+"task",
+"waiting"
+],
+"person": true,
+"sure": false
+}
+],
+[
+"get tint quotes for the gv70",
+{
+"kind": [
+"task"
+],
+"project": "GV70 car purchase"
+}
+],
+[
+"christie never answered about co host",
+{
+"kind": [
+"waiting"
+],
+"person": true,
+"project": "BOOS and BREWS"
+}
+],
+[
+"invoice charlie remaining deposit",
+{
+"kind": [
+"task"
+],
+"project": "CR Photography (Charlie Roberts)"
+}
+],
+[
+"idea: reels series for vet clinics",
+{
+"kind": [
+"idea"
+]
+}
+],
+[
+"renew car registration",
+{
+"kind": [
+"task"
+],
+"date": ""
+}
+],
+[
+"pick up the heavy thing at myrtlewood from dad",
+{
+"kind": [
+"dup"
+],
+"dup": "s-txt-20260929T1055-4"
+}
+],
+[
+"laundry",
+{
+"kind": [
+"task"
+],
+"date": ""
+}
+],
+[
+"ask Bill Abell firm for signature",
+{
+"kind": [
+"task",
+"waiting"
+],
+"project": "Bill Abell law firm"
+}
+],
+[
+"call the dr",
+{
+"kind": [
+"task",
+"event"
+],
+"date": ""
+}
+],
+[
+"test",
+{
+"kind": [
+"drop"
+]
+}
+],
+[
+"update evolve website portfolio page",
+{
+"kind": [
+"task"
+],
+"project": "Evolve website"
+}
+],
+[
+"Threads of Change: get photos from mom",
+{
+"kind": [
+"task",
+"waiting"
+],
+"project": "Threads of Change"
+}
+],
+[
+"budget meeting with gavin thursday 10am",
+{
+"kind": [
+"event"
+],
+"date": "2026-10-15",
+"person": true
+}
+],
+[
+"buy gaff tape and batteries",
+{
+"kind": [
+"task"
+],
+"date": ""
+}
+],
+[
+"college outreach list from grace",
+{
+"kind": [
+"task",
+"waiting"
+],
+"project": "College and Greek outreach"
+}
+],
+[
+"fuse the denim next steps?",
+{
+"kind": [
+"task",
+"idea"
+],
+"project": "FUSE THE DENIM"
+}
+],
+[
+"sister lunch moved",
+{
+"kind": [
+"task",
+"event"
+],
+"date": ""
+}
+],
+[
+"pay WOW fiber bill",
+{
+"kind": [
+"task"
+],
+"date": ""
+}
+]
+]

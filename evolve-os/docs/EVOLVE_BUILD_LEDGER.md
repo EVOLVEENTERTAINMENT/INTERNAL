@@ -1024,3 +1024,9 @@ two per page maximum, never per card.
 ## V163 (2026-10-12) Live
 - Another session published its own V162 at 17:47Z (write receipts to diag/writes). My V162 never went live; kept as src/EvolveOS_V162_unpublished.html.
 - V163 = that live V162 (src/EvolveOS_V162_live_receipts.html) + patches/v163.py (the brain dump). Suites green, sweep clean, brain dump test passes. Live as version 163.
+
+## Brain dump grading (2026-10-12)
+- harness/eval: 34 realistic lines with known answers, the exact prompt V163 sends (built in the page from live data plus memory/core), scored by score.py.
+- With memory: 99%, 100% (two mid-size runs), 100% (smallest model). Without memory: 82%, projects 1 of 15. The memory is what makes it file things to the right project.
+- Unknown people (Mary E, Tyler) were flagged and asked about every time. No invented dates in any run.
+- Limits: the test lines were written by me, not Jackson; the page's default tier model was stood in for by subagents.
