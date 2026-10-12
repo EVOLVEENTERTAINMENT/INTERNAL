@@ -1096,3 +1096,7 @@ two per page maximum, never per card.
 - Once a chat turn has read mail or messages, catch_note and add_waiting stage for his OK (modelStagedCard on Inbox) instead of writing.
 - askModel cancels the call on timeout (AbortController signal), and a cancelled chat turn's tools refuse to run. Timeout says so plainly.
 - Suites green.
+
+## V176 (live as version 177) Undo that fails part way stays retryable
+- undoBatch keeps the items that did not go back as the open change, so Put it back stays for them. Toast: "2 put back. 1 could not be reversed. <reason>. Press Put it back again to try it."
+- Suites green.

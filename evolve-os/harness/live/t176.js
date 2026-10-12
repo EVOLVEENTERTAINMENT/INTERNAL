@@ -1,0 +1,16 @@
+const {chromium}=require('../h/node_modules/playwright');const http=require('http');const fs=require('fs');
+const file=process.argv[2];const port=8991;
+const srv=http.createServer((q,r)=>{r.writeHead(200,{'content-type':'text/html'});r.end(fs.readFileSync(file));}).listen(port);
+(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome'});
+ const p=await (await b.newContext({viewport:{width:390,height:844},timezoneId:'America/Chicago'})).newPage();const errs=[];p.on('pageerror',e=>errs.push(String(e)));
+ await p.addInitScript({path:__dirname+'/mocklive.js'});await p.addInitScript(()=>{try{localStorage.setItem('evolve-toured','1')}catch(e){}});
+ await p.goto('http://localhost:'+port+'/');await p.waitForTimeout(3500);
+ const r=await p.evaluate(async()=>{const o={};let n=0;
+   const real=undoOne; undoOne=async it=>{n++; if(n===2)throw {code:"upstream_error"}; return {};};
+   const h={id:"htest",label:"3 changes",items:[{title:"a"},{title:"b"},{title:"c"}],at:new Date().toISOString()};
+   S.hist=[h].concat(S.hist||[]);
+   await undoBatch(h); o.first={undone:h.undone,items:h.items.map(x=>x.title)};
+   await undoBatch(h); o.second={undone:h.undone,items:h.items.map(x=>x.title)};
+   o.toasts=[...document.querySelectorAll('#toast .tst')].map(t=>t.textContent.slice(0,120));
+   undoOne=real; return o;});
+ console.log(JSON.stringify(r,null,1));console.log(errs.join("\n"));await b.close();srv.close();})();
