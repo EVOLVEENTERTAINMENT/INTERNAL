@@ -1110,3 +1110,10 @@ two per page maximum, never per card.
 - Board day view: a "To do" list above the hours with his own dated tasks and dated Inbox items, from the same myTodos() Home uses. Today takes carried ones; other days show "due"; past days show none.
 - Test: harness/live/t177.js. Suites green, startup writes unchanged. Shot: docs/shots/V177_board_todo_phone.png.
 - Sweeps at 1440 and 390: 19 screens, 1179 clicks, no errors, no overflow.
+
+## V178 (live as version 179) Phone pass on every screen
+- Audit: harness/live/mob.js shoots 30 screens at 390 (all rooms, week list and grid, Now panel, queue, chat, ten project pages) and measures tap targets under 36px, text under 11px, sideways overflow. Four reviewers went through the shots; fixes are one block in the main stylesheet under @media (max-width:660px), so desktop is untouched (layout diff at 1440 and 820 identical apart from People below).
+- Biggest fixes: Inbox cards no longer show one word per line with buttons off the edge (actions wrap under the text). Projects By client view no longer scrolls the whole page sideways (a 5000px caption, .block2 .d). Top tabs all fit, More is reachable. Week list is one column instead of seven side by side. By stage board snaps one column at a time. Project tabs scroll to the open tab. Pills and buttons at 40px, labels at 10px or more, iOS no longer zooms on typing (16px inputs).
+- People showed Heard back twice (inside the waiting pane and as its own section). Now once, at every width.
+- Projects header, KPI tile and client cards count live projects with isLive (21 to 20), matching Home.
+- Small targets per screen went from 15 to 291 down to 0 to 12. Suites green, startup writes unchanged, sweeps clean at 1440 and 390. Shot: docs/shots/V178_phone_pass.png.
