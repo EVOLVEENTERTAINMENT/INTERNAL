@@ -1117,3 +1117,8 @@ two per page maximum, never per card.
 - People showed Heard back twice (inside the waiting pane and as its own section). Now once, at every width.
 - Projects header, KPI tile and client cards count live projects with isLive (21 to 20), matching Home.
 - Small targets per screen went from 15 to 291 down to 0 to 12. Suites green, startup writes unchanged, sweeps clean at 1440 and 390. Shot: docs/shots/V178_phone_pass.png.
+
+## Leaderboard plan (Oct 16), not built yet
+- Plan: docs/EvolveOS_LeaderboardPlan_26-10-16.pdf. Paste a site link, GitHub (evolve-lead-engine) audits it with the same engine2 scan, score and phone render, results come back through the Lead Engine Drive folder, the board judges it with the rubric and ranks it with every saved prospect.
+- Decided: pasted sites come back in about 30 minutes, GitHub checks every 30 minutes from 7 AM to 11 PM Central. Pasted sites get a "You found it" mark and no score boost.
+- Build order: 1 GitHub single site job, 2 paste on the board (adds Google Drive to the board's connections), 3 judge and place (plus a step in the 1:13 AM task), 4 the Leaderboard on Pipeline with daily movement, 5 learning from call outcomes after 20 calls.
