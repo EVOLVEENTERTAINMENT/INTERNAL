@@ -13,8 +13,23 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: evolve-desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm test
+
   mac:
-    runs-on: macos-14
+    needs: test
+    runs-on: macos-latest
     timeout-minutes: 30
     defaults:
       run:
