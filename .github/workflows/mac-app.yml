@@ -1,0 +1,37 @@
+name: Build the Evolve OS Mac app
+
+# Builds the Mac app on GitHub's own Mac machines, because the app has to be
+# put together on a Mac. The result is a .dmg to download from the run page.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'evolve-desktop/**'
+      - '.github/workflows/mac-app.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  mac:
+    runs-on: macos-14
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: evolve-desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm test
+      - name: Build the app (not signed yet)
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: npm run dist:mac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Evolve-OS-mac
+          path: evolve-desktop/dist/*.dmg
+          retention-days: 14
