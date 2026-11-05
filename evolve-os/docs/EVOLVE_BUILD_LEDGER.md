@@ -1130,3 +1130,12 @@ two per page maximum, never per card.
 - Tested end to end from this session: GitHub audit 35 seconds; a paste session (Sonnet) ran the audit, judged and wrote the result in about 2.5 minutes, about $0.44 at list price. Test record deleted afterwards.
 - Not live: publishing needs the board to declare Claude Code Remote create_session, and the publish was refused twice by the session's safety check even after Jackson said yes. Waiting on him.
 - Suites green, startup writes unchanged, sweeps at 1440 and 390 clean (1235 clicks).
+
+## Evolve OS for Mac, step 1 (Nov 5)
+- Plan: docs/EvolveOS_MacAppPlan_26-11-05.pdf. Jackson chose a fully standalone app with the data on Supabase.
+- evolve-desktop/: Electron app. The board (V182 html, unchanged) loads from evolve://app/ with claude-shim.js injected first, which answers window.claude.use() for db (app/store.js, a local JSON store with the artifact db semantics: nested paths, recursive update merge, __delete__, where/orderBy/limit, versions) and downloads (save dialog). sample and mcp resolve to null for now.
+- Checked here under xvfb: the board opens on the Oct 12 data copy (572 records), writes and merges persist across restarts, diag/boot shows db and downloads true. Tests: npm test (store, shim).
+- GitHub Actions "Build the Evolve OS Mac app" (.github/workflows/mac-app.yml) builds unsigned zips for Apple and Intel Macs on macos-latest. First green run: 42129680552. macos-14 label runs were cancelled before starting; disk images raced each other, so zips.
+- Step 2 started: supabase/schema.sql (one docs table, owner RLS, doc_set and doc_update with the same deep merge, realtime) tested against local Postgres 16; app/supabase-store.js written, not yet connected.
+- The bulk copy of the live board data through ArtifactData out_dir is refused for co-written documents, so the real data move will be an "Export everything" button on the claude.ai board.
+- Note: the INTERNAL repo is public, so the board source and the app builds are visible to anyone.
