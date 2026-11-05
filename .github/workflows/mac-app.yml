@@ -1,7 +1,7 @@
 name: Build the Evolve OS Mac app
 
 # Builds the Mac app on GitHub's own Mac machines, because the app has to be
-# put together on a Mac. The result is a .dmg to download from the run page.
+# put together on a Mac. The result is a .zip to download from the run page.
 on:
   workflow_dispatch:
   push:
@@ -48,5 +48,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Evolve-OS-mac
-          path: evolve-desktop/dist/*.dmg
+          path: evolve-desktop/dist/*.zip
           retention-days: 14

@@ -32,21 +32,21 @@
       "identity": null,
       "target": [
         {
-          "target": "dmg",
+          "target": "zip",
           "arch": [
             "arm64",
             "x64"
           ]
         }
       ]
-    },
-    "dmg": {
-      "title": "Evolve OS"
     }
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/EVOLVEENTERTAINMENT/INTERNAL.git"
   },
-  "author": "Evolve Entertainment Studios"
+  "author": "Evolve Entertainment Studios",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4"
+  }
 }

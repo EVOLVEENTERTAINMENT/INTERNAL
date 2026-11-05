@@ -110,12 +110,7 @@ class LocalStore {
   query(colPath, q) {
     const col = checkCol(colPath); const docs = this.load(col); q = q || {};
     let rows = Object.keys(docs).map(id => ({ id, data: docs[id].data, version: docs[id].version, updatedAt: docs[id].updatedAt }));
-    for (const w of q.where || []) rows = rows.filter(r => test(w[1], getField(r.data, w[0]), w[2]));
-    for (const o of (q.orderBy || []).slice().reverse()) {
-      const dir = o[1] === 'desc' ? -1 : 1;
-      rows.sort((a, b) => dir * cmp(getField(a.data, o[0]), getField(b.data, o[0])));
-    }
-    if (q.limit) rows = rows.slice(0, q.limit);
+    rows = applyQuery(rows, q);
     return rows.map(r => ({ id: r.id, data: clone(r.data), version: r.version, updatedAt: r.updatedAt }));
   }
   // One time copy of an ArtifactData export: <dir>/<collection>/<doc>.json,
@@ -143,4 +138,15 @@ class LocalStore {
     try { return !fs.readdirSync(this.dir).some(f => f.endsWith('.json')); } catch (e) { return true; }
   }
 }
-module.exports = { LocalStore, merge, test };
+// Filtering and ordering shared by every store, so local and Supabase agree.
+function applyQuery(rows, q) {
+  q = q || {};
+  for (const w of q.where || []) rows = rows.filter(r => test(w[1], getField(r.data, w[0]), w[2]));
+  for (const o of (q.orderBy || []).slice().reverse()) {
+    const dir = o[1] === 'desc' ? -1 : 1;
+    rows.sort((a, b) => dir * cmp(getField(a.data, o[0]), getField(b.data, o[0])));
+  }
+  if (q.limit) rows = rows.slice(0, q.limit);
+  return rows;
+}
+module.exports = { LocalStore, merge, test, applyQuery, splitDoc, checkCol, stripDeletes, err };

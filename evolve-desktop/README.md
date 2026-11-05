@@ -22,8 +22,8 @@ Data lives in the app's own folder (`~/Library/Application Support/Evolve OS/boa
 File > Bring in board data... copies in an export folder (`<collection>/<doc>.json`).
 
 ## Build the Mac app
-GitHub builds it on a Mac: Actions, "Build the Evolve OS Mac app". The .dmg is on
-the run page. It is not signed yet, so the first time: right click the app, Open.
+GitHub builds it on a Mac: Actions, "Build the Evolve OS Mac app". The .zip is on
+the run page: unzip it and drag Evolve OS to Applications. It is not signed yet, so the first time: right click the app, Open.
 
 ## Tests
     npm test
