@@ -76,7 +76,65 @@
       .then(function (r) { if (!r || !r.saved) { var e = new Error('declined'); e.code = 'declined'; throw e; } return r; });
   } };
 
-  var caps = { db: db, downloads: downloads };
+  /* Claude. Same calls the board makes inside claude.ai: sample(input, opts)
+     gives {text, truncated}, sample.json gives parsed JSON. When the board
+     passes tools, Claude may call them; they run here, in the page, and the
+     answer goes back to Claude until it is done. */
+  function toMessages(input) {
+    if (typeof input === 'string') return [{ role: 'user', content: input }];
+    return (input || []).map(function (m) { return { role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content) }; });
+  }
+  function aiErr(e) { return { code: (e && e.code) || 'upstream_error', message: String((e && e.message) || e) }; }
+  function runSample(input, opts, wantJson) {
+    opts = opts || {};
+    var tools = (opts.tools || []).filter(function (t) { return t && t.name && typeof t.execute === 'function'; });
+    var msgs = toMessages(input);
+    if (wantJson) {
+      var last = msgs[msgs.length - 1];
+      last.content = String(last.content) + '\n\nAnswer with the JSON only, no other words and no code fence.';
+    }
+    var schemas = tools.map(function (t) { return { name: t.name, description: t.description, inputSchema: t.inputSchema }; });
+    var rounds = 0, signal = opts.signal;
+    function aborted() { return signal && signal.aborted; }
+    function step() {
+      if (aborted()) return Promise.reject({ code: 'cancelled', message: 'cancelled' });
+      return call('ai:messages', { tier: opts.modelTier || 'default', messages: msgs, tools: schemas }).then(function (r) {
+        if (aborted()) throw { code: 'cancelled', message: 'cancelled' };
+        var uses = (r.content || []).filter(function (c) { return c.type === 'tool_use'; });
+        if (uses.length && rounds < 12) {
+          rounds++;
+          msgs.push({ role: 'assistant', content: r.content });
+          return Promise.all(uses.map(function (u) {
+            var t = tools.filter(function (x) { return x.name === u.name; })[0];
+            return Promise.resolve().then(function () {
+              if (!t) throw new Error('no tool named ' + u.name);
+              return t.execute(u.input || {}, { signal: signal });
+            }).then(function (out) {
+              return { type: 'tool_result', tool_use_id: u.id, content: JSON.stringify(out === undefined ? null : out).slice(0, 60000) };
+            }, function (e) {
+              return { type: 'tool_result', tool_use_id: u.id, is_error: true, content: String((e && e.message) || e).slice(0, 2000) };
+            });
+          })).then(function (results) { msgs.push({ role: 'user', content: results }); return step(); });
+        }
+        var text = (r.content || []).filter(function (c) { return c.type === 'text'; }).map(function (c) { return c.text; }).join('');
+        if (opts.onText) { try { opts.onText({ text: text, delta: text }); } catch (x) {} }
+        return { text: text, truncated: r.stop_reason === 'max_tokens', modelTierApplied: opts.modelTier || 'default' };
+      }, function (e) { throw aiErr(e); });
+    }
+    return step();
+  }
+  function parseJson(text) {
+    var t = String(text || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+    try { return JSON.parse(t); } catch (x) {}
+    var a = t.search(/[\[{]/), open = t.charAt(a), close = open === '[' ? ']' : '}', b = t.lastIndexOf(close);
+    if (a >= 0 && b > a) { try { return JSON.parse(t.slice(a, b + 1)); } catch (x) {} }
+    var e = new Error('Claude did not answer with JSON'); e.code = 'transform_error'; e.text = text; throw e;
+  }
+  var sample = function (input, opts) { return runSample(input, opts, false); };
+  sample.json = function (input, opts) { return runSample(input, opts, true).then(function (r) { return parseJson(r.text); }); };
+  sample.limits = function () { return Promise.resolve({ maxPromptBytes: 400000, images: false }); };
+
+  var caps = { db: db, downloads: downloads, sample: sample };
   /* sample (Claude) arrives in step 3 and mcp (calendar, Gmail, texts) in
      steps 4 and 5. Until then they resolve to null, as they would on a page
      that has not been granted them. */
@@ -86,7 +144,7 @@
     use: function (name) {
       return ready().then(function (hc) {
         if (name === 'permissions') return { state: function () { return Promise.resolve({}); }, request: function () { return Promise.resolve({}); } };
-        if (hc && hc[name] && window.__evolveCaps && window.__evolveCaps[name]) return window.__evolveCaps[name];
+        if (name === 'sample' && !(hc && hc.sample)) return null;
         return caps[name] || null;
       });
     }

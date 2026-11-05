@@ -20,3 +20,8 @@ fs.writeFileSync(path.join(snap, 'brain', 'digest.json'), JSON.stringify({ id: '
 const s3 = new LocalStore(fs.mkdtempSync(path.join(os.tmpdir(), 'evs3-'))); assert.equal(s3.importSnapshot(snap), 1);
 assert.equal(s3.get('brain/digest').data.headline, 'hi'); assert.equal(s3.get('brain/digest').version, 7);
 console.log('store ok');
+const { readExport } = require('../app/importer');
+const rows = readExport(JSON.stringify({ format: 'evolve-os-export', version: 1, collections: { brain: { digest: { headline: 'x' } }, prospects: { a: { name: 'A' }, b: { name: 'B' } } } }));
+assert.equal(rows.length, 3); assert.deepEqual(rows[0], { col: 'brain', id: 'digest', data: { headline: 'x' }, version: 1 });
+assert.throws(() => readExport('{"projects":{}}'));
+console.log('importer ok');

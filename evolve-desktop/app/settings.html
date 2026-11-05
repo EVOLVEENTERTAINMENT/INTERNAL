@@ -1,0 +1,51 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Evolve OS Settings</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+:root{--bg:#0B0B0C;--s1:#141416;--s2:#1A1A1D;--hair:rgba(255,255,255,.09);--fg:#F2F2F4;--fg2:#ABABB2;--fg3:#82828C;--acc:#F2703F;--ok:#5BA97A;--bad:#E0574E}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;padding:22px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--fg3);font-size:12.5px;margin-bottom:20px}
+section{background:var(--s1);border:1px solid var(--hair);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.12em;color:var(--fg2);margin:0 0 10px}
+label{display:block;font-size:12px;color:var(--fg3);margin:10px 0 4px}
+input{width:100%;padding:9px 11px;border-radius:9px;border:1px solid var(--hair);background:var(--s2);color:var(--fg);font:inherit}
+button{margin-top:12px;padding:9px 15px;border-radius:9px;border:0;background:var(--acc);color:#0B0B0C;font-weight:700;cursor:pointer}
+button.q{background:var(--s2);color:var(--fg2);border:1px solid var(--hair)}
+.st{font-size:12.5px;margin-top:8px;color:var(--fg2)}.st.ok{color:var(--ok)}.st.bad{color:var(--bad)}
+</style></head><body>
+<h1>Settings</h1><div class="sub" id="where"></div>
+<section><h2>Claude</h2>
+<div class="st" id="cst"></div>
+<label for="key">Anthropic API key</label><input id="key" type="password" autocomplete="off" placeholder="sk-ant-...">
+<button id="savekey">Save key</button> <button class="q" id="clearkey">Remove key</button>
+<div class="st" id="cmsg"></div></section>
+<section><h2>Your data on Supabase</h2>
+<div class="st" id="sst"></div>
+<label for="url">Project URL</label><input id="url" placeholder="https://your-project.supabase.co">
+<label for="anon">Anon public key</label><input id="anon" type="password" autocomplete="off">
+<label for="email">Email</label><input id="email" type="email" autocomplete="username">
+<label for="pw">Password</label><input id="pw" type="password" autocomplete="current-password">
+<button id="signin">Sign in</button> <button class="q" id="signout">Sign out</button>
+<div class="st" id="smsg"></div>
+<div id="move" hidden><label>This Mac has <b id="lc"></b> records that are not on Supabase yet.</label><button class="q" id="moveup">Copy them to Supabase</button><div class="st" id="mmsg"></div></div>
+</section>
+<script>
+const $=id=>document.getElementById(id), S=window.settings;
+const say=(id,t,c)=>{const n=$(id);n.textContent=t||'';n.className='st'+(c?' '+c:'');};
+async function load(){
+  const s=await S.call('set:state');
+  $('where').textContent=s.store==='supabase'?'Your board is on Supabase'+(s.who?', signed in as '+s.who:'')+'.':'Your board is on this Mac only.';
+  say('cst',s.claude?'Claude is on.':'Claude is off until you add a key.',s.claude?'ok':'');
+  say('sst',s.store==='supabase'?'Connected.':'Not connected.',s.store==='supabase'?'ok':'');
+  if(s.supabaseUrl)$('url').value=s.supabaseUrl;
+  if(s.supabaseAnon)$('anon').placeholder='saved';
+  $('move').hidden=!(s.store==='supabase'&&s.localCount>0); $('lc').textContent=s.localCount;
+  if(!s.encrypted)say('cmsg','This Mac could not lock the key away, so it is saved without encryption.','bad');
+}
+const run=async(id,ch,a,ok)=>{say(id,'Working...');try{const r=await S.call(ch,a);say(id,ok(r),'ok');load();}catch(e){say(id,String(e.message||e).replace(/^Error invoking remote method '[^']+': (Error: )?/,''),'bad');}};
+$('savekey').onclick=()=>run('cmsg','set:claude',{key:$('key').value},()=>{$('key').value='';return 'Saved. Claude answered.';});
+$('clearkey').onclick=()=>run('cmsg','set:claude',{key:''},()=>'Removed.');
+$('signin').onclick=()=>run('smsg','set:supabase',{url:$('url').value,anon:$('anon').value,email:$('email').value,password:$('pw').value},r=>{$('pw').value='';return 'Signed in as '+r.who+'.';});
+$('signout').onclick=()=>run('smsg','set:signout',{},()=>'Signed out. The board is back on this Mac.');
+$('moveup').onclick=()=>run('mmsg','set:moveup',{},r=>r.n+' records copied to Supabase.');
+load();
+</script></body></html>
