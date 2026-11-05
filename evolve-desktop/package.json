@@ -1,0 +1,52 @@
+{
+  "name": "evolve-os",
+  "productName": "Evolve OS",
+  "version": "0.1.0",
+  "description": "Evolve OS as its own Mac app",
+  "main": "app/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node test/store.test.js && node test/shim.test.js",
+    "dist:mac": "electron-builder --mac --publish never"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "25.1.8"
+  },
+  "build": {
+    "appId": "com.evolveentertain.evolveos",
+    "productName": "Evolve OS",
+    "copyright": "Evolve Entertainment Studios",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "app/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
+      "identity": null,
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ]
+    },
+    "dmg": {
+      "title": "Evolve OS"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/EVOLVEENTERTAINMENT/INTERNAL.git"
+  },
+  "author": "Evolve Entertainment Studios"
+}
