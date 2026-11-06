@@ -16,6 +16,7 @@ const imessage = require('./imessage');
 const linkCatch = require('./link-catch');
 const { autoMove } = require('./automove');
 const { BoardUpdates } = require('./board-updates');
+const capture = require('./capture');
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
@@ -104,7 +105,7 @@ function wire() {
   ipcMain.handle('db:delete', guard(a => store.delete(a.path)));
   ipcMain.handle('db:query', guard(a => store.query(a.col, a.q)));
   ipcMain.handle('db:acquire', guard(a => ({ acquired: true, holder: a.opts && a.opts.holder })));
-  ipcMain.handle('host:caps', guard(() => ({ sample: cfg.hasSecret('anthropic'), mcp: google.connected() || imessage.available(), store: where() })));
+  ipcMain.handle('host:caps', guard(() => ({ sample: cfg.hasSecret('anthropic'), mcp: google.connected() || imessage.available() || where() === 'supabase', store: where() })));
   ipcMain.handle('mcp:list', guard(() => {
     const servers = [];
     if (google.connected()) {
@@ -112,12 +113,15 @@ function wire() {
       servers.push({ server: GM, kind: 'connector', authStatus: 'connected', tools: ['search_threads', 'get_thread'].map(name => ({ name, description: '' })) });
     }
     if (imessage.available()) servers.push({ server: IM, kind: 'connector', authStatus: 'connected', tools: ['get_unread_imessages', 'read_imessages'].map(name => ({ name, description: '' })) });
+    // texts and voice notes arrive in your online database, so this needs the Supabase sign in
+    if (where() === 'supabase') servers.push({ server: capture.SERVER, kind: 'connector', authStatus: 'connected', tools: capture.TOOLS.map(name => ({ name, description: '' })) });
     return { servers };
   }));
   ipcMain.handle('mcp:call', guard(a => {
     if (a.server === GC) return google.calendar(a.tool, a.input || {});
     if (a.server === GM) return google.gmail(a.tool, a.input || {});
     if (a.server === IM) return imessage.call(a.tool, a.input || {});
+    if (a.server === capture.SERVER && where() === 'supabase') return capture.call(store, a.tool, a.input || {});
     const e = new Error(a.server + ' is not connected in this app yet.'); e.code = 'server_not_connected'; throw e;
   }));
   ipcMain.handle('ai:messages', guard(a => ai.messages(cfg.secret('anthropic'), a)));

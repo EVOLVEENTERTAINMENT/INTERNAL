@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js && node test/automove.test.js && node test/board-updates.test.js",
+    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js && node test/automove.test.js && node test/board-updates.test.js && node test/capture.test.js",
     "dist:mac": "electron-builder --mac --publish never"
   },
   "devDependencies": {
