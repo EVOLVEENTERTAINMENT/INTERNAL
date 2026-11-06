@@ -1164,3 +1164,6 @@ two per page maximum, never per card.
 - Function claude deployed (verify_jwt on), OWNER_EMAIL set. It answers only Jackson and says it has no key until ANTHROPIC_API_KEY is set on the project. supabase-js from esm.sh failed inside the function, so it checks the sign in with a direct call.
 - Not tested for real yet: the actual email and link click (that sends Jackson an email). First try is his.
 - Still needs Jackson: Anthropic key (app Settings, and the Supabase secret for the phone); Google OAuth desktop client; hosting for the phone site.
+- Paste once: saving the Anthropic key in the Mac app also saves it to app_secrets (save_app_secret, owner only, no read policy); the claude function reads it with the service key. Checked on the real project.
+- Phone site hosting: .github/workflows/phone-site.yml deploys web/dist to GitHub Pages (https://evolveentertainment.github.io/INTERNAL/). First run failed until Pages is switched on in the repo settings (Source: GitHub Actions); the workflow token cannot switch it on. The address is already on the Supabase redirect allow list.
+- Board data cannot be read out through ArtifactData files (documents others may have written), so the move stays Download data on the board, then File > Bring in board data and Copy them to Supabase.
