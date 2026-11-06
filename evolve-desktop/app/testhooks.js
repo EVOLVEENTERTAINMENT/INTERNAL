@@ -228,8 +228,36 @@ function wrap(ch, fn, dl) {
 }
 
 // Called from main.js once the board window exists.
+// EVOLVE_CHECK_CDP=1: Chrome's debugging protocol logs every request, page
+// event and media pipeline event to the console, from the first load on, so
+// a load that never finishes on one machine can be compared with one that did.
+function cdpTrace(wc) {
+  const dbg = wc.debugger, short = u => String(u || '').replace(/^evolve:\/\/app\//, '').slice(0, 70), say = s => console.log('cdp ' + s);
+  try {
+    dbg.attach('1.3');
+    dbg.on('message', (e, method, p) => {
+      if (method === 'Network.requestWillBeSent') say('req ' + p.requestId + ' ' + short(p.request.url) + (p.request.headers && p.request.headers.Range ? ' ' + p.request.headers.Range : ''));
+      else if (method === 'Network.responseReceived') say('res ' + p.requestId + ' ' + p.response.status + ' ' + short(p.response.url) + (p.response.fromDiskCache ? ' disk-cache' : '') + (p.response.fromServiceWorker ? ' sw' : ''));
+      else if (method === 'Network.requestServedFromCache') say('mem-cache ' + p.requestId);
+      else if (method === 'Network.loadingFinished') say('fin ' + p.requestId);
+      else if (method === 'Network.loadingFailed') say('fail ' + p.requestId + ' ' + p.errorText + (p.canceled ? ' canceled' : ''));
+      else if (method === 'Page.javascriptDialogOpening') say('dialog ' + p.type + ' ' + String(p.message).slice(0, 80));
+      else if (method === 'Page.lifecycleEvent') say('life ' + p.name);
+      else if (/^Page\.(frameStoppedLoading|loadEventFired|domContentEventFired|frameNavigated|frameStartedLoading)$/.test(method)) say(method);
+      else if (method === 'Media.playerEventsAdded') for (const x of p.events || []) say('media ' + p.playerId.slice(-6) + ' event ' + String(x.value).slice(0, 160));
+      else if (method === 'Media.playerErrorsRaised') for (const x of p.errors || []) say('media ' + p.playerId.slice(-6) + ' error ' + x.errorType + ' ' + x.code + ' ' + JSON.stringify(x.data || {}).slice(0, 160));
+      else if (method === 'Media.playerMessagesAdded') for (const x of p.messages || []) say('media ' + p.playerId.slice(-6) + ' ' + x.level + ' ' + String(x.message).slice(0, 160));
+      else if (method === 'Media.playerPropertiesChanged') for (const x of p.properties || []) say('media ' + p.playerId.slice(-6) + ' prop ' + x.name + '=' + String(x.value).slice(0, 80));
+      else if (method === 'Media.playersCreated') say('media players ' + (p.players || []).map(x => x.slice(-6)).join(','));
+    });
+    for (const d of ['Network', 'Page', 'Media']) dbg.sendCommand(d + '.enable').then(() => say(d + ' on'), e => say(d + ' not on: ' + (e && e.message || e)));
+    dbg.sendCommand('Page.setLifecycleEventsEnabled', { enabled: true }).catch(() => {});
+  } catch (e) { say('not attached: ' + (e && e.message || e)); }
+}
+
 function attach(win, o) {
   const errors = [];
+  if (env.EVOLVE_CHECK_CDP && (env.EVOLVE_TOUR || env.EVOLVE_CHECK)) cdpTrace(win.webContents);
   if (env.EVOLVE_TOUR || env.EVOLVE_CHECK) {
     win.webContents.on('console-message', (e, level, message, line, src) => { if (level >= 3) errors.push(String(message).slice(0, 300) + ' @' + path.basename(String(src || '')) + ':' + line); });
     win.webContents.on('render-process-gone', (e, d) => errors.push('renderer gone: ' + d.reason));

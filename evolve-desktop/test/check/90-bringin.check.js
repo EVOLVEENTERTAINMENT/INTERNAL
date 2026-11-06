@@ -20,7 +20,9 @@ module.exports = {
     // off by default because an attached debugger also switches off the
     // throttling of a hidden window, which hides the very thing under test.
     const dbg = wc.debugger, cdp = [], short = u => String(u || '').replace(/^evolve:\/\/app\//, '').slice(0, 70);
-    if (ctx.env.EVOLVE_CHECK_CDP) try {
+    // With EVOLVE_CHECK_CDP the tracer in testhooks.js is already attached and
+    // logging from the first load, so this file only attaches when it is not.
+    if (ctx.env.EVOLVE_CHECK_CDP && !dbg.isAttached()) try {
       dbg.attach('1.3'); await dbg.sendCommand('Network.enable'); await dbg.sendCommand('Page.enable');
       dbg.on('message', (e, method, p) => {
         if (method === 'Network.requestWillBeSent') cdp.push('req ' + p.requestId + ' ' + short(p.request.url) + (p.request.headers && p.request.headers.Range ? ' ' + p.request.headers.Range : ''));
@@ -42,7 +44,7 @@ module.exports = {
       fin = events.includes('did-finish-load'); gone = /^undefined\|/.test(last);
       console.log('bring in state ' + i + ' ' + JSON.stringify({ page: last, loading: wc.isLoading(), waiting: wc.isWaitingForResponse(), crashed: wc.isCrashed(), url: wc.getURL(), events: events.slice(-8), cdp: cdp.splice(0) }));
     }
-    try { if (dbg.isAttached()) dbg.detach(); } catch (e) {}
+    try { if (cdp.length && dbg.isAttached()) dbg.detach(); } catch (e) {}
     ctx.t('bring in: the board reloaded', fin || gone, JSON.stringify({ finishEvent: fin, markerGone: gone, page: last, events }));
     await ctx.ready();
     const ideas = ctx.readCol('ideas');
