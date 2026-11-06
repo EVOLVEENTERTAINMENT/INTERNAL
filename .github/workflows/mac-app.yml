@@ -16,15 +16,26 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     defaults:
       run:
         working-directory: evolve-desktop
+    env:
+      EVOLVE_TEST_PG: postgresql://postgres@localhost:5432/postgres
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - run: npm ci
+      - name: The board schema on a real Postgres
+        run: psql "$EVOLVE_TEST_PG" -q -v ON_ERROR_STOP=1 -f test/pre-local.sql -f supabase/schema.sql
       - run: npm test
 
   mac:

@@ -1,0 +1,25 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Evolve OS</title><meta name="theme-color" content="#0B0B0C"><link rel="apple-touch-icon" href="icon.png">
+<style>
+:root{--bg:#0B0B0C;--s1:#141416;--s2:#1A1A1D;--hair:rgba(255,255,255,.09);--fg:#F2F2F4;--fg3:#82828C;--acc:#F2703F;--bad:#E0574E}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+form{width:100%;max-width:360px;background:var(--s1);border:1px solid var(--hair);border-radius:14px;padding:22px}
+img{width:56px;height:56px;display:block;margin:0 0 14px}h1{font-size:20px;margin:0 0 16px}
+label{display:block;font-size:13px;color:var(--fg3);margin:12px 0 5px}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--hair);background:var(--s2);color:var(--fg);font:inherit}
+button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;background:var(--acc);color:#0B0B0C;font:700 16px -apple-system,sans-serif}
+#msg{min-height:22px;margin-top:10px;font-size:14px;color:var(--bad)}
+</style></head><body>
+<form id="f"><img src="icon.png" alt=""><h1>Evolve OS</h1>
+<label for="e">Email</label><input id="e" type="email" autocomplete="username" required>
+<label for="p">Password</label><input id="p" type="password" autocomplete="current-password" required>
+<button>Sign in</button><div id="msg"></div></form>
+<script src="supabase.js"></script><script src="config.js"></script>
+<script>
+const C=window.EVOLVE_WEB, sb=supabase.createClient(C.url,C.anon,{auth:{persistSession:true}});
+sb.auth.getSession().then(r=>{ if(r.data.session) location.replace('board.html'); });
+document.getElementById('f').onsubmit=async ev=>{ ev.preventDefault();
+  const r=await sb.auth.signInWithPassword({email:document.getElementById('e').value,password:document.getElementById('p').value});
+  if(r.error){document.getElementById('msg').textContent='That email and password did not match.';return;}
+  location.replace('board.html'); };
+</script></body></html>

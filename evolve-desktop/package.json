@@ -7,12 +7,13 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js",
+    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js",
     "dist:mac": "electron-builder --mac --publish never"
   },
   "devDependencies": {
     "electron": "33.2.1",
-    "electron-builder": "25.1.8"
+    "electron-builder": "25.1.8",
+    "pg": "^8.13.1"
   },
   "build": {
     "appId": "com.evolveentertain.evolveos",
