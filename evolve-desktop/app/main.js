@@ -282,7 +282,10 @@ function menu() {
 
 function open() {
   win = new BrowserWindow({ width: 1440, height: 900, minWidth: 380, minHeight: 600, title: 'Evolve OS', backgroundColor: '#0B0B0C',
-    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true } });
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true,
+      // The window on GitHub's Mac counts as hidden, and a throttled hidden
+      // page there never finished a reload. Checks run as a visible window.
+      backgroundThrottling: !(process.env.EVOLVE_CHECK || process.env.EVOLVE_TOUR) } });
   const external = url => /^https?:|^tel:|^mailto:/i.test(url) && shell.openExternal(url);
   win.webContents.setWindowOpenHandler(({ url }) => { external(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('evolve://')) { e.preventDefault(); external(url); } });

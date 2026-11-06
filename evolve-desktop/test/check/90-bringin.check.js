@@ -15,10 +15,12 @@ module.exports = {
     const events = [];
     for (const ev of ['did-start-loading', 'did-stop-loading', 'did-finish-load', 'did-fail-load', 'did-navigate', 'render-process-gone', 'unresponsive', 'responsive', 'will-prevent-unload'])
       wc.on(ev, (e, ...a) => events.push(ev + (a.length ? ' ' + JSON.stringify(a.slice(0, 2)).slice(0, 120) : '')));
-    // Chrome's debugging protocol: every request after the reload, which
-    // one never finishes, and any dialog that would block the page.
+    // Chrome's debugging protocol can be attached here (EVOLVE_CHECK_CDP=1)
+    // to log every request after the reload and any blocking dialog. It is
+    // off by default because an attached debugger also switches off the
+    // throttling of a hidden window, which hides the very thing under test.
     const dbg = wc.debugger, cdp = [], short = u => String(u || '').replace(/^evolve:\/\/app\//, '').slice(0, 70);
-    try {
+    if (ctx.env.EVOLVE_CHECK_CDP) try {
       dbg.attach('1.3'); await dbg.sendCommand('Network.enable'); await dbg.sendCommand('Page.enable');
       dbg.on('message', (e, method, p) => {
         if (method === 'Network.requestWillBeSent') cdp.push('req ' + p.requestId + ' ' + short(p.request.url) + (p.request.headers && p.request.headers.Range ? ' ' + p.request.headers.Range : ''));
