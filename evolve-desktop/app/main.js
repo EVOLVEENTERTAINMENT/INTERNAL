@@ -5,12 +5,12 @@
 const { app, BrowserWindow, ipcMain, protocol, net, shell, dialog, Menu, safeStorage, powerMonitor } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { pathToFileURL } = require('url');
 const { LocalStore } = require('./store');
 const { SupabaseStore } = require('./supabase-store');
 const { create: makeConfig } = require('./config');
 const ai = require('./ai');
 const { readExport, importNote, logImport } = require('./importer');
+const { serveFile } = require('./serve-file');
 const { Google } = require('./google');
 const imessage = require('./imessage');
 const linkCatch = require('./link-catch');
@@ -57,7 +57,10 @@ function serveBoard() {
       const html = fs.readFileSync(full, 'utf8').replace('<head>', '<head><script>' + SHIM.replace(/<\/script/gi, '<\\/script') + '</script>');
       return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
     }
-    return net.fetch(pathToFileURL(full).toString());
+    // Media and the rest are served with byte ranges (see serve-file.js): a
+    // reload asks for ranges, and a plain fetch of the file ignored them, which
+    // left the page loading for ever on a Mac.
+    return serveFile(req, full);
   });
 }
 
