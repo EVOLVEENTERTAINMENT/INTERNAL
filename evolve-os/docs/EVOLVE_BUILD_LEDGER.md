@@ -1139,3 +1139,11 @@ two per page maximum, never per card.
 - Step 2 started: supabase/schema.sql (one docs table, owner RLS, doc_set and doc_update with the same deep merge, realtime) tested against local Postgres 16; app/supabase-store.js written, not yet connected.
 - The bulk copy of the live board data through ArtifactData out_dir is refused for co-written documents, so the real data move will be an "Export everything" button on the claude.ai board.
 - Note: the INTERNAL repo is public, so the board source and the app builds are visible to anyone.
+
+## Evolve OS for Mac, steps 2 to 5 code (Nov 5 to 6)
+- claude.ai board V183 live as version 188: Download data saves every collection read straight from the database (format evolve-os-export, collections map, plus the old fields). No wording or capability change.
+- App: Settings window (Cmd+,) for the Claude key (checked with one call, kept with safeStorage), Supabase sign in and copy-up, Google client ID and secret with Connect Google, Full Disk Access shortcut. File > Bring in board data takes the export file.
+- Doorway now answers sample/sample.json (tool loop runs in the board window, key stays in main), and mcp: callTool, watchTool, invalidate, listTools for Google Calendar and Gmail (app/google.js, connector shapes: list_events returns events not items; Gmail camel case fields; Gmail read only) and Messages (app/imessage.js, chat.db through sqlite3, read only). Capture Line is not in the app yet.
+- Supabase: supabase/schema.sql tested on local Postgres; app/supabase-store.js not yet run against a real project.
+- Tests: store, importer, shim (db, sample with tools), google (stand-in Google). Mac build green: run 42133585747.
+- Waiting on Jackson: Supabase project URL and anon key; Anthropic key in Settings; Google Cloud OAuth client.
