@@ -40,7 +40,11 @@
           ]
         }
       ]
-    }
+    },
+    "electronLanguages": [
+      "en",
+      "en-US"
+    ]
   },
   "repository": {
     "type": "git",
