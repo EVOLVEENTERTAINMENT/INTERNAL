@@ -1170,3 +1170,8 @@ two per page maximum, never per card.
 - Phone site live: pushing a gh-pages branch switched GitHub Pages on (Jackson OK'd the branch). phone-site.yml now rebuilds gh-pages on changes. https://evolveentertainment.github.io/INTERNAL/ (not reachable from the cloud session, checked by the Pages run).
 - First sign in moves the board by itself (app/automove.js): newest Evolve_OS_Data_*.json in Downloads plus local records, only into an empty Supabase.
 - Mac build ad-hoc signed (identity "-") and published to the release mac-latest: Evolve-OS-Apple-chip.zip, Evolve-OS-Intel.zip.
+
+## Mac plan v3 and Step 1 (Nov 6)
+- Jackson asked for a real plan, Mac first: evolve-os/docs/EvolveOS_MacAppPlan_v3_26-11-06.pdf (approved as v2, then updated). Apple Developer account later, once the software is further along. Updates must be automatic with no clicks: board updates pulled by the app (no Apple needed), app updates silent once signed. iPhone app via TestFlight is Step 6, replacing the phone site, which is parked (phone-site.yml manual only; gh-pages stays up).
+- Step 1 done: mac-app.yml opens the packaged arm64 app on macos-latest with a made-up board (test/make-sample-board.js), EVOLVE_TOUR clicks all 11 tabs plus Settings, prints 640px JPGs as TOUR_JPG lines. Run 42146281318: errors [], darwin arm64. Logs are only readable through get_job_logs saved to a file (blob host blocked).
+- The release step was dropped: the workflow token gets 403 on the releases API (git push to gh-pages works). Installer goes to Jackson directly in Step 2.
