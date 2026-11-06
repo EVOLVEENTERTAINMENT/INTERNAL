@@ -11,8 +11,15 @@ class SupabaseStore {
     this.sb = createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true, storage } });
     this.listeners = new Set(); this.channel = null;
   }
-  async signIn(email, password) {
-    const { data, error } = await this.sb.auth.signInWithPassword({ email, password });
+  // No password: Supabase emails a short code, you type it in. Only the
+  // account already on the project can get one (new sign ups are off).
+  async sendCode(email) {
+    const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+    if (error) throw err('needs_reauth', error.message);
+    return { sent: true };
+  }
+  async verifyCode(email, code) {
+    const { data, error } = await this.sb.auth.verifyOtp({ email, token: String(code).replace(/\s+/g, ''), type: 'email' });
     if (error) throw err('needs_reauth', error.message);
     this.live(); return { email: data.user && data.user.email };
   }

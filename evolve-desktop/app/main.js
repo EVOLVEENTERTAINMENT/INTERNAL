@@ -22,6 +22,9 @@ let store, local, cfg, google, win, settingsWin, unhook = null;
 const GC = 'Google Calendar', GM = 'Gmail', IM = 'host:Read_and_Send_iMessages';
 const home = () => process.env.EVOLVE_DATA_DIR || path.join(app.getPath('userData'), 'board-data');
 
+// Your EVOLVE OPS project. Both are public by design (the database only opens
+// for your sign in), so they ship with the app and you only type your email.
+const SUPABASE_DEFAULT = { url: 'https://agjtcdbxlqomlgqgoutd.supabase.co', anon: 'sb_publishable_euJcVW3q5ZSRZyMIQ8H3hg_P_MXSs64' };
 function useStore(s) {
   if (unhook) unhook();
   store = s;
@@ -93,7 +96,7 @@ function wire() {
     const c = cfg.get();
     let who = null;
     if (store instanceof SupabaseStore) who = await store.who().catch(() => null);
-    return { claude: cfg.hasSecret('anthropic'), encrypted: cfg.encrypted(), supabaseUrl: c.supabaseUrl || '', supabaseAnon: c.supabaseAnon ? 'saved' : '',
+    return { claude: cfg.hasSecret('anthropic'), encrypted: cfg.encrypted(), supabaseUrl: c.supabaseUrl || SUPABASE_DEFAULT.url, supabaseAnon: c.supabaseAnon || !c.supabaseUrl ? 'saved' : '',
       store: where(), who: who && who.email, localCount: localCount(),
       google: google.connected(), googleEmail: google.email(), googleClientId: c.googleClientId || '', mac: process.platform === 'darwin', messages: imessage.available() };
   }));
@@ -102,13 +105,17 @@ function wire() {
     if (k) await ai.messages(k, { tier: 'quick', messages: [{ role: 'user', content: 'Reply with the word ok.' }], maxTokens: 5 });
     cfg.setSecret('anthropic', k || null); reloadBoard(); return { ok: true };
   }));
+  let pendingSb = null;
   ipcMain.handle('set:supabase', guard(async a => {
     const url = String(a.url || '').trim().replace(/\/+$/, ''), anon = String(a.anon || '').trim();
     if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url)) { const e = new Error('That does not look like a Supabase project URL.'); e.code = 'bad_request'; throw e; }
     const keep = cfg.get();
-    cfg.set({ supabaseUrl: url, supabaseAnon: anon || keep.supabaseAnon || '' });
-    const sb = new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() });
-    const who = await sb.signIn(String(a.email || ''), String(a.password || ''));
+    cfg.set({ supabaseUrl: url, supabaseAnon: anon || keep.supabaseAnon || (url === SUPABASE_DEFAULT.url ? SUPABASE_DEFAULT.anon : '') });
+    if (pendingSb && pendingSb.url !== url) pendingSb = null;
+    const sb = pendingSb || Object.assign(new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() }), { url });
+    const email = String(a.email || '').trim();
+    if (!a.code) { await sb.sendCode(email); pendingSb = sb; return { ok: true, sent: true }; }
+    const who = await sb.verifyCode(email, a.code); pendingSb = null;
     useStore(sb); reloadBoard(); return { ok: true, who: who.email };
   }));
   ipcMain.handle('set:google', guard(async a => {

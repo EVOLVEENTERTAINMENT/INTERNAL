@@ -12,14 +12,20 @@ button{width:100%;margin-top:18px;padding:13px;border:0;border-radius:10px;backg
 </style></head><body>
 <form id="f"><img src="icon.png" alt=""><h1>Evolve OS</h1>
 <label for="e">Email</label><input id="e" type="email" autocomplete="username" required>
-<label for="p">Password</label><input id="p" type="password" autocomplete="current-password" required>
-<button>Sign in</button><div id="msg"></div></form>
+<div id="cb" hidden><label for="p">Code from the email</label><input id="p" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></div>
+<button id="go">Email me a code</button><div id="msg"></div></form>
 <script src="supabase.js"></script><script src="config.js"></script>
 <script>
 const C=window.EVOLVE_WEB, sb=supabase.createClient(C.url,C.anon,{auth:{persistSession:true}});
 sb.auth.getSession().then(r=>{ if(r.data.session) location.replace('board.html'); });
 document.getElementById('f').onsubmit=async ev=>{ ev.preventDefault();
-  const r=await sb.auth.signInWithPassword({email:document.getElementById('e').value,password:document.getElementById('p').value});
-  if(r.error){document.getElementById('msg').textContent='That email and password did not match.';return;}
+  const $=id=>document.getElementById(id), email=$('e').value.trim(), msg=$('msg');
+  if($('cb').hidden){
+    const r=await sb.auth.signInWithOtp({email,options:{shouldCreateUser:false}});
+    if(r.error){msg.textContent='That email could not get a code.';return;}
+    $('cb').hidden=false;$('go').textContent='Sign in';msg.style.color='var(--fg3)';msg.textContent='Check your email for a 6 digit code.';$('p').focus();return;
+  }
+  const r=await sb.auth.verifyOtp({email,token:$('p').value.replace(/\s+/g,''),type:'email'});
+  if(r.error){msg.style.color='';msg.textContent='That code did not work. Try again or ask for a new one.';return;}
   location.replace('board.html'); };
 </script></body></html>

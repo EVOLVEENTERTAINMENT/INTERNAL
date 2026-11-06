@@ -7,12 +7,14 @@ const PG = process.env.EVOLVE_TEST_PG;
 if (!PG) { console.log('supabase skipped (no EVOLVE_TEST_PG)'); process.exit(0); }
 (async () => {
   const { Client } = require('pg'); const c = new Client({ connectionString: PG }); await c.connect(); await c.query('delete from docs'); await c.end();
-  const fake = await start({ pgUrl: PG, email: 'jackson@example.com', password: 'pw' });
+  const fake = await start({ pgUrl: PG, email: 'jackson@example.com', code: '123456' });
   const mem = {}; const storage = { getItem: k => mem[k] || null, setItem: (k, v) => { mem[k] = v; }, removeItem: k => { delete mem[k]; } };
   const s = new SupabaseStore({ url: fake.url, anonKey: 'anon', storage });
   s.live = () => {};   // no realtime socket in the stand-in
-  await assert.rejects(s.signIn('jackson@example.com', 'wrong'), e => e.code === 'needs_reauth');
-  assert.equal((await s.signIn('jackson@example.com', 'pw')).email, 'jackson@example.com');
+  await assert.rejects(s.sendCode('someone@else.com'), e => e.code === 'needs_reauth');
+  assert.deepEqual(await s.sendCode('jackson@example.com'), { sent: true });
+  await assert.rejects(s.verifyCode('jackson@example.com', '000000'), e => e.code === 'needs_reauth');
+  assert.equal((await s.verifyCode('jackson@example.com', '123 456')).email, 'jackson@example.com');
   let ev = 0; s.onChange(() => ev++);
   assert.equal((await s.set('tasks/t1', { title: 'a', meta: { x: 1, y: 2 }, n: 3 })).version, 1);
   assert.equal((await s.update('tasks/t1', { meta: { y: 5 }, n: { __delete__: true } })).version, 2);

@@ -1,11 +1,11 @@
 // A stand-in for the parts of Supabase the app uses, on a real Postgres with
-// the real schema: password sign in, the docs table through the REST paths
+// the real schema: emailed code sign in, the docs table through the REST paths
 // supabase-js calls, and the doc_set and doc_update functions. Test use only.
 'use strict';
 const http = require('http');
 const { Client } = require('pg');
 
-async function start({ pgUrl, email, password }) {
+async function start({ pgUrl, email, code }) {
   const pg = new Client({ connectionString: pgUrl }); await pg.connect();
   const user = { id: '00000000-0000-0000-0000-000000000001', email, aud: 'authenticated', role: 'authenticated' };
   const log = [];
@@ -18,10 +18,16 @@ async function start({ pgUrl, email, password }) {
     log.push([req.method, u.pathname + u.search]);
     if (req.method === 'OPTIONS') return send(res, 204);
     try {
-      if (u.pathname === '/auth/v1/token') {
-        if (!body || body.email !== email || body.password !== password) return send(res, 400, { error: 'invalid_grant', error_description: 'Invalid login credentials' });
-        return send(res, 200, { access_token: 'tok', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'ref', user });
+      const session = () => ({ access_token: 'tok', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'ref', user });
+      if (u.pathname === '/auth/v1/otp') {
+        if (!body || body.email !== email || body.create_user !== false) return send(res, 422, { code: 'otp_disabled', msg: 'Signups not allowed for otp' });
+        return send(res, 200, {});
       }
+      if (u.pathname === '/auth/v1/verify') {
+        if (!body || body.email !== email || body.token !== code || body.type !== 'email') return send(res, 403, { code: 'otp_expired', msg: 'Token has expired or is invalid' });
+        return send(res, 200, session());
+      }
+      if (u.pathname === '/auth/v1/token') return send(res, 200, session());
       if (u.pathname === '/auth/v1/user') return send(res, 200, user);
       if (u.pathname === '/auth/v1/logout') return send(res, 204);
       if (u.pathname === '/functions/v1/claude') return send(res, 200, { content: [{ type: 'text', text: '{"ok":true}' }], stop_reason: 'end_turn' });

@@ -5,7 +5,7 @@
 'use strict';
 const fs = require('fs'); const path = require('path');
 const R = path.join(__dirname, '..'), OUT = path.join(__dirname, 'dist');
-const url = process.env.EVOLVE_SUPABASE_URL, anon = process.env.EVOLVE_SUPABASE_ANON;
+const url = process.env.EVOLVE_SUPABASE_URL || 'https://agjtcdbxlqomlgqgoutd.supabase.co', anon = process.env.EVOLVE_SUPABASE_ANON || 'sb_publishable_euJcVW3q5ZSRZyMIQ8H3hg_P_MXSs64';
 if (!url || !anon) { console.error('Set EVOLVE_SUPABASE_URL and EVOLVE_SUPABASE_ANON first.'); process.exit(2); }
 fs.rmSync(OUT, { recursive: true, force: true }); fs.mkdirSync(path.join(OUT, 'media'), { recursive: true });
 const cp = (a, b) => fs.copyFileSync(path.join(R, a), path.join(OUT, b));

@@ -70,6 +70,7 @@ create or replace function public.docs_owner() returns trigger
 language plpgsql security definer set search_path = public, auth as $$
 begin
   if new.owner is null then new.owner := coalesce(auth.uid(), (select id from auth.users order by created_at limit 1)); end if;
+  if new.owner is null then raise exception 'no_owner: create your sign in first' using errcode = 'P0401'; end if;
   return new;
 end $$;
 drop trigger if exists docs_owner on public.docs;
@@ -77,4 +78,7 @@ create trigger docs_owner before insert on public.docs for each row execute func
 alter table public.docs alter column owner drop default;
 
 -- live updates for the app and the phone
-alter publication supabase_realtime add table public.docs;
+do $$ begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'docs')
+  then alter publication supabase_realtime add table public.docs; end if;
+end $$;
