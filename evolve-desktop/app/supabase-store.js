@@ -8,18 +8,19 @@ const { applyQuery, splitDoc, checkCol, stripDeletes, err } = require('./store')
 
 class SupabaseStore {
   constructor({ url, anonKey, storage }) {
-    this.sb = createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true, storage } });
+    this.sb = createClient(url, anonKey, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, flowType: 'pkce', storage } });
     this.listeners = new Set(); this.channel = null;
   }
-  // No password: Supabase emails a short code, you type it in. Only the
-  // account already on the project can get one (new sign ups are off).
-  async sendCode(email) {
-    const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+  // No password: Supabase emails a sign-in link. Clicking it comes back with a
+  // one time code that only this copy of the app can trade for the sign in.
+  // Only the account already on the project can get one (sign ups are off).
+  async sendLink(email, redirectTo) {
+    const { error } = await this.sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false, emailRedirectTo: redirectTo } });
     if (error) throw err('needs_reauth', error.message);
     return { sent: true };
   }
-  async verifyCode(email, code) {
-    const { data, error } = await this.sb.auth.verifyOtp({ email, token: String(code).replace(/\s+/g, ''), type: 'email' });
+  async finishLink(code) {
+    const { data, error } = await this.sb.auth.exchangeCodeForSession(code);
     if (error) throw err('needs_reauth', error.message);
     this.live(); return { email: data.user && data.user.email };
   }

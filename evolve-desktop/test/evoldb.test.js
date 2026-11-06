@@ -5,7 +5,7 @@ const PG = process.env.EVOLVE_TEST_PG;
 if (!PG) { console.log('evoldb skipped (no EVOLVE_TEST_PG)'); process.exit(0); }
 (async () => {
   const { Client } = require('pg'); const c = new Client({ connectionString: PG }); await c.connect(); await c.query('delete from docs'); await c.end();
-  const fake = await start({ pgUrl: PG, email: 'j@x', code: '123456' });
+  const fake = await start({ pgUrl: PG, email: 'j@x' });
   const tool = path.join(__dirname, '../tools/evoldb.py');
   const run = (...a) => new Promise(res => execFile('python3', ['-I', tool, ...a], { env: { EVOLVE_DB_URL: fake.url, SUPABASE_SERVICE_KEY: 'service', PATH: process.env.PATH }, encoding: 'utf8' },
     (e, out, err) => res({ code: e ? e.code : 0, out: out.trim() ? JSON.parse(out.trim()) : null, err })));

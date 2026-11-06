@@ -1,11 +1,13 @@
 // A stand-in for the parts of Supabase the app uses, on a real Postgres with
-// the real schema: emailed code sign in, the docs table through the REST paths
+// the real schema: emailed link sign in, the docs table through the REST paths
 // supabase-js calls, and the doc_set and doc_update functions. Test use only.
 'use strict';
 const http = require('http');
 const { Client } = require('pg');
+const crypto = require('crypto');
 
-async function start({ pgUrl, email, code }) {
+async function start({ pgUrl, email }) {
+  let link = null;   // the last emailed link: where it goes and the PKCE challenge
   const pg = new Client({ connectionString: pgUrl }); await pg.connect();
   const user = { id: '00000000-0000-0000-0000-000000000001', email, aud: 'authenticated', role: 'authenticated' };
   const log = [];
@@ -21,11 +23,13 @@ async function start({ pgUrl, email, code }) {
       const session = () => ({ access_token: 'tok', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, refresh_token: 'ref', user });
       if (u.pathname === '/auth/v1/otp') {
         if (!body || body.email !== email || body.create_user !== false) return send(res, 422, { code: 'otp_disabled', msg: 'Signups not allowed for otp' });
+        link = { to: u.searchParams.get('redirect_to'), challenge: body.code_challenge };
         return send(res, 200, {});
       }
-      if (u.pathname === '/auth/v1/verify') {
-        if (!body || body.email !== email || body.token !== code || body.type !== 'email') return send(res, 403, { code: 'otp_expired', msg: 'Token has expired or is invalid' });
-        return send(res, 200, session());
+      if (u.pathname === '/auth/v1/token' && u.searchParams.get('grant_type') === 'pkce') {
+        const ok = link && body && body.auth_code === 'link-code' && crypto.createHash('sha256').update(body.code_verifier || '').digest('base64url') === link.challenge;
+        if (!ok) return send(res, 400, { code: 'bad_code_verifier', msg: 'code challenge does not match previously saved code verifier' });
+        link = null; return send(res, 200, session());
       }
       if (u.pathname === '/auth/v1/token') return send(res, 200, session());
       if (u.pathname === '/auth/v1/user') return send(res, 200, user);
@@ -70,6 +74,8 @@ async function start({ pgUrl, email, code }) {
     } catch (e) { send(res, 500, { message: e.message }); }
   });
   await new Promise(r => srv.listen(0, '127.0.0.1', r));
-  return { url: 'http://127.0.0.1:' + srv.address().port, log, close: async () => { srv.close(); await pg.end(); } };
+  return { url: 'http://127.0.0.1:' + srv.address().port, log,
+    // what clicking the emailed link does: back to the app with a one time code
+    click: () => link && link.to + (link.to.includes('?') ? '&' : '?') + 'code=link-code', close: async () => { srv.close(); await pg.end(); } };
 }
 module.exports = { start };

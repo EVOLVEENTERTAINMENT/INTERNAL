@@ -5,9 +5,9 @@ const { start } = require('./fake-supabase'); const { SupabaseStore } = require(
 const PW = process.env.EVOLVE_PLAYWRIGHT, PG = process.env.EVOLVE_TEST_PG, SNAP = process.env.EVOLVE_SNAPSHOT, SHOT = process.env.EVOLVE_SHOT || '/tmp/web.png';
 (async () => {
   const { Client } = require('pg'); const c = new Client({ connectionString: PG }); await c.connect(); await c.query('delete from docs'); await c.end();
-  const fake = await start({ pgUrl: PG, email: 'jackson@example.com', code: '123456' });
+  const fake = await start({ pgUrl: PG, email: 'jackson@example.com' });
   const mem = {}; const s = new SupabaseStore({ url: fake.url, anonKey: 'anon', storage: { getItem: k => mem[k] || null, setItem: (k, v) => { mem[k] = v; }, removeItem: () => {} } });
-  s.live = () => {}; await s.sendCode('jackson@example.com'); await s.verifyCode('jackson@example.com', '123456');
+  s.live = () => {}; await s.sendLink('jackson@example.com', 'http://x/'); await s.finishLink(new URL(fake.click()).searchParams.get('code'));
   const rows = [];
   for (const col of fs.readdirSync(SNAP)) for (const f of fs.readdirSync(path.join(SNAP, col))) { const x = JSON.parse(fs.readFileSync(path.join(SNAP, col, f))); rows.push({ col, id: x.id, data: x.data }); }
   console.log('seeded', await s.importRows(rows));
@@ -23,7 +23,8 @@ const PW = process.env.EVOLVE_PLAYWRIGHT, PG = process.env.EVOLVE_TEST_PG, SNAP 
   const errs = []; p.on('pageerror', e => errs.push(String(e)));
   await p.goto('http://localhost:' + port + '/board.html'); await p.waitForTimeout(800);
   const gated = p.url().endsWith('index.html');
-  await p.fill('#e', 'jackson@example.com'); await p.click('button'); await p.waitForSelector('#p', { state: 'visible' }); await p.fill('#p', '123456'); await p.click('button');
+  await p.fill('#e', 'jackson@example.com'); await p.click('button'); await p.waitForFunction(() => /Check your email/.test(document.getElementById('msg').textContent));
+  await p.goto(fake.click());
   await p.waitForURL(/board\.html/); await p.waitForTimeout(6000);
   const info = await p.evaluate(async () => {
     await dbSet('scraps/s-web-test', { id: 's-web-test', text: 'Phone site write test', at: new Date().toISOString(), state: 'raw' });

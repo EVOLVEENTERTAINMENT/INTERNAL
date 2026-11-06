@@ -13,6 +13,7 @@ const ai = require('./ai');
 const { readExport } = require('./importer');
 const { Google } = require('./google');
 const imessage = require('./imessage');
+const linkCatch = require('./link-catch');
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
@@ -105,18 +106,18 @@ function wire() {
     if (k) await ai.messages(k, { tier: 'quick', messages: [{ role: 'user', content: 'Reply with the word ok.' }], maxTokens: 5 });
     cfg.setSecret('anthropic', k || null); reloadBoard(); return { ok: true };
   }));
-  let pendingSb = null;
   ipcMain.handle('set:supabase', guard(async a => {
     const url = String(a.url || '').trim().replace(/\/+$/, ''), anon = String(a.anon || '').trim();
     if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url)) { const e = new Error('That does not look like a Supabase project URL.'); e.code = 'bad_request'; throw e; }
     const keep = cfg.get();
     cfg.set({ supabaseUrl: url, supabaseAnon: anon || keep.supabaseAnon || (url === SUPABASE_DEFAULT.url ? SUPABASE_DEFAULT.anon : '') });
-    if (pendingSb && pendingSb.url !== url) pendingSb = null;
-    const sb = pendingSb || Object.assign(new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() }), { url });
-    const email = String(a.email || '').trim();
-    if (!a.code) { await sb.sendCode(email); pendingSb = sb; return { ok: true, sent: true }; }
-    const who = await sb.verifyCode(email, a.code); pendingSb = null;
-    useStore(sb); reloadBoard(); return { ok: true, who: who.email };
+    const sb = new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() });
+    const redirect = await linkCatch.waitForLink(async code => {
+      await sb.finishLink(code); useStore(sb); reloadBoard();
+      for (const w of [settingsWin, win]) if (w && !w.isDestroyed()) { w.show(); w.focus(); }
+    });
+    try { await sb.sendLink(String(a.email || '').trim(), redirect); } catch (e) { linkCatch.stop(); throw e; }
+    return { ok: true, sent: true };
   }));
   ipcMain.handle('set:google', guard(async a => {
     if (a.clientId) cfg.set({ googleClientId: String(a.clientId).trim() });

@@ -32,8 +32,7 @@ button.q{background:var(--s2);color:var(--fg2);border:1px solid var(--hair)}
 <label for="url">Project URL</label><input id="url" placeholder="https://your-project.supabase.co">
 <label for="anon">Anon public key</label><input id="anon" type="password" autocomplete="off">
 <label for="email">Email</label><input id="email" type="email" autocomplete="username">
-<div id="codebox" hidden><label for="code">Code from the email</label><input id="code" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></div>
-<button id="signin">Email me a code</button> <button class="q" id="signout">Sign out</button>
+<button id="signin">Email me a sign-in link</button> <button class="q" id="signout">Sign out</button>
 <div class="st" id="smsg"></div>
 <div id="move" hidden><label>This Mac has <b id="lc"></b> records that are not on Supabase yet.</label><button class="q" id="moveup">Copy them to Supabase</button><div class="st" id="mmsg"></div></div>
 </section>
@@ -57,10 +56,10 @@ async function load(){
 const run=async(id,ch,a,ok)=>{say(id,'Working...');try{const r=await S.call(ch,a);say(id,ok(r),'ok');load();}catch(e){say(id,String(e.message||e).replace(/^Error invoking remote method '[^']+': (Error: )?/,''),'bad');}};
 $('savekey').onclick=()=>run('cmsg','set:claude',{key:$('key').value},()=>{$('key').value='';return 'Saved. Claude answered.';});
 $('clearkey').onclick=()=>run('cmsg','set:claude',{key:''},()=>'Removed.');
-$('signin').onclick=()=>{const c=$('codebox').hidden?'':$('code').value.trim();
-  run('smsg','set:supabase',{url:$('url').value,anon:$('anon').value,email:$('email').value,code:c},r=>{
-    if(r.sent){$('codebox').hidden=false;$('signin').textContent='Sign in';$('code').focus();return 'Check your email for a 6 digit code.';}
-    $('code').value='';$('codebox').hidden=true;$('signin').textContent='Email me a code';return 'Signed in as '+r.who+'.';});};
+let waitT=null;
+$('signin').onclick=()=>run('smsg','set:supabase',{url:$('url').value,anon:$('anon').value,email:$('email').value},()=>{
+  clearInterval(waitT); waitT=setInterval(async()=>{const st=await S.call('set:state'); if(st.store==='supabase'){clearInterval(waitT);say('smsg','Signed in as '+st.who+'.','ok');load();}},2000);
+  return 'Check your email on this Mac and click the link.';});
 $('signout').onclick=()=>run('smsg','set:signout',{},()=>'Signed out. The board is back on this Mac.');
 $('moveup').onclick=()=>run('mmsg','set:moveup',{},r=>r.n+' records copied to Supabase.');
 $('gconnect').onclick=()=>run('gmsg','set:google',{clientId:$('gid').value,clientSecret:$('gsec').value},r=>{$('gsec').value='';return 'Connected as '+r.email+'.';});
