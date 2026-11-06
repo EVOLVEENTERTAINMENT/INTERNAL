@@ -55,7 +55,16 @@ jobs:
       - name: Build the app (not signed yet)
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-        run: npm run dist:mac
+        run: npm run dist:mac -- -c.mac.identity=null
+      # Sign each app as one piece (ad hoc, until Apple approval) and refuse to
+      # go on if the signature does not check out. A broken signature is what
+      # makes macOS say the app is damaged.
+      - name: Sign the apps and check the signatures
+        run: |
+          for app in dist/mac-arm64/*.app dist/mac/*.app; do
+            codesign --force --deep --sign - "$app"
+            codesign --verify --deep --strict --verbose=2 "$app"
+          done
       - uses: actions/upload-artifact@v4
         with:
           name: Evolve-OS-mac
@@ -84,9 +93,22 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: |
-          npx electron-builder --mac dmg --arm64 --publish never -c.dmg.artifactName='Evolve-OS-Apple-chip.dmg' -c.dmg.format=ULFO
-          npx electron-builder --mac dmg --x64 --publish never -c.dmg.artifactName='Evolve-OS-Intel.dmg' -c.dmg.format=ULFO
+          npx electron-builder --mac dmg --arm64 --publish never --prepackaged "$(ls -d dist/mac-arm64/*.app)" -c.mac.identity=null -c.dmg.artifactName='Evolve-OS-Apple-chip.dmg' -c.dmg.format=ULFO
+          npx electron-builder --mac dmg --x64 --publish never --prepackaged "$(ls -d dist/mac/*.app)" -c.mac.identity=null -c.dmg.artifactName='Evolve-OS-Intel.dmg' -c.dmg.format=ULFO
           ls -la dist/*.dmg
+      # The same check your Mac does: open the installer, mark the app as
+      # downloaded from the internet, and check its signature.
+      - name: Check the app inside each installer like a downloaded copy
+        run: |
+          for d in dist/Evolve-OS-Apple-chip.dmg dist/Evolve-OS-Intel.dmg; do
+            m="$(mktemp -d)"; hdiutil attach -nobrowse -readonly -mountpoint "$m" "$d" >/dev/null
+            rm -rf "$RUNNER_TEMP/check.app"; ditto "$m/Evolve OS.app" "$RUNNER_TEMP/check.app"
+            hdiutil detach "$m" >/dev/null
+            xattr -w com.apple.quarantine "0083;$(printf %x "$(date +%s)");Chrome;" "$RUNNER_TEMP/check.app"
+            codesign --verify --deep --strict --verbose=2 "$RUNNER_TEMP/check.app"
+            spctl -a -vv -t exec "$RUNNER_TEMP/check.app" 2>&1 | tee "$RUNNER_TEMP/spctl.txt" || true
+            if grep -qi "damaged\|invalid\|a sealed resource is missing" "$RUNNER_TEMP/spctl.txt"; then echo "BROKEN SIGNATURE in $d"; exit 1; fi
+          done
       - name: Put the installers on the mac-builds branch
         if: github.ref == 'refs/heads/claude/kind-cerf-4hh0hw'
         run: |
