@@ -24,7 +24,7 @@ const $=id=>document.getElementById(id), msg=$('msg'), q=new URLSearchParams(loc
   if(q.get('error')){ history.replaceState(null,'',location.pathname); msg.textContent='That link did not work. Ask for a new one.'; return; }
 })();
 $('f').onsubmit=async ev=>{ ev.preventDefault();
-  const r=await sb.auth.signInWithOtp({email:$('e').value.trim(),options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});
+  const r=await sb.auth.signInWithOtp({email:$('e').value.trim(),options:{shouldCreateUser:false,emailRedirectTo:new URL('index.html',location.href).href.split('?')[0]}});
   if(r.error){msg.style.color='';msg.textContent='That email could not get a link.';return;}
   msg.style.color='var(--fg3)';msg.textContent='Check your email on this phone and tap the link.'; };
 </script></body></html>
