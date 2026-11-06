@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js",
+    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js && node test/automove.test.js",
     "dist:mac": "electron-builder --mac --publish never"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
     "mac": {
       "category": "public.app-category.productivity",
       "icon": "build/icon.png",
-      "identity": null,
+      "identity": "-",
       "target": [
         {
           "target": "zip",

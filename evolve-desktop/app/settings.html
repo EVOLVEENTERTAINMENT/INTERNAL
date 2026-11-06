@@ -58,7 +58,7 @@ $('savekey').onclick=()=>run('cmsg','set:claude',{key:$('key').value},()=>{$('ke
 $('clearkey').onclick=()=>run('cmsg','set:claude',{key:''},()=>'Removed.');
 let waitT=null;
 $('signin').onclick=()=>run('smsg','set:supabase',{url:$('url').value,anon:$('anon').value,email:$('email').value},()=>{
-  clearInterval(waitT); waitT=setInterval(async()=>{const st=await S.call('set:state'); if(st.store==='supabase'){clearInterval(waitT);say('smsg','Signed in as '+st.who+'.','ok');load();}},2000);
+  clearInterval(waitT); waitT=setInterval(async()=>{const st=await S.call('set:state'); if(st.store==='supabase'){clearInterval(waitT);say('smsg','Signed in as '+st.who+'.'+(st.moved?' '+st.moved+' records copied to Supabase.':''),'ok');load();}},2000);
   return 'Check your email on this Mac and click the link.';});
 $('signout').onclick=()=>run('smsg','set:signout',{},()=>'Signed out. The board is back on this Mac.');
 $('moveup').onclick=()=>run('mmsg','set:moveup',{},r=>r.n+' records copied to Supabase.');

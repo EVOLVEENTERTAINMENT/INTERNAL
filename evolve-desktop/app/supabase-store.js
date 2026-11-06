@@ -76,6 +76,10 @@ class SupabaseStore {
     return applyQuery(rows, q);
   }
   // One time copy from the local store or an export, 500 rows at a time.
+  async count() {
+    const { count, error } = await this.sb.from('docs').select('path', { count: 'exact', head: true });
+    if (error) this.fail(error); return count || 0;
+  }
   async importRows(rows) {
     let n = 0;
     for (let i = 0; i < rows.length; i += 500) {

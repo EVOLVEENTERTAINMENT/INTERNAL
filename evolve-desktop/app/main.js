@@ -14,6 +14,7 @@ const { readExport } = require('./importer');
 const { Google } = require('./google');
 const imessage = require('./imessage');
 const linkCatch = require('./link-catch');
+const { autoMove } = require('./automove');
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
@@ -37,7 +38,7 @@ async function connectSupabase() {
   const sb = new SupabaseStore({ url: c.supabaseUrl, anonKey: c.supabaseAnon, storage: cfg.authStorage() });
   const who = await sb.who().catch(() => null);
   if (!who) return false;
-  sb.live(); useStore(sb); return true;
+  sb.live(); useStore(sb); moveIfEmpty(sb); return true;
 }
 function where() { return store instanceof SupabaseStore ? 'supabase' : 'mac'; }
 
@@ -98,7 +99,7 @@ function wire() {
     let who = null;
     if (store instanceof SupabaseStore) who = await store.who().catch(() => null);
     return { claude: cfg.hasSecret('anthropic'), encrypted: cfg.encrypted(), supabaseUrl: c.supabaseUrl || SUPABASE_DEFAULT.url, supabaseAnon: c.supabaseAnon || !c.supabaseUrl ? 'saved' : '',
-      store: where(), who: who && who.email, localCount: localCount(),
+      store: where(), who: who && who.email, localCount: localCount(), moved: lastMove,
       google: google.connected(), googleEmail: google.email(), googleClientId: c.googleClientId || '', mac: process.platform === 'darwin', messages: imessage.available() };
   }));
   ipcMain.handle('set:claude', guard(async a => {
@@ -117,6 +118,7 @@ function wire() {
     const redirect = await linkCatch.waitForLink(async code => {
       await sb.finishLink(code); useStore(sb); reloadBoard();
       if (cfg.secret('anthropic')) sb.saveKey(cfg.secret('anthropic')).catch(() => {});
+      await moveIfEmpty(sb);
       for (const w of [settingsWin, win]) if (w && !w.isDestroyed()) { w.show(); w.focus(); }
     });
     try { await sb.sendLink(String(a.email || '').trim(), redirect); } catch (e) { linkCatch.stop(); throw e; }
@@ -141,10 +143,19 @@ function wire() {
       const col = decodeURIComponent(f.slice(0, -5));
       for (const r of local.query(col)) rows.push({ col, id: r.id, data: r.data, version: r.version });
     }
-    const n = await store.importRows(rows); reloadBoard(); return { ok: true, n };
+    const n = await store.importRows(rows); cfg.set({ localMoved: true }); reloadBoard(); return { ok: true, n };
   }));
 }
+// First sign in: copy the board's Download data file and this Mac's records up.
+let lastMove = 0;
+async function moveIfEmpty(sb) {
+  try {
+    const r = await autoMove({ sb, local, downloads: process.env.EVOLVE_DOWNLOADS || app.getPath('downloads') });
+    if (r.n) { lastMove = r.n; cfg.set({ localMoved: true }); reloadBoard(); }
+  } catch (e) { console.error('auto move', e.message || e); }
+}
 function localCount() {
+  if (cfg.get().localMoved) return 0;
   try { return fs.readdirSync(local.dir).filter(f => f.endsWith('.json')).reduce((n, f) => n + Object.keys(JSON.parse(fs.readFileSync(path.join(local.dir, f), 'utf8'))).length, 0); }
   catch (e) { return 0; }
 }

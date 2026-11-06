@@ -10,7 +10,7 @@ on:
       - '.github/workflows/mac-app.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -61,3 +61,15 @@ jobs:
           name: Evolve-OS-mac
           path: evolve-desktop/dist/*.zip
           retention-days: 14
+      # A plain download link that always has the newest build:
+      # github.com/EVOLVEENTERTAINMENT/INTERNAL/releases/latest
+      - name: Put the newest build on the download page
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp dist/*-arm64-mac.zip "Evolve-OS-Apple-chip.zip"
+          cp "$(ls dist/*-mac.zip | grep -v arm64)" "Evolve-OS-Intel.zip"
+          gh release delete mac-latest --yes --cleanup-tag || true
+          gh release create mac-latest Evolve-OS-Apple-chip.zip Evolve-OS-Intel.zip --target "$GITHUB_SHA" --latest \
+            --title "Evolve OS for Mac" --notes "Newest build. Most Macs from 2021 on use Apple chip."

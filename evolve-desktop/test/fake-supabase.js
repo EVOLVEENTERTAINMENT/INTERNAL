@@ -55,6 +55,10 @@ async function start({ pgUrl, email }) {
         const where = [], args = [];
         for (const k of ['path', 'col']) { const v = u.searchParams.get(k); if (v && v.startsWith('eq.')) { args.push(v.slice(3)); where.push(k + ' = $' + args.length); } }
         const w = where.length ? ' where ' + where.join(' and ') : '';
+        if (req.method === 'HEAD') {
+          const r = await pg.query('select count(*)::int n from docs' + w, args);
+          res.writeHead(200, Object.assign({ 'content-range': '*/' + r.rows[0].n }, CORS)); return res.end();
+        }
         if (req.method === 'GET') {
           const cols = (u.searchParams.get('select') || '*').split(',').map(s => s.replace(/[^a-z_*]/g, '')).join(',');
           let sql = 'select ' + cols + ' from docs' + w + ' order by path';
