@@ -7,16 +7,26 @@ module.exports = {
     if (!ctx.env.EVOLVE_BRING_IN) { ctx.skip('bring in: the export file is brought in', 'no EVOLVE_BRING_IN file'); return; }
     // Three ways to see the reload, so a miss says which part did not happen:
     // the load events, and a marker set on the old page that a reload wipes.
+    // Every page call here is time boxed, and the window state goes to the
+    // app log every five seconds, so a reload that never answers still tells
+    // its story in the log instead of freezing the whole file.
     const wc = ctx.win.webContents;
-    const loaded = ctx.nextLoad(45000);
-    const started = new Promise(res => { let d = false; const fin = v => { if (!d) { d = true; res(v); } }; wc.once('did-start-loading', () => fin(true)); setTimeout(() => fin(false), 45000); });
-    await ctx.js('window.__beforeReload = 1; "ok"');
+    const race = (p, ms, v) => Promise.race([p.catch(e => 'ERR ' + (e && e.message || e)), new Promise(r => setTimeout(() => r(v), ms))]);
+    const events = [];
+    for (const ev of ['did-start-loading', 'did-stop-loading', 'did-finish-load', 'did-fail-load', 'did-navigate', 'render-process-gone', 'unresponsive', 'responsive', 'will-prevent-unload'])
+      wc.on(ev, (e, ...a) => events.push(ev + (a.length ? ' ' + JSON.stringify(a.slice(0, 2)).slice(0, 120) : '')));
+    await race(ctx.js('window.__beforeReload = 1; "ok"'), 5000, 'no answer');
     ctx.t('bring in: the menu item is there', ctx.menuClick('Bring in board data...'));
     const msg = await ctx.until(() => ctx.dialogs.filter(d => /brought in/.test(d.text))[0], 20000);
     ctx.t('bring in: the app says 3 records brought in', !!msg && /^3 records brought in/.test(msg.text), msg ? msg.text : ctx.dialogs.map(d => d.text).join(' | '));
-    const fin = await loaded;
-    const gone = await ctx.until(async () => (await ctx.js('typeof window.__beforeReload').catch(() => 'unknown')) === 'undefined', 10000).catch(() => false);
-    ctx.t('bring in: the board reloaded', !!(fin || gone), JSON.stringify({ finishEvent: fin, startEvent: await started, markerGone: !!gone, loading: wc.isLoading(), url: wc.getURL(), dialogs: ctx.dialogs.map(d => d.text) }));
+    let fin = false, gone = false, last = '';
+    for (let i = 0; i < 12 && !(fin && gone); i++) {
+      await ctx.wait(5000);
+      last = String(await race(ctx.js('typeof window.__beforeReload + "|" + (typeof S !== "undefined" && S.migrated)'), 2000, 'no answer'));
+      fin = events.includes('did-finish-load'); gone = /^undefined\|/.test(last);
+      console.log('bring in state ' + i + ' ' + JSON.stringify({ page: last, loading: wc.isLoading(), crashed: wc.isCrashed(), url: wc.getURL(), events: events.slice(-8) }));
+    }
+    ctx.t('bring in: the board reloaded', fin || gone, JSON.stringify({ finishEvent: fin, markerGone: gone, page: last, events }));
     await ctx.ready();
     const ideas = ctx.readCol('ideas');
     ctx.t('bring in: the ideas are on disk', Object.keys(ideas).length === 2, Object.keys(ideas).join(','));
