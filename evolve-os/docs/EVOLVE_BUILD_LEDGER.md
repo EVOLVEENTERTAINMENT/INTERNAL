@@ -1154,3 +1154,13 @@ two per page maximum, never per card.
 - Schema: p_if_version guards on doc_set and doc_update, owner trigger so service key writes belong to the first user.
 - tools/evoldb.py for the scheduled tasks (ArtifactData equivalent), routines/PREAMBLE.txt for the switch.
 - test/fake-supabase.js stands in for Supabase REST and auth on real Postgres. CI runs the Supabase tests against a Postgres service: run 42135090318 green, all six suites ran.
+
+## EVOLVE OPS on Supabase, live (Nov 6)
+- Project EVOLVE OPS, ref agjtcdbxlqomlgqgoutd, org Evolve Entertainment Studios (free), us-east-1. Set up through the Management API with Jackson's access token (network secret on the Evolve OS environment, host api.supabase.com). The project host agjtcdbxlqomlgqgoutd.supabase.co is also allowed there.
+- Schema run (re-runs cleanly now). One auth user: jackson@evolveentertain.com, confirmed, no password. New sign ups are off.
+- Checked on the real project: doc_set, doc_update merge and versions, owner set by the trigger, live change events, delete; signed out with only the public key reads 0 rows and cannot write.
+- Sign in is an emailed link (Jackson chose it: the free plan cannot put a code in Supabase's email without our own mail sender). Mac app catches the link at http://127.0.0.1:45813/signed-in (app/link-catch.js) and trades it with PKCE; the phone site trades it on its own page. site_url and the redirect allow list are that local address; add the phone site address once it is hosted. Wording approved by Jackson from screenshots.
+- The app and phone build carry the project URL and publishable key (public by design).
+- Function claude deployed (verify_jwt on), OWNER_EMAIL set. It answers only Jackson and says it has no key until ANTHROPIC_API_KEY is set on the project. supabase-js from esm.sh failed inside the function, so it checks the sign in with a direct call.
+- Not tested for real yet: the actual email and link click (that sends Jackson an email). First try is his.
+- Still needs Jackson: Anthropic key (app Settings, and the Supabase secret for the phone); Google OAuth desktop client; hosting for the phone site.
