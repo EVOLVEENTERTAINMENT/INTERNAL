@@ -1167,3 +1167,6 @@ two per page maximum, never per card.
 - Paste once: saving the Anthropic key in the Mac app also saves it to app_secrets (save_app_secret, owner only, no read policy); the claude function reads it with the service key. Checked on the real project.
 - Phone site hosting: .github/workflows/phone-site.yml deploys web/dist to GitHub Pages (https://evolveentertainment.github.io/INTERNAL/). First run failed until Pages is switched on in the repo settings (Source: GitHub Actions); the workflow token cannot switch it on. The address is already on the Supabase redirect allow list.
 - Board data cannot be read out through ArtifactData files (documents others may have written), so the move stays Download data on the board, then File > Bring in board data and Copy them to Supabase.
+- Phone site live: pushing a gh-pages branch switched GitHub Pages on (Jackson OK'd the branch). phone-site.yml now rebuilds gh-pages on changes. https://evolveentertainment.github.io/INTERNAL/ (not reachable from the cloud session, checked by the Pages run).
+- First sign in moves the board by itself (app/automove.js): newest Evolve_OS_Data_*.json in Downloads plus local records, only into an empty Supabase.
+- Mac build ad-hoc signed (identity "-") and published to the release mac-latest: Evolve-OS-Apple-chip.zip, Evolve-OS-Intel.zip.
