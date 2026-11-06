@@ -11,12 +11,15 @@ const { SupabaseStore } = require('./supabase-store');
 const { create: makeConfig } = require('./config');
 const ai = require('./ai');
 const { readExport } = require('./importer');
+const { Google } = require('./google');
+const imessage = require('./imessage');
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
 protocol.registerSchemesAsPrivileged([{ scheme: 'evolve', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
-let store, local, cfg, win, settingsWin, unhook = null;
+let store, local, cfg, google, win, settingsWin, unhook = null;
+const GC = 'Google Calendar', GM = 'Gmail', IM = 'host:Read_and_Send_iMessages';
 const home = () => process.env.EVOLVE_DATA_DIR || path.join(app.getPath('userData'), 'board-data');
 
 function useStore(s) {
@@ -60,7 +63,22 @@ function wire() {
   ipcMain.handle('db:delete', guard(a => store.delete(a.path)));
   ipcMain.handle('db:query', guard(a => store.query(a.col, a.q)));
   ipcMain.handle('db:acquire', guard(a => ({ acquired: true, holder: a.opts && a.opts.holder })));
-  ipcMain.handle('host:caps', guard(() => ({ sample: cfg.hasSecret('anthropic'), store: where() })));
+  ipcMain.handle('host:caps', guard(() => ({ sample: cfg.hasSecret('anthropic'), mcp: google.connected() || imessage.available(), store: where() })));
+  ipcMain.handle('mcp:list', guard(() => {
+    const servers = [];
+    if (google.connected()) {
+      servers.push({ server: GC, kind: 'connector', authStatus: 'connected', tools: ['list_events', 'get_event', 'create_event', 'update_event', 'delete_event'].map(name => ({ name, description: '' })) });
+      servers.push({ server: GM, kind: 'connector', authStatus: 'connected', tools: ['search_threads', 'get_thread'].map(name => ({ name, description: '' })) });
+    }
+    if (imessage.available()) servers.push({ server: IM, kind: 'connector', authStatus: 'connected', tools: ['get_unread_imessages', 'read_imessages'].map(name => ({ name, description: '' })) });
+    return { servers };
+  }));
+  ipcMain.handle('mcp:call', guard(a => {
+    if (a.server === GC) return google.calendar(a.tool, a.input || {});
+    if (a.server === GM) return google.gmail(a.tool, a.input || {});
+    if (a.server === IM) return imessage.call(a.tool, a.input || {});
+    const e = new Error(a.server + ' is not connected in this app yet.'); e.code = 'server_not_connected'; throw e;
+  }));
   ipcMain.handle('ai:messages', guard(a => ai.messages(cfg.secret('anthropic'), a)));
   ipcMain.handle('dl:save', guard(async a => {
     const r = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('downloads'), path.basename(String(a.filename || 'evolve-file'))) });
@@ -76,7 +94,8 @@ function wire() {
     let who = null;
     if (store instanceof SupabaseStore) who = await store.who().catch(() => null);
     return { claude: cfg.hasSecret('anthropic'), encrypted: cfg.encrypted(), supabaseUrl: c.supabaseUrl || '', supabaseAnon: c.supabaseAnon ? 'saved' : '',
-      store: where(), who: who && who.email, localCount: localCount() };
+      store: where(), who: who && who.email, localCount: localCount(),
+      google: google.connected(), googleEmail: google.email(), googleClientId: c.googleClientId || '', mac: process.platform === 'darwin', messages: imessage.available() };
   }));
   ipcMain.handle('set:claude', guard(async a => {
     const k = String(a.key || '').trim();
@@ -92,6 +111,14 @@ function wire() {
     const who = await sb.signIn(String(a.email || ''), String(a.password || ''));
     useStore(sb); reloadBoard(); return { ok: true, who: who.email };
   }));
+  ipcMain.handle('set:google', guard(async a => {
+    if (a.clientId) cfg.set({ googleClientId: String(a.clientId).trim() });
+    if (a.clientSecret) cfg.setSecret('googleClientSecret', String(a.clientSecret).trim());
+    const r = await google.signIn(url => shell.openExternal(url));
+    reloadBoard(); return { ok: true, email: r.email };
+  }));
+  ipcMain.handle('set:googleout', guard(async () => { google.signOut(); reloadBoard(); return { ok: true }; }));
+  ipcMain.handle('set:fda', guard(async () => { await shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles'); return { ok: true }; }));
   ipcMain.handle('set:signout', guard(async () => {
     if (store instanceof SupabaseStore) await store.signOut();
     useStore(local); reloadBoard(); return { ok: true };
@@ -166,6 +193,7 @@ function open() {
 app.whenReady().then(async () => {
   cfg = makeConfig(path.join(home(), '..', 'settings'), safeStorage);
   local = new LocalStore(home());
+  google = new Google(cfg);
   if (local.isEmpty() && process.env.EVOLVE_SNAPSHOT && fs.existsSync(process.env.EVOLVE_SNAPSHOT)) local.importSnapshot(process.env.EVOLVE_SNAPSHOT);
   useStore(local);
   await connectSupabase().catch(() => false);

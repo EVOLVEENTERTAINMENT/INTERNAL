@@ -134,7 +134,42 @@
   sample.json = function (input, opts) { return runSample(input, opts, true).then(function (r) { return parseJson(r.text); }); };
   sample.limits = function () { return Promise.resolve({ maxPromptBytes: 400000, images: false }); };
 
-  var caps = { db: db, downloads: downloads, sample: sample };
+  /* The connectors: Google Calendar, Gmail and Messages, answered by the app
+     with your own sign ins. Same calls and the same result shape as the
+     claude.ai connectors: {content, payload}. */
+  var watches = new Set();
+  function mcpErr(e) { return { code: (e && e.code) || 'tool_error', message: String((e && e.message) || e), retryable: (e && e.code) === 'rate_limited' }; }
+  function mcpCall(server, tool, input) {
+    return call('mcp:call', { server: server, tool: tool, input: input || {} }).then(function (payload) {
+      return { content: [{ type: 'text', text: JSON.stringify(payload) }], structuredContent: payload, payload: payload };
+    }, function (e) { throw mcpErr(e); });
+  }
+  var mcp = {
+    callTool: function (server, tool, input) { return mcpCall(server, tool, input); },
+    listTools: function () { return call('mcp:list', {}); },
+    describeTool: function () { return Promise.reject({ code: 'not_in_manifest', message: 'not available here' }); },
+    server: function (name) {
+      return Promise.resolve(new Proxy({}, { get: function (_t, tool) { return function (input) { return mcpCall(name, String(tool), input).then(function (r) { return r.payload; }); }; } }));
+    },
+    invalidate: function (server, tool) {
+      watches.forEach(function (w) { if (w.server === server && (!tool || w.tool === tool)) w.run(); });
+      return Promise.resolve();
+    },
+    watchTool: function (server, tool, input, handler, opts) {
+      var w = { server: server, tool: tool, alive: true, timer: null };
+      w.run = function () {
+        if (!w.alive) return;
+        mcpCall(server, tool, input).then(function (r) { if (w.alive) handler({ type: 'data', result: Object.assign(r, { cache: { storedAt: Date.now(), revalidating: false } }) }); },
+          function (e) { if (w.alive) handler({ type: 'error', error: e }); });
+      };
+      watches.add(w); setTimeout(w.run, 0);
+      var every = opts && opts.refetchInterval;
+      if (every) w.timer = setInterval(w.run, Math.max(30000, every));
+      return function () { w.alive = false; if (w.timer) clearInterval(w.timer); watches.delete(w); };
+    }
+  };
+
+  var caps = { db: db, downloads: downloads, sample: sample, mcp: mcp };
   /* sample (Claude) arrives in step 3 and mcp (calendar, Gmail, texts) in
      steps 4 and 5. Until then they resolve to null, as they would on a page
      that has not been granted them. */
@@ -145,6 +180,7 @@
       return ready().then(function (hc) {
         if (name === 'permissions') return { state: function () { return Promise.resolve({}); }, request: function () { return Promise.resolve({}); } };
         if (name === 'sample' && !(hc && hc.sample)) return null;
+        if (name === 'mcp' && !(hc && hc.mcp)) return null;
         return caps[name] || null;
       });
     }

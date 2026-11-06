@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js && node test/shim.test.js",
+    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js",
     "dist:mac": "electron-builder --mac --publish never"
   },
   "devDependencies": {

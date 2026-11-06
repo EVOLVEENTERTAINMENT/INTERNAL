@@ -18,6 +18,15 @@ button.q{background:var(--s2);color:var(--fg2);border:1px solid var(--hair)}
 <label for="key">Anthropic API key</label><input id="key" type="password" autocomplete="off" placeholder="sk-ant-...">
 <button id="savekey">Save key</button> <button class="q" id="clearkey">Remove key</button>
 <div class="st" id="cmsg"></div></section>
+<section><h2>Google Calendar and Gmail</h2>
+<div class="st" id="gst"></div>
+<label for="gid">Google client ID</label><input id="gid" autocomplete="off" placeholder="....apps.googleusercontent.com">
+<label for="gsec">Google client secret</label><input id="gsec" type="password" autocomplete="off">
+<button id="gconnect">Connect Google</button> <button class="q" id="gout">Disconnect</button>
+<div class="st" id="gmsg"></div></section>
+<section id="msgsec"><h2>Messages</h2>
+<div class="st" id="ist"></div>
+<button class="q" id="fda">Open Full Disk Access settings</button></section>
 <section><h2>Your data on Supabase</h2>
 <div class="st" id="sst"></div>
 <label for="url">Project URL</label><input id="url" placeholder="https://your-project.supabase.co">
@@ -39,6 +48,10 @@ async function load(){
   if(s.supabaseUrl)$('url').value=s.supabaseUrl;
   if(s.supabaseAnon)$('anon').placeholder='saved';
   $('move').hidden=!(s.store==='supabase'&&s.localCount>0); $('lc').textContent=s.localCount;
+  say('gst',s.google?'Connected as '+s.googleEmail+'.':'Not connected.',s.google?'ok':'');
+  if(s.googleClientId)$('gid').value=s.googleClientId;
+  say('ist',!s.mac?'Messages can only be read on your Mac.':s.messages?'Messages found. If texts do not show up, give Evolve OS Full Disk Access.':'Messages not found on this Mac.',s.messages?'ok':'');
+  $('fda').hidden=!s.mac;
   if(!s.encrypted)say('cmsg','This Mac could not lock the key away, so it is saved without encryption.','bad');
 }
 const run=async(id,ch,a,ok)=>{say(id,'Working...');try{const r=await S.call(ch,a);say(id,ok(r),'ok');load();}catch(e){say(id,String(e.message||e).replace(/^Error invoking remote method '[^']+': (Error: )?/,''),'bad');}};
@@ -47,5 +60,8 @@ $('clearkey').onclick=()=>run('cmsg','set:claude',{key:''},()=>'Removed.');
 $('signin').onclick=()=>run('smsg','set:supabase',{url:$('url').value,anon:$('anon').value,email:$('email').value,password:$('pw').value},r=>{$('pw').value='';return 'Signed in as '+r.who+'.';});
 $('signout').onclick=()=>run('smsg','set:signout',{},()=>'Signed out. The board is back on this Mac.');
 $('moveup').onclick=()=>run('mmsg','set:moveup',{},r=>r.n+' records copied to Supabase.');
+$('gconnect').onclick=()=>run('gmsg','set:google',{clientId:$('gid').value,clientSecret:$('gsec').value},r=>{$('gsec').value='';return 'Connected as '+r.email+'.';});
+$('gout').onclick=()=>run('gmsg','set:googleout',{},()=>'Disconnected.');
+$('fda').onclick=()=>run('ist','set:fda',{},()=>'Turn on Evolve OS in the list, then quit and reopen the app.');
 load();
 </script></body></html>
