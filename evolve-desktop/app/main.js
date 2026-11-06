@@ -204,6 +204,31 @@ function open() {
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('evolve://')) { e.preventDefault(); external(url); } });
   win.loadURL('evolve://app/index.html');
   // For automated checks only: run a script, take a picture of the window and quit.
+  // Tour mode for checking a build: open every tab, screenshot each, note errors.
+  if (process.env.EVOLVE_TOUR) {
+    const dir = process.env.EVOLVE_TOUR, errors = [];
+    fs.mkdirSync(dir, { recursive: true });
+    win.webContents.on('console-message', (e, level, message, line, src) => { if (level >= 3) errors.push(String(message).slice(0, 300) + ' @' + path.basename(String(src || '')) + ':' + line); });
+    win.webContents.on('render-process-gone', (e, d) => errors.push('renderer gone: ' + d.reason));
+    win.webContents.once('did-finish-load', () => setTimeout(async () => {
+      const js = s => win.webContents.executeJavaScript(s).catch(e => 'ERR ' + e);
+      const tabs = await js('[...document.querySelectorAll("#modes button[data-m]")].map(b=>({m:b.dataset.m,label:b.textContent.replace(/\\s+/g," ").trim()}))');
+      const seen = [];
+      for (const [i, t] of (Array.isArray(tabs) ? tabs : []).entries()) {
+        await js('document.querySelector("#modes button[data-m=\'' + t.m + '\']").click()');
+        await new Promise(r => setTimeout(r, 1800));
+        const shot = String(i + 1).padStart(2, '0') + '-' + t.m + '.png';
+        fs.writeFileSync(path.join(dir, shot), (await win.webContents.capturePage()).toPNG());
+        seen.push(Object.assign({ shot, current: await js('(document.querySelector("#modes button[aria-current=true]")||{}).dataset?.m||""') }, t));
+      }
+      openSettings();
+      await new Promise(r => setTimeout(r, 2500));
+      if (settingsWin && !settingsWin.isDestroyed()) fs.writeFileSync(path.join(dir, '99-settings.png'), (await settingsWin.webContents.capturePage()).toPNG());
+      const info = await js('({build:typeof BUILD!=="undefined"?BUILD:null,title:document.title})');
+      fs.writeFileSync(path.join(dir, 'tour.json'), JSON.stringify({ app: app.getVersion(), platform: process.platform, arch: process.arch, info, tabs: seen, errors }, null, 1));
+      app.quit();
+    }, Number(process.env.EVOLVE_SHOT_WAIT || 6000)));
+  }
   if (process.env.EVOLVE_SHOT) win.webContents.once('did-finish-load', () => setTimeout(async () => {
     if (process.env.EVOLVE_EVAL) { await win.webContents.executeJavaScript(process.env.EVOLVE_EVAL).catch(e => fs.writeFileSync(process.env.EVOLVE_SHOT + '.err', String(e))); await new Promise(r => setTimeout(r, 1500)); }
     const img = await win.webContents.capturePage(); fs.writeFileSync(process.env.EVOLVE_SHOT, img.toPNG());

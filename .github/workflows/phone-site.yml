@@ -5,13 +5,7 @@ name: Put the Evolve OS phone site online
 # the board's code; your data stays on Supabase behind your sign in.
 on:
   workflow_dispatch:
-  push:
-    branches: [claude/kind-cerf-4hh0hw]
-    paths:
-      - 'evolve-desktop/web/**'
-      - 'evolve-desktop/app/board/**'
-      - 'evolve-desktop/app/shim/**'
-      - '.github/workflows/phone-site.yml'
+  # Parked until the Mac app is done (plan, Step 6). Run by hand when needed.
 
 permissions:
   contents: write

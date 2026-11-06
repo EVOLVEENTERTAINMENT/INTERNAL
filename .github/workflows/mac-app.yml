@@ -10,7 +10,7 @@ on:
       - '.github/workflows/mac-app.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -61,15 +61,18 @@ jobs:
           name: Evolve-OS-mac
           path: evolve-desktop/dist/*.zip
           retention-days: 14
-      # A plain download link that always has the newest build:
-      # github.com/EVOLVEENTERTAINMENT/INTERNAL/releases/latest
-      - name: Put the newest build on the download page
-        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-        env:
-          GH_TOKEN: ${{ github.token }}
+      # Step 1 of the plan: open the built app on this real Mac, click every
+      # tab on a made-up board, and print small screenshots into the log.
+      - name: Open the app on a real Mac and tour every tab
         run: |
-          cp dist/*-arm64-mac.zip "Evolve-OS-Apple-chip.zip"
-          cp "$(ls dist/*-mac.zip | grep -v arm64)" "Evolve-OS-Intel.zip"
-          gh release delete mac-latest --yes --cleanup-tag || true
-          gh release create mac-latest Evolve-OS-Apple-chip.zip Evolve-OS-Intel.zip --target "$GITHUB_SHA" --latest \
-            --title "Evolve OS for Mac" --notes "Newest build. Most Macs from 2021 on use Apple chip."
+          node test/make-sample-board.js "$RUNNER_TEMP/sample"
+          APP="$(ls -d dist/mac-arm64/*.app | head -1)"
+          codesign -dv "$APP" 2>&1 | grep -E 'Signature|Identifier' || true
+          EVOLVE_DATA_DIR="$RUNNER_TEMP/data" EVOLVE_SNAPSHOT="$RUNNER_TEMP/sample" EVOLVE_TOUR="$RUNNER_TEMP/tour" EVOLVE_SHOT_WAIT=9000 \
+            "$APP/Contents/MacOS/$(basename "$APP" .app)" &
+          for i in $(seq 1 90); do [ -f "$RUNNER_TEMP/tour/tour.json" ] && break; sleep 2; done
+          sleep 2; pkill -f "mac-arm64" || true
+          cat "$RUNNER_TEMP/tour/tour.json"
+          cd "$RUNNER_TEMP/tour"
+          for f in *.png; do sips -s format jpeg -s formatOptions 60 --resampleWidth 640 "$f" --out "${f%.png}.jpg" >/dev/null; echo "TOUR_JPG ${f%.png} $(base64 < "${f%.png}.jpg" | tr -d '\n')"; done
+          test -f tour.json
