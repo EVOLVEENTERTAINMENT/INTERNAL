@@ -13,7 +13,13 @@ Deno.serve(async (req) => {
   const data = { user: who.ok ? await who.json().catch(() => null) : null };
   const owner = (Deno.env.get("OWNER_EMAIL") || "").toLowerCase();
   if (!data.user || !owner || (data.user.email || "").toLowerCase() !== owner) return out(401, { error: "not signed in as the owner" });
-  const key = Deno.env.get("ANTHROPIC_API_KEY") || "";
+  let key = Deno.env.get("ANTHROPIC_API_KEY") || "";
+  if (!key) {   // saved by the Mac app when you saved it in Settings
+    const sk = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    const r = await fetch(Deno.env.get("SUPABASE_URL") + "/rest/v1/app_secrets?name=eq.anthropic&select=value", { headers: { apikey: sk, authorization: "Bearer " + sk } });
+    const rows = r.ok ? await r.json().catch(() => []) : [];
+    key = (rows[0] && rows[0].value) || "";
+  }
   if (!key) return out(503, { error: "Claude has no key on Supabase yet" });
   const a = await req.json().catch(() => ({}));
   const body: Record<string, unknown> = { model: MODELS[a.tier] || MODELS.default, max_tokens: Math.min(Number(a.maxTokens) || 8192, 32000), messages: a.messages || [] };

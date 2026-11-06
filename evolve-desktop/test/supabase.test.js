@@ -21,6 +21,10 @@ if (!PG) { console.log('supabase skipped (no EVOLVE_TEST_PG)'); process.exit(0);
   const bad = await fetch(redirect).then(r => r.text(), () => 'closed');
   assert.ok(bad === 'closed' || /did not work/.test(bad), 'the page closes after one use');
   await assert.rejects(s.finishLink('link-code'), e => e.code === 'needs_reauth', 'a link only works once');
+  assert.equal(await s.saveKey('sk-ant-test'), true);
+  { const { Client } = require('pg'); const c = new Client({ connectionString: PG }); await c.connect();
+    assert.equal((await c.query("select value from app_secrets where name='anthropic'")).rows[0].value, 'sk-ant-test');
+    await s.saveKey(''); assert.equal((await c.query('select count(*)::int n from app_secrets')).rows[0].n, 0); await c.end(); }
   let ev = 0; s.onChange(() => ev++);
   assert.equal((await s.set('tasks/t1', { title: 'a', meta: { x: 1, y: 2 }, n: 3 })).version, 1);
   assert.equal((await s.update('tasks/t1', { meta: { y: 5 }, n: { __delete__: true } })).version, 2);

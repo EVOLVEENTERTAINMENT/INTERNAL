@@ -24,6 +24,12 @@ class SupabaseStore {
     if (error) throw err('needs_reauth', error.message);
     this.live(); return { email: data.user && data.user.email };
   }
+  // The phone's Claude reads the key from here; nobody can read it back out.
+  async saveKey(key) {
+    const { error } = await this.sb.rpc('save_app_secret', { p_name: 'anthropic', p_value: key || '' });
+    if (error) throw err('io_failed', error.message);
+    return true;
+  }
   async signOut() { await this.sb.auth.signOut(); if (this.channel) this.sb.removeChannel(this.channel); this.channel = null; }
   async who() { const { data } = await this.sb.auth.getSession(); return data.session ? { email: data.session.user.email } : null; }
   live() {

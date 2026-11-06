@@ -82,3 +82,29 @@ do $$ begin
   if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'docs')
   then alter publication supabase_realtime add table public.docs; end if;
 end $$;
+
+-- The Anthropic key for the phone's Claude. The Mac app saves it here when you
+-- save it in Settings, so you paste it once. No policies: nobody can read it
+-- through the API, only the claude function (service key) can.
+create table if not exists public.app_secrets (
+  name       text primary key,
+  value      text not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.app_secrets enable row level security;
+revoke all on public.app_secrets from anon, authenticated;
+
+create or replace function public.save_app_secret(p_name text, p_value text) returns boolean
+language plpgsql security definer set search_path = public, auth as $$
+begin
+  if auth.uid() is null or auth.uid() <> (select id from auth.users order by created_at limit 1) then
+    raise exception 'not the owner' using errcode = '42501';
+  end if;
+  if p_name not in ('anthropic') then raise exception 'unknown secret' using errcode = '22023'; end if;
+  if p_value is null or p_value = '' then delete from public.app_secrets where name = p_name;
+  else insert into public.app_secrets (name, value) values (p_name, p_value)
+       on conflict (name) do update set value = excluded.value, updated_at = now(); end if;
+  return true;
+end $$;
+revoke execute on function public.save_app_secret(text, text) from public, anon;
+grant execute on function public.save_app_secret(text, text) to authenticated;

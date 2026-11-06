@@ -104,7 +104,9 @@ function wire() {
   ipcMain.handle('set:claude', guard(async a => {
     const k = String(a.key || '').trim();
     if (k) await ai.messages(k, { tier: 'quick', messages: [{ role: 'user', content: 'Reply with the word ok.' }], maxTokens: 5 });
-    cfg.setSecret('anthropic', k || null); reloadBoard(); return { ok: true };
+    cfg.setSecret('anthropic', k || null);
+    if (store instanceof SupabaseStore) await store.saveKey(k).catch(() => {});   // the phone uses the same key
+    reloadBoard(); return { ok: true };
   }));
   ipcMain.handle('set:supabase', guard(async a => {
     const url = String(a.url || '').trim().replace(/\/+$/, ''), anon = String(a.anon || '').trim();
@@ -114,6 +116,7 @@ function wire() {
     const sb = new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() });
     const redirect = await linkCatch.waitForLink(async code => {
       await sb.finishLink(code); useStore(sb); reloadBoard();
+      if (cfg.secret('anthropic')) sb.saveKey(cfg.secret('anthropic')).catch(() => {});
       for (const w of [settingsWin, win]) if (w && !w.isDestroyed()) { w.show(); w.focus(); }
     });
     try { await sb.sendLink(String(a.email || '').trim(), redirect); } catch (e) { linkCatch.stop(); throw e; }

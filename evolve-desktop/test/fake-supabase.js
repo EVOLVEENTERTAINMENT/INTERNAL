@@ -44,6 +44,11 @@ async function start({ pgUrl, email }) {
           try { const r = await pg.query('select public.doc_update($1,$2::jsonb,$3) v', [body.p_path, JSON.stringify(body.p_patch), body.p_if_version == null ? null : body.p_if_version]); return send(res, 200, r.rows[0].v); }
           catch (e) { return send(res, 400, { code: e.code, message: e.message, details: null, hint: null }); }
         }
+        if (fn === 'save_app_secret') {
+          try { await pg.query('begin'); await pg.query("select set_config('test.uid', $1, true)", [user.id]);
+            const r = await pg.query('select public.save_app_secret($1,$2) v', [body.p_name, body.p_value]); await pg.query('commit'); return send(res, 200, r.rows[0].v); }
+          catch (e) { await pg.query('rollback'); return send(res, 400, { code: e.code, message: e.message, details: null, hint: null }); }
+        }
         return send(res, 404, { message: 'no function' });
       }
       if (u.pathname === '/rest/v1/docs') {
