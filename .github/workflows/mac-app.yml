@@ -84,15 +84,17 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: |
-          npx electron-builder --mac dmg --arm64 --publish never -c.dmg.artifactName='Evolve-OS-Apple-chip.dmg'
-          npx electron-builder --mac dmg --x64 --publish never -c.dmg.artifactName='Evolve-OS-Intel.dmg'
+          npx electron-builder --mac dmg --arm64 --publish never -c.dmg.artifactName='Evolve-OS-Apple-chip.dmg' -c.dmg.format=ULFO
+          npx electron-builder --mac dmg --x64 --publish never -c.dmg.artifactName='Evolve-OS-Intel.dmg' -c.dmg.format=ULFO
           ls -la dist/*.dmg
       - name: Put the installers on the mac-builds branch
         if: github.ref == 'refs/heads/claude/kind-cerf-4hh0hw'
         run: |
           mkdir -p "$RUNNER_TEMP/out" && cd "$RUNNER_TEMP/out"
           for f in Evolve-OS-Apple-chip Evolve-OS-Intel; do
-            split -b 45m "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" "$f.dmg.part-"
+            # one plain file when it fits under GitHub's 100 MB limit, so there is a direct download link
+            if [ "$(stat -f%z "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg")" -lt 99000000 ]; then cp "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" .;
+            else split -b 45m "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" "$f.dmg.part-"; fi
             shasum -a 256 "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" | awk -v n="$f.dmg" '{print $1"  "n}' >> SHA256.txt
           done
           printf 'Newest Evolve OS installers, built from %s. Parts join with cat.\n' "$GITHUB_SHA" > README.txt
