@@ -1,0 +1,46 @@
+name: Put the Evolve OS phone site online
+
+# Builds evolve-desktop/web and hosts it on GitHub Pages. The pages are only
+# the board's code; your data stays on Supabase behind your sign in.
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'evolve-desktop/web/**'
+      - 'evolve-desktop/app/board/**'
+      - 'evolve-desktop/app/shim/**'
+      - '.github/workflows/phone-site.yml'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: phone-site
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+        working-directory: evolve-desktop
+      - run: node web/build.js
+        working-directory: evolve-desktop
+      - uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: evolve-desktop/web/dist
+      - id: deploy
+        uses: actions/deploy-pages@v4
