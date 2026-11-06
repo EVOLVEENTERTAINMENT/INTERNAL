@@ -45,7 +45,15 @@ jobs:
         env:
           EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
           EVOLVE_SHOT_WAIT: '9000'
-        run: npm run check
+        # On a failure the app log and every failed check go into the job log,
+        # since the artifact host cannot be read from a cloud session.
+        run: |
+          npm run check || {
+            echo '--- app.log (last 80 lines)'; tail -n 80 "$EVOLVE_CHECK_WORK/app.log" || true
+            echo '--- failed checks'
+            node -e 'const j=require(process.argv[1]);for(const r of j.results||[])if(!r.ok)console.log(r.file,"|",r.name,"|",r.detail||"")' "$EVOLVE_CHECK_WORK/out/check.json" || true
+            exit 1
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -107,7 +115,15 @@ jobs:
         env:
           EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
           EVOLVE_SHOT_WAIT: '9000'
-        run: npm run check
+        # On a failure the app log and every failed check go into the job log,
+        # since the artifact host cannot be read from a cloud session.
+        run: |
+          npm run check || {
+            echo '--- app.log (last 80 lines)'; tail -n 80 "$EVOLVE_CHECK_WORK/app.log" || true
+            echo '--- failed checks'
+            node -e 'const j=require(process.argv[1]);for(const r of j.results||[])if(!r.ok)console.log(r.file,"|",r.name,"|",r.detail||"")' "$EVOLVE_CHECK_WORK/out/check.json" || true
+            exit 1
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
