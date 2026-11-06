@@ -2,7 +2,7 @@
 // board's calls: the database (on this Mac, or Supabase once you sign in),
 // Claude on your own key, and file saves.
 'use strict';
-const { app, BrowserWindow, ipcMain, protocol, net, shell, dialog, Menu, safeStorage } = require('electron');
+const { app, BrowserWindow, ipcMain, protocol, net, shell, dialog, Menu, safeStorage, powerMonitor } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { pathToFileURL } = require('url');
@@ -15,12 +15,13 @@ const { Google } = require('./google');
 const imessage = require('./imessage');
 const linkCatch = require('./link-catch');
 const { autoMove } = require('./automove');
+const { BoardUpdates } = require('./board-updates');
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
 protocol.registerSchemesAsPrivileged([{ scheme: 'evolve', privileges: { standard: true, secure: true, supportFetchAPI: true, stream: true } }]);
 
-let store, local, cfg, google, win, settingsWin, unhook = null;
+let store, local, cfg, google, win, settingsWin, unhook = null, updates = null;
 const GC = 'Google Calendar', GM = 'Gmail', IM = 'host:Read_and_Send_iMessages';
 const home = () => process.env.EVOLVE_DATA_DIR || path.join(app.getPath('userData'), 'board-data');
 
@@ -46,14 +47,49 @@ function serveBoard() {
   protocol.handle('evolve', async req => {
     const u = new URL(req.url);
     const rel = decodeURIComponent(u.pathname).replace(/^\/+/, '') || 'index.html';
-    const full = path.normalize(path.join(BOARD_DIR, rel));
-    if (!full.startsWith(BOARD_DIR)) return new Response('not found', { status: 404 });
+    const root = updates ? updates.dir() : BOARD_DIR;
+    const full = path.normalize(path.join(root, rel));
+    if (!full.startsWith(root)) return new Response('not found', { status: 404 });
     if (rel === 'index.html') {
       // The doorway goes in first, before any of the board's own scripts run.
       const html = fs.readFileSync(full, 'utf8').replace('<head>', '<head><script>' + SHIM.replace(/<\/script/gi, '<\\/script') + '</script>');
       return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } });
     }
     return net.fetch(pathToFileURL(full).toString());
+  });
+}
+
+// The board updates itself (see board-updates.js). Checks soon after opening
+// and every 5 minutes, then switches once you have been idle for a minute.
+function startBoardUpdates() {
+  if ((process.env.EVOLVE_TOUR || process.env.EVOLVE_SHOT) && !process.env.EVOLVE_BOARD_SOURCE) return;   // automated checks use the built in board
+  const base = process.env.EVOLVE_BOARD_SOURCE || ((cfg.get().supabaseUrl || SUPABASE_DEFAULT.url) + '/storage/v1/object/public/board');
+  updates = new BoardUpdates({ cacheDir: path.join(home(), '..', 'board-versions'), bundledDir: BOARD_DIR, baseUrl: base, appVersion: app.getVersion(),
+    fetchFn: u => net.fetch(u, { cache: 'no-store' }) });
+  let ready = null, busy = false;
+  const idleSecs = Number(process.env.EVOLVE_UPDATE_IDLE || 60);
+  const check = async () => {
+    if (busy || ready) return; busy = true;
+    try { const r = await updates.check(); if (r.ready) ready = r.ready; } catch (e) { console.error('board update check', e.message || e); }
+    busy = false;
+  };
+  setTimeout(check, Number(process.env.EVOLVE_UPDATE_FIRST || 20000));
+  setInterval(check, 5 * 60 * 1000);
+  setInterval(() => {
+    if (!ready || !win || win.isDestroyed()) return;
+    if (powerMonitor.getSystemIdleTime() < idleSecs) return;
+    updates.activate(ready); ready = null; win.reload();
+  }, 10000);
+}
+// After every load: a new version that does not start within 20 seconds is
+// marked bad and the one before comes back.
+function watchBoardStart() {
+  win.webContents.on('did-finish-load', () => {
+    if (!updates || !updates.pending()) return;
+    setTimeout(async () => {
+      const ok = await win.webContents.executeJavaScript('typeof BUILD!=="undefined"&&!!document.getElementById("modes")').catch(() => false);
+      if (ok) updates.confirm(); else if (updates.fail()) win.reload();
+    }, 20000);
   });
 }
 
@@ -99,7 +135,7 @@ function wire() {
     let who = null;
     if (store instanceof SupabaseStore) who = await store.who().catch(() => null);
     return { claude: cfg.hasSecret('anthropic'), encrypted: cfg.encrypted(), supabaseUrl: c.supabaseUrl || SUPABASE_DEFAULT.url, supabaseAnon: c.supabaseAnon || !c.supabaseUrl ? 'saved' : '',
-      store: where(), who: who && who.email, localCount: localCount(), moved: lastMove,
+      store: where(), who: who && who.email, board: updates ? updates.activeVersion() : 'built-in', localCount: localCount(), moved: lastMove,
       google: google.connected(), googleEmail: google.email(), googleClientId: c.googleClientId || '', mac: process.platform === 'darwin', messages: imessage.available() };
   }));
   ipcMain.handle('set:claude', guard(async a => {
@@ -202,6 +238,7 @@ function open() {
   const external = url => /^https?:|^tel:|^mailto:/i.test(url) && shell.openExternal(url);
   win.webContents.setWindowOpenHandler(({ url }) => { external(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('evolve://')) { e.preventDefault(); external(url); } });
+  watchBoardStart();
   win.loadURL('evolve://app/index.html');
   // For automated checks only: run a script, take a picture of the window and quit.
   // Tour mode for checking a build: open every tab, screenshot each, note errors.
@@ -244,7 +281,7 @@ app.whenReady().then(async () => {
   if (local.isEmpty() && process.env.EVOLVE_SNAPSHOT && fs.existsSync(process.env.EVOLVE_SNAPSHOT)) local.importSnapshot(process.env.EVOLVE_SNAPSHOT);
   useStore(local);
   await connectSupabase().catch(() => false);
-  serveBoard(); wire(); menu(); open();
+  startBoardUpdates(); serveBoard(); wire(); menu(); open();
   if (process.env.EVOLVE_SETTINGS_SHOT) setTimeout(() => { openSettings(); settingsWin.webContents.once('did-finish-load', () => setTimeout(async () => { const i = await settingsWin.webContents.capturePage(); fs.writeFileSync(process.env.EVOLVE_SETTINGS_SHOT, i.toPNG()); }, 800)); }, 1500);
   app.on('activate', () => { if (!BrowserWindow.getAllWindows().length) open(); });
 });

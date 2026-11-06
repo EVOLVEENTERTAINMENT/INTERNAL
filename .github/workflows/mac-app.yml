@@ -10,7 +10,7 @@ on:
       - '.github/workflows/mac-app.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   test:
@@ -76,3 +76,28 @@ jobs:
           cd "$RUNNER_TEMP/tour"
           for f in *.png; do sips -s format jpeg -s formatOptions 60 --resampleWidth 640 "$f" --out "${f%.png}.jpg" >/dev/null; echo "TOUR_JPG ${f%.png} $(base64 < "${f%.png}.jpg" | tr -d '\n')"; done
           test -f tour.json
+      # Step 2 of the plan: the installer. One chip at a time (two disk images
+      # at once trip over each other). GitHub refuses files over 100 MB, so
+      # each one is cut into parts and put on the mac-builds branch, which only
+      # ever holds the newest build.
+      - name: Make the installers
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        run: |
+          npx electron-builder --mac dmg --arm64 --publish never -c.dmg.artifactName='Evolve-OS-Apple-chip.dmg'
+          npx electron-builder --mac dmg --x64 --publish never -c.dmg.artifactName='Evolve-OS-Intel.dmg'
+          ls -la dist/*.dmg
+      - name: Put the installers on the mac-builds branch
+        if: github.ref == 'refs/heads/claude/kind-cerf-4hh0hw'
+        run: |
+          mkdir -p "$RUNNER_TEMP/out" && cd "$RUNNER_TEMP/out"
+          for f in Evolve-OS-Apple-chip Evolve-OS-Intel; do
+            split -b 45m "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" "$f.dmg.part-"
+            shasum -a 256 "$GITHUB_WORKSPACE/evolve-desktop/dist/$f.dmg" | awk -v n="$f.dmg" '{print $1"  "n}' >> SHA256.txt
+          done
+          printf 'Newest Evolve OS installers, built from %s. Parts join with cat.\n' "$GITHUB_SHA" > README.txt
+          git init -q -b mac-builds
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Installers from ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${GITHUB_REPOSITORY}.git" mac-builds
