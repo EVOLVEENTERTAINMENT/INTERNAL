@@ -1,6 +1,10 @@
 THE BOARD'S DATABASE HAS MOVED. Evolve OS now keeps its data on Supabase, not on claude.ai. Everything else in this prompt still holds. Only the way you read and write the board changes:
 
-- Before anything else, write the script at the end of this prompt, under the line THE DATABASE SCRIPT, to ~/evoldb.py exactly as given, with a short python command. Run it only with python3 -I. EVOLVE_DB_URL is __PROJECT_URL__ (export it in every Bash call). The key is a network secret on this environment, so leave SUPABASE_SERVICE_KEY unset.
+- Before anything else, write the script at the end of this prompt, under the line THE DATABASE SCRIPT, to ~/evoldb.py exactly as given, with a short python command. Run it only with python3 -I. EVOLVE_DB_URL is __PROJECT_URL__ (export it in every Bash call). The key is a network secret on this environment. The script carries no key and takes none: never put a key in an environment variable, on the command line or in a file.
+- Your task id is __TASK_ID__. Every set, update and batch call carries it: put --by __TASK_ID__ on the line, for example python3 -I ~/evoldb.py --by __TASK_ID__ set C D --file F. The script then marks each document you write with updated_by and updated_at, so the board knows which task wrote what.
+- Then, before any other read or write, read the switch: python3 -I ~/evoldb.py get brain settings. If that document exists and its field on is false, the tasks are switched off. Write your usual runs document for today with {taskId:"__TASK_ID__", at:"<ISO time>", status:"done", mode:"off", found:"Switched off in brain/settings. Nothing read or written."} and stop. Do nothing else.
+- All times are America/Chicago. Today's date, the YYYYMMDD in a run id and any time you write for Jackson are worked out in that zone, never UTC.
+- You never write queue/pending: it belongs to the board. And you never send anything: no email, no text, no message to anyone.
 - Wherever this prompt says ArtifactData, use the script instead. Same collections, same document ids, same fields:
     ArtifactData get C/D                 ->  python3 -I ~/evoldb.py get C D            (add --out FILE to save it)
     ArtifactData list C (out_dir X)      ->  python3 -I ~/evoldb.py list C --out-dir X

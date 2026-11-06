@@ -5189,10 +5189,12 @@ function exportData(){
    database, not only what is open on screen. The Mac app brings this file in
    as it is. The older top level fields stay, so nothing that reads them
    changes. */
-const EXPORT_COLS=("activity agenda assign audit bin brain brief briefs bus calmeta changelog chat clients code context "
-  +"costs crew decisions detectors diag digests done duelist expenses goals ideas intent invoices kept leadops memory meta "
-  +"milestones money mustdo notes nudge pastes pbrain people pipeline prefs projects prospects pw queue recover runs sales "
-  +"scraps settings sweeps targets tasks teambrief templates time_active time_entries travel_memory views waiting weather workorders").split(" ");
+/* V186. Four more names (arrivals, daily_brief, daysig, ledger) so the file
+   carries them when they hold records. Empty ones are skipped as before. */
+const EXPORT_COLS=("activity agenda arrivals assign audit bin brain brief briefs bus calmeta changelog chat clients code context "
+  +"costs crew daily_brief daysig decisions detectors diag digests done duelist expenses goals ideas intent invoices kept "
+  +"leadops ledger memory meta milestones money mustdo notes nudge pastes pbrain people pipeline prefs projects prospects pw queue "
+  +"recover runs sales scraps settings sweeps targets tasks teambrief templates time_active time_entries travel_memory views waiting weather workorders").split(" ");
 async function exportAll(){
   const out=Object.assign(exportData(),{format:"evolve-os-export",version:1,build:BUILD,collections:{},unread:[]});
   if(!db)return out;
@@ -19388,9 +19390,14 @@ function modeSettings(){
 
   // Connections, honest about what is actually live
   const cn=e("div",{class:"rows"});
+  /* V186. Once the servers have been listed, the Google rows read the per
+     server flags that detectServers sets. Inside the Mac app mcp can be live
+     with only Messages or the Capture Line behind it, and !!mcp alone said
+     Google was there. Before the list answers, it reads as it always did. */
+  const listed=!!(S.diag&&S.diag.listed);
   const conns=[
-    ["Google Calendar","where your time actually is",!!mcp],
-    ["Gmail","read only, drafts only, nothing sends",!!mcp],
+    ["Google Calendar","where your time actually is",listed?!!(S.servers&&S.servers.gcal):!!mcp],
+    ["Gmail","read only, drafts only, nothing sends",listed?!!(S.servers&&S.servers.gmail):!!mcp],
     ["Saved data","invoices, projects and notes you type in",!!db],
     ["Downloads","saving a file out of this page",!!dlx],
     ["Messages","runs on your Mac, needs a desktop session",!!(S.servers&&S.servers.imsg)]];
@@ -19895,7 +19902,8 @@ async function runSweep(s){
       :"That sweep did not finish. "+fix(c);
   }finally{ S.working=null; paint(); }
   const id="r"+Date.now();
-  const row={id:id,sweepId:s.id,at:new Date().toISOString(),found:found,changed:changed};
+  /* V186. taskId beside sweepId, the same value, so one key reads everywhere. */
+  const row={id:id,sweepId:s.id,taskId:s.id,at:new Date().toISOString(),found:found,changed:changed};
   S.runs.unshift(row);
   dbSet("runs/"+id,row);
   S.working=null;paint();
@@ -29130,7 +29138,7 @@ function pwDrawDel(host,ps){
   host.appendChild(bd);
 }
 
-const BUILD="V185 2026-11-06T04:30Z";
+const BUILD="V186 2026-11-06T06:30Z";
 (async function boot(){
   const c=window.claude;
   if(!c||!c.use){conn("bad","No live data");paint();return;}

@@ -7,15 +7,26 @@
 const fs = require('fs');
 const path = require('path');
 
-const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/;
+// One path segment (a collection name or a document id). The board writes ids
+// with spaces and punctuation ("crew/John Smith", "calmeta/<google event id>"),
+// so anything printable is fine. No "/" (that splits paths), no control
+// characters, not "." or "..", no space at either end, at most 200 characters.
+// Ids are JSON keys in the local store and a text column on Supabase, so the
+// file system never sees them.
+const CTRL = /[\u0000-\u001f\u007f-\u009f]/;
+function segOk(x) {
+  if (typeof x !== 'string' || !x.length || x.length > 200) return false;
+  if (x === '.' || x === '..' || x.includes('/') || CTRL.test(x)) return false;
+  return x.trim() === x;
+}
 function splitDoc(p) {
   const s = String(p || '').split('/').filter(Boolean);
-  if (s.length < 2 || s.length % 2 !== 0 || !s.every(x => SEG.test(x))) throw err('invalid_argument', 'bad document path: ' + p);
+  if (s.length < 2 || s.length % 2 !== 0 || !s.every(segOk)) throw err('invalid_argument', 'bad document path: ' + p);
   return { col: s.slice(0, -1).join('/'), id: s[s.length - 1] };
 }
 function checkCol(p) {
   const s = String(p || '').split('/').filter(Boolean);
-  if (!s.length || s.length % 2 !== 1 || !s.every(x => SEG.test(x))) throw err('invalid_argument', 'bad collection path: ' + p);
+  if (!s.length || s.length % 2 !== 1 || !s.every(segOk)) throw err('invalid_argument', 'bad collection path: ' + p);
   return s.join('/');
 }
 function err(code, message) { const e = new Error(message); e.code = code; return e; }
@@ -149,4 +160,4 @@ function applyQuery(rows, q) {
   if (q.limit) rows = rows.slice(0, q.limit);
   return rows;
 }
-module.exports = { LocalStore, merge, test, applyQuery, splitDoc, checkCol, stripDeletes, err };
+module.exports = { LocalStore, merge, test, applyQuery, splitDoc, checkCol, segOk, stripDeletes, err };

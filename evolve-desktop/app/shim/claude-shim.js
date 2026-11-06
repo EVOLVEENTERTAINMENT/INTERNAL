@@ -9,7 +9,15 @@
   'use strict';
   var host = window.evolveHost;
   if (!host) return;
-  var call = function (ch, a) { return host.invoke(ch, a); };
+  /* The app answers a failed call with {error: {code, message}}, since a
+     thrown error loses its code on the way to the page. That becomes the
+     rejection here, so every caller below sees e.code. */
+  var call = function (ch, a) {
+    return host.invoke(ch, a).then(function (r) {
+      if (r && r.error && r.error.code) { var e = new Error(r.error.message); e.code = r.error.code; throw e; }
+      return r;
+    });
+  };
   var clone = function (v) { return v === undefined ? undefined : JSON.parse(JSON.stringify(v)); };
   var META = { fromCache: false, hasPendingWrites: false };
   function dbErr(e) { return { code: (e && e.code) || 'unavailable', message: String((e && e.message) || e) }; }
@@ -84,7 +92,9 @@
     if (typeof input === 'string') return [{ role: 'user', content: input }];
     return (input || []).map(function (m) { return { role: m.role === 'assistant' ? 'assistant' : 'user', content: String(m.content) }; });
   }
-  function aiErr(e) { return { code: (e && e.code) || 'upstream_error', message: String((e && e.message) || e) }; }
+  /* The app says "aborted" for a call it cut on request; the board knows
+     that as "cancelled". "timeout" passes through as is. */
+  function aiErr(e) { var c = (e && e.code) || 'upstream_error'; return { code: c === 'aborted' ? 'cancelled' : c, message: String((e && e.message) || e) }; }
   function runSample(input, opts, wantJson) {
     opts = opts || {};
     var tools = (opts.tools || []).filter(function (t) { return t && t.name && typeof t.execute === 'function'; });
@@ -96,10 +106,26 @@
     var schemas = tools.map(function (t) { return { name: t.name, description: t.description, inputSchema: t.inputSchema }; });
     var rounds = 0, signal = opts.signal;
     function aborted() { return signal && signal.aborted; }
+    function cancelled() { return { code: 'cancelled', message: 'cancelled' }; }
+    /* One model call. Each call carries an id; when the board's signal fires
+       the app is told to abort that id, and this promise rejects right away,
+       so no tool_use from the call can run afterwards. Without a signal the
+       call is made as before. */
+    function ask() {
+      var id = Math.random().toString(36).slice(2, 12) + Date.now().toString(36);
+      var p = call('ai:messages', { id: id, tier: opts.modelTier || 'default', messages: msgs, tools: schemas });
+      if (!signal) return p;
+      return new Promise(function (resolve, reject) {
+        var onAbort = function () { reject(cancelled()); call('ai:abort', { id: id }).catch(function () {}); };
+        signal.addEventListener('abort', onAbort);
+        p.then(function (r) { signal.removeEventListener('abort', onAbort); resolve(r); },
+          function (e) { signal.removeEventListener('abort', onAbort); reject(e); });
+      });
+    }
     function step() {
-      if (aborted()) return Promise.reject({ code: 'cancelled', message: 'cancelled' });
-      return call('ai:messages', { tier: opts.modelTier || 'default', messages: msgs, tools: schemas }).then(function (r) {
-        if (aborted()) throw { code: 'cancelled', message: 'cancelled' };
+      if (aborted()) return Promise.reject(cancelled());
+      return ask().then(function (r) {
+        if (aborted()) throw cancelled();
         var uses = (r.content || []).filter(function (c) { return c.type === 'tool_use'; });
         if (uses.length && rounds < 12) {
           rounds++;

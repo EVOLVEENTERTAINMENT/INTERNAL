@@ -77,11 +77,32 @@ drop trigger if exists docs_owner on public.docs;
 create trigger docs_owner before insert on public.docs for each row execute function public.docs_owner();
 alter table public.docs alter column owner drop default;
 
+-- One time copy of rows from the local store or a Download data file. A path
+-- that already exists keeps its data replaced and its version moving forward
+-- (never back to 1), so a version read before the copy still fails the
+-- if_version check the way it should. Returns how many rows were written.
+create or replace function public.docs_import(p_rows jsonb) returns integer
+language plpgsql security invoker as $$
+declare n integer;
+begin
+  insert into public.docs (path, col, id, data, version)
+  select r->>'path', r->>'col', r->>'id', coalesce(r->'data', '{}'::jsonb), greatest(coalesce((r->>'version')::integer, 1), 1)
+  from jsonb_array_elements(coalesce(p_rows, '[]'::jsonb)) r
+  on conflict (path) do update set data = excluded.data, version = greatest(public.docs.version, excluded.version) + 1, updated_at = now();
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
 -- live updates for the app and the phone
 do $$ begin
   if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'docs')
   then alter publication supabase_realtime add table public.docs; end if;
 end $$;
+-- Replica identity stays at the default (the key). A delete event then
+-- carries only the path, and the app takes col and id from it. Realtime
+-- sends delete events to every subscriber without the row policies, so a
+-- full old row here would hand the deleted record to anyone with the
+-- publishable key.
 
 -- The Anthropic key for the phone's Claude. The Mac app saves it here when you
 -- save it in Settings, so you paste it once. No policies: nobody can read it

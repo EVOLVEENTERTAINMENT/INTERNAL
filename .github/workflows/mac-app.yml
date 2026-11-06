@@ -15,7 +15,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     services:
       postgres:
         image: postgres:16
@@ -37,6 +37,21 @@ jobs:
       - name: The board schema on a real Postgres
         run: psql "$EVOLVE_TEST_PG" -q -v ON_ERROR_STOP=1 -f test/pre-local.sql -f supabase/schema.sql
       - run: npm test
+      # Step 5 of the plan, the automated half: the real app on a made-up
+      # board with fake connectors and a fake Claude, one check per feature.
+      - name: A display for the app
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq xvfb
+      - name: Check every board feature in the running app
+        env:
+          EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
+          EVOLVE_SHOT_WAIT: '9000'
+        run: npm run check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: feature-check-linux
+          path: ${{ runner.temp }}/check/out
+          retention-days: 14
 
   mac:
     needs: test
@@ -84,7 +99,21 @@ jobs:
           cat "$RUNNER_TEMP/tour/tour.json"
           cd "$RUNNER_TEMP/tour"
           for f in *.png; do sips -s format jpeg -s formatOptions 60 --resampleWidth 640 "$f" --out "${f%.png}.jpg" >/dev/null; echo "TOUR_JPG ${f%.png} $(base64 < "${f%.png}.jpg" | tr -d '\n')"; done
-          test -f tour.json
+          # The gate: a console error, a tab that did not open or a missing BUILD fails the build.
+          node "$GITHUB_WORKSPACE/evolve-desktop/test/check/tour-gate.js" tour.json
+      # Step 5 of the plan, the automated half, on a real Mac: every board
+      # feature driven through the app with fake connectors and a fake Claude.
+      - name: Check every board feature on a real Mac
+        env:
+          EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
+          EVOLVE_SHOT_WAIT: '9000'
+        run: npm run check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: feature-check-mac
+          path: ${{ runner.temp }}/check/out
+          retention-days: 14
       # Step 2 of the plan: the installer. One chip at a time (two disk images
       # at once trip over each other). GitHub refuses files over 100 MB, so
       # each one is cut into parts and put on the mac-builds branch, which only

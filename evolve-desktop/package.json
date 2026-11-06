@@ -7,13 +7,15 @@
   "private": true,
   "scripts": {
     "start": "electron .",
-    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js && node test/automove.test.js && node test/board-updates.test.js && node test/capture.test.js",
-    "dist:mac": "electron-builder --mac --publish never"
+    "test": "node test/store.test.js && node test/shim.test.js && node test/google.test.js && node test/supabase.test.js && node test/evoldb.test.js && node test/automove.test.js && node test/board-updates.test.js && node test/capture.test.js && node test/ai.test.js && node test/engine.test.js",
+    "dist:mac": "electron-builder --mac --publish never",
+    "check": "node test/check/run.js"
   },
   "devDependencies": {
     "electron": "33.2.1",
     "electron-builder": "25.1.8",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "ws": "^8.22.1"
   },
   "build": {
     "appId": "com.evolveentertain.evolveos",

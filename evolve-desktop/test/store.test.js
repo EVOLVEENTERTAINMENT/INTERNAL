@@ -20,8 +20,33 @@ fs.writeFileSync(path.join(snap, 'brain', 'digest.json'), JSON.stringify({ id: '
 const s3 = new LocalStore(fs.mkdtempSync(path.join(os.tmpdir(), 'evs3-'))); assert.equal(s3.importSnapshot(snap), 1);
 assert.equal(s3.get('brain/digest').data.headline, 'hi'); assert.equal(s3.get('brain/digest').version, 7);
 console.log('store ok');
-const { readExport } = require('../app/importer');
-const rows = readExport(JSON.stringify({ format: 'evolve-os-export', version: 1, collections: { brain: { digest: { headline: 'x' } }, prospects: { a: { name: 'A' }, b: { name: 'B' } } } }));
-assert.equal(rows.length, 3); assert.deepEqual(rows[0], { col: 'brain', id: 'digest', data: { headline: 'x' }, version: 1 });
+// ids the board writes: typed names, google event ids, dates with punctuation
+const { segOk } = require('../app/store');
+s.set('crew/John Smith', { name: 'John Smith', role: 'Gaffer' });
+assert.deepEqual(s.get('crew/John Smith').data, { name: 'John Smith', role: 'Gaffer' });
+assert.equal(s.query('crew').map(r => r.id).join(), 'John Smith');
+assert.equal(new LocalStore(dir).get('crew/John Smith').exists, true, 'a space in the id survives the disk');
+s.set("calmeta/abc123_20261106T140000Z@google.com (copy) #2, 'quoted' 100%", { ok: 1 });
+assert.equal(s.query('calmeta').length, 1);
+s.set('teambrief/2026-11-09', { a: 1 }); s.set('agenda/Mon 9 Nov, 09:30', { a: 1 });
+assert.equal(s.get('agenda/Mon 9 Nov, 09:30').exists, true);
+for (const bad of ['tasks/..', 'tasks/.', 'tasks/ lead', 'tasks/trail ', 'tasks/\u0007bell', 'tasks/' + 'x'.repeat(201), 'crew/a/b'])
+  assert.throws(() => s.set(bad, { a: 1 }), e => e.code === 'invalid_argument', 'refuses ' + JSON.stringify(bad));
+assert.throws(() => s.query('tasks/..'), e => e.code === 'invalid_argument');
+assert.equal(s.query('crew/John Smith/notes').length, 0, 'a nested collection under a spaced id reads');
+assert.equal(segOk('a/b'), false); assert.equal(segOk('..'), false); assert.equal(segOk('John Smith'), true); assert.equal(segOk('x'.repeat(200)), true);
+console.log('ids ok');
+const { readExport, importNote } = require('../app/importer');
+const ex = readExport(JSON.stringify({ format: 'evolve-os-export', version: 1, collections: { brain: { digest: { headline: 'x' } }, prospects: { a: { name: 'A' }, b: { name: 'B' } } } }));
+assert.equal(ex.rows.length, 3); assert.deepEqual(ex.rows[0], { col: 'brain', id: 'digest', data: { headline: 'x' }, version: 1 });
+assert.deepEqual(ex.skipped, []); assert.deepEqual(ex.unread, []);
 assert.throws(() => readExport('{"projects":{}}'));
+// a bad id, a bad collection and a non object are noted, the rest still comes in
+const ex2 = readExport(JSON.stringify({ format: 'evolve-os-export', version: 1, unread: ['weather', 7],
+  collections: { crew: { 'John Smith': { name: 'J' }, 'a/b': { name: 'slash' }, '..': { name: 'dots' }, n: 5 }, 'tasks/t9': { z: { a: 1 } }, tasks: { t1: { title: 'ok' } } } }));
+assert.deepEqual(ex2.rows.map(r => r.col + '/' + r.id), ['crew/John Smith', 'tasks/t1']);
+assert.deepEqual(ex2.skipped, [{ path: 'crew/a/b', reason: 'bad_id' }, { path: 'crew/..', reason: 'bad_id' }, { path: 'crew/n', reason: 'not_object' }, { path: 'tasks/t9/z', reason: 'bad_collection' }]);
+assert.deepEqual(ex2.unread, ['weather']);
+const note = importNote(Object.assign({ file: '/x/Evolve_OS_Data.json' }, ex2));
+assert.equal(note.counts.records, 2); assert.equal(note.counts.collections, 2); assert.equal(note.counts.skipped, 4); assert.ok(note.at);
 console.log('importer ok');

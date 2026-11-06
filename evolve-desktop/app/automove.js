@@ -5,7 +5,7 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const { readExport } = require('./importer');
+const { readExport, importNote, logImport } = require('./importer');
 
 function newestExport(dir) {
   let best = null;
@@ -33,12 +33,25 @@ function localRows(local) {
 // Returns { n, file } with how many records were copied, or { n: 0 } when
 // Supabase already had records or there was nothing to copy.
 async function autoMove({ sb, local, downloads }) {
-  if ((await sb.count()) > 0) return { n: 0, skipped: 'not_empty' };
+  // Only his records count as "not empty". The board writes diag/boot on every
+  // open and a run with nothing to copy writes diag/import, and neither must
+  // stop the move once a good file is there.
+  const n0 = await sb.count();
+  if (n0 > 0 && (await sb.query('diag')).length < n0) return { n: 0, skipped: 'not_empty' };
   const file = newestExport(downloads);
   const byPath = new Map();
-  if (file) for (const r of readExport(fs.readFileSync(file, 'utf8'))) byPath.set(r.col + '/' + r.id, r);
+  // A bad id or a collection the board could not read is noted, never a stop.
+  const exp = file ? readExport(fs.readFileSync(file, 'utf8')) : { rows: [], skipped: [], unread: [] };
+  for (const r of exp.rows) byPath.set(r.col + '/' + r.id, r);
   for (const r of localRows(local)) if (!byPath.has(r.col + '/' + r.id)) byPath.set(r.col + '/' + r.id, r);   // the export wins
-  if (!byPath.size) return { n: 0 };
-  return { n: await sb.importRows([...byPath.values()]), file };
+  const rows = [...byPath.values()];
+  if (!rows.length && !exp.skipped.length && !exp.unread.length) return { n: 0 };
+  const n = rows.length ? await sb.importRows(rows) : 0;
+  // The note is written even when nothing came in, so the skip reasons are
+  // kept in the record and not only in the console.
+  const note = importNote({ rows, skipped: exp.skipped, unread: exp.unread, file });
+  logImport('auto move', note);
+  try { await sb.set('diag/import', note); } catch (e) { console.error('auto move: diag/import not written', e.message || e); }
+  return { n, file, skipped: exp.skipped, unread: exp.unread };
 }
 module.exports = { autoMove, newestExport };

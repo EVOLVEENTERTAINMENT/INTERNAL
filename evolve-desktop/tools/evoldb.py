@@ -4,21 +4,68 @@
 # query, set, update, delete, batch, with if_version guards. Python standard
 # library only. Run with python3 -I.
 #
-# Needs EVOLVE_DB_URL (https://<project>.supabase.co). The key is the service
-# key: either in SUPABASE_SERVICE_KEY, or saved as a network secret for that
-# host (header apikey), in which case any value here is replaced on the way out.
-import sys, os, json, argparse, urllib.request, urllib.parse, urllib.error
+# Needs EVOLVE_DB_URL (https://<project>.supabase.co). The script carries no
+# key. The service key is saved once as a network secret for that host (header
+# apikey), and the proxy puts it in on the way out; the placeholder sent here
+# is replaced. There is no environment variable for the key, by design.
+#
+# Two options may go anywhere on the command line:
+#   --by <task id>              stamps updated_by on every set and update, in batch
+#                               too, so each write names its writer; updated_at is
+#                               filled only when the data given carries none (on
+#                               update, the patch)
+#   --localhost-test-key <k>    TEST ONLY: a made up key for the stand-in server
+#                               in the test suite. Honoured only when EVOLVE_DB_URL
+#                               is on localhost or 127.0.0.1; refused anywhere else.
+import sys, os, re, json, argparse, urllib.request, urllib.parse, urllib.error
+from datetime import datetime, timezone
 
 URL = os.environ.get('EVOLVE_DB_URL', '').rstrip('/')
-KEY = os.environ.get('SUPABASE_SERVICE_KEY') or 'from-network-secret'
+PLACEHOLDER = 'from-network-secret'
+BY_RE = re.compile(r'^[A-Za-z0-9._-]{1,40}$')
 
 def die(msg, code=2):
     print(json.dumps({'error': msg})); sys.exit(code)
 
+def take_option(argv, name):
+    # pulls "--name value" or "--name=value" out of argv, wherever it sits
+    val, rest, i = None, [], 0
+    while i < len(argv):
+        a = argv[i]
+        if a == name:
+            if i + 1 >= len(argv): die(name + ' needs a value')
+            val = argv[i + 1]; i += 2; continue
+        if a.startswith(name + '='): val = a[len(name) + 1:]; i += 1; continue
+        rest.append(a); i += 1
+    return val, rest
+
+def is_local(url):
+    try: host = urllib.parse.urlsplit(url).hostname or ''
+    except ValueError: return False
+    return host in ('localhost', '127.0.0.1')
+
+BY, argv = take_option(sys.argv[1:], '--by')
+TEST_KEY, argv = take_option(argv, '--localhost-test-key')
+if BY is not None and not BY_RE.match(BY): die('--by must be a short task id, letters, digits, dot, dash or underscore')
+if TEST_KEY is not None and not is_local(URL): die('--localhost-test-key is for the test server only; EVOLVE_DB_URL is not localhost')
+
+def stamp_now():
+    return datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+def stamped(data):
+    # the writer's mark on a set or update, only when --by was given; a task's
+    # own updated_at wins over the stamp
+    if BY is None or not isinstance(data, dict): return data
+    d = dict(data); d['updated_by'] = BY
+    if not d.get('updated_at'): d['updated_at'] = stamp_now()
+    return d
+
 def req(method, path, body=None, headers=None):
     if not URL: die('EVOLVE_DB_URL is not set')
-    h = {'apikey': KEY, 'content-type': 'application/json'}
-    if os.environ.get('SUPABASE_SERVICE_KEY'): h['authorization'] = 'Bearer ' + KEY
+    if TEST_KEY is not None:
+        h = {'apikey': TEST_KEY, 'authorization': 'Bearer ' + TEST_KEY, 'content-type': 'application/json'}
+    else:
+        h = {'apikey': PLACEHOLDER, 'content-type': 'application/json'}
     h.update(headers or {})
     r = urllib.request.Request(URL + path, method=method, headers=h, data=None if body is None else json.dumps(body).encode())
     try:
@@ -40,7 +87,7 @@ def split(col, doc_id):
 def fetch_col(col):
     rows, start = [], 0
     while True:
-        q = urllib.parse.urlencode({'select': 'id,data,version,updated_at', 'col': 'eq.' + col, 'order': 'id', 'offset': start, 'limit': 1000})
+        q = urllib.parse.urlencode({'select': 'id,data,version,updated_at', 'col': 'eq.' + col, 'order': 'id.asc', 'offset': start, 'limit': 1000})
         page = req('GET', '/rest/v1/docs?' + q) or []
         rows += page
         if len(page) < 1000: return rows
@@ -91,12 +138,16 @@ def write(op, col, doc_id, data, if_version):
             if cur[0]['version'] != if_version: die('version_moved: %s' % cur[0]['version'], 3)
         req('DELETE', '/rest/v1/docs?' + urllib.parse.urlencode({'path': 'eq.' + p})); return {'deleted': p}
     if not isinstance(data, dict): die('the document must be a JSON object')
+    if op not in ('set', 'update'): die('unknown op: %s' % op)
+    data = stamped(data)
     if op == 'set': v = req('POST', '/rest/v1/rpc/doc_set', {'p_path': p, 'p_col': col, 'p_id': doc_id, 'p_data': data, 'p_if_version': if_version})
     else: v = req('POST', '/rest/v1/rpc/doc_update', {'p_path': p, 'p_patch': data, 'p_if_version': if_version})
-    return {'path': p, 'version': v}
+    r = {'path': p, 'version': v}
+    if BY is not None: r['updated_by'] = BY; r['updated_at'] = data['updated_at']
+    return r
 
 def main():
-    ap = argparse.ArgumentParser(prog='evoldb.py'); sp = ap.add_subparsers(dest='cmd', required=True)
+    ap = argparse.ArgumentParser(prog='evoldb.py', epilog='--by TASK_ID and --localhost-test-key KEY (tests only) may go anywhere on the line'); sp = ap.add_subparsers(dest='cmd', required=True)
     g = sp.add_parser('get'); g.add_argument('collection'); g.add_argument('doc_id'); g.add_argument('--out')
     l = sp.add_parser('list'); l.add_argument('collection'); l.add_argument('--out-dir'); l.add_argument('--limit', type=int)
     q = sp.add_parser('query'); q.add_argument('collection'); q.add_argument('--where', action='append', default=[], help='JSON triple, e.g. ["status","eq","on_sheet"]')
@@ -105,7 +156,7 @@ def main():
         w = sp.add_parser(n); w.add_argument('collection'); w.add_argument('doc_id'); w.add_argument('--data'); w.add_argument('--file'); w.add_argument('--if-version', type=int)
     d = sp.add_parser('delete'); d.add_argument('collection'); d.add_argument('doc_id'); d.add_argument('--if-version', type=int)
     b = sp.add_parser('batch'); b.add_argument('file', help='JSON array of {op, collection, doc_id, data or file_path, if_version}')
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     if a.cmd == 'get':
         p = split(a.collection, a.doc_id)
         r = req('GET', '/rest/v1/docs?' + urllib.parse.urlencode({'select': 'id,data,version,updated_at', 'path': 'eq.' + p}))
@@ -135,6 +186,8 @@ def main():
                     with open(o['file_path'], encoding='utf-8') as f: data = json.load(f)
                 else: data = o.get('data')
             done.append(write(o.get('op'), o.get('collection'), o.get('doc_id'), data, o.get('if_version')))
-        print(json.dumps({'applied': len(done), 'results': done}))
+        out = {'applied': len(done), 'results': done}
+        if BY is not None: out['updated_by'] = BY
+        print(json.dumps(out))
 
 if __name__ == '__main__': main()

@@ -10,13 +10,14 @@ const { LocalStore } = require('./store');
 const { SupabaseStore } = require('./supabase-store');
 const { create: makeConfig } = require('./config');
 const ai = require('./ai');
-const { readExport } = require('./importer');
+const { readExport, importNote, logImport } = require('./importer');
 const { Google } = require('./google');
 const imessage = require('./imessage');
 const linkCatch = require('./link-catch');
 const { autoMove } = require('./automove');
 const { BoardUpdates } = require('./board-updates');
 const capture = require('./capture');
+const testhooks = require('./testhooks').install();   // off unless an EVOLVE_* check variable is set
 
 const BOARD_DIR = path.join(__dirname, 'board');
 const SHIM = fs.readFileSync(path.join(__dirname, 'shim', 'claude-shim.js'), 'utf8');
@@ -63,7 +64,7 @@ function serveBoard() {
 // The board updates itself (see board-updates.js). Checks soon after opening
 // and every 5 minutes, then switches once you have been idle for a minute.
 function startBoardUpdates() {
-  if ((process.env.EVOLVE_TOUR || process.env.EVOLVE_SHOT) && !process.env.EVOLVE_BOARD_SOURCE) return;   // automated checks use the built in board
+  if ((process.env.EVOLVE_TOUR || process.env.EVOLVE_SHOT || process.env.EVOLVE_CHECK) && !process.env.EVOLVE_BOARD_SOURCE) return;   // automated checks use the built in board
   const base = process.env.EVOLVE_BOARD_SOURCE || ((cfg.get().supabaseUrl || SUPABASE_DEFAULT.url) + '/storage/v1/object/public/board');
   updates = new BoardUpdates({ cacheDir: path.join(home(), '..', 'board-versions'), bundledDir: BOARD_DIR, baseUrl: base, appVersion: app.getVersion(),
     fetchFn: u => net.fetch(u, { cache: 'no-store' }) });
@@ -95,9 +96,12 @@ function watchBoardStart() {
 }
 
 function wire() {
+  // A failed call answers with {error: {code, message}}: a thrown error loses
+  // its code on the way to the page (ipcRenderer.invoke keeps the message
+  // only). The shim and the Settings preload turn that into the rejection.
   const guard = fn => async (_e, a) => {
     try { return await fn(a || {}); }
-    catch (e) { const x = new Error(e.message); x.code = e.code || 'unavailable'; throw x; }
+    catch (e) { return { error: { code: (e && e.code) || 'unavailable', message: String((e && e.message) || e) } }; }
   };
   ipcMain.handle('db:get', guard(a => store.get(a.path)));
   ipcMain.handle('db:set', guard(a => store.set(a.path, a.data)));
@@ -124,7 +128,30 @@ function wire() {
     if (a.server === capture.SERVER && where() === 'supabase') return capture.call(store, a.tool, a.input || {});
     const e = new Error(a.server + ' is not connected in this app yet.'); e.code = 'server_not_connected'; throw e;
   }));
-  ipcMain.handle('ai:messages', guard(a => ai.messages(cfg.secret('anthropic'), a)));
+  // Claude. Each call from the board carries an id; ai:abort with that id cuts
+  // the call (the board's own 75 s limit, or the user asking again). After a
+  // call that came back, its token usage goes into usage/<day>; a problem
+  // there is logged and never fails the call. A failed call answers with
+  // {error: {code, message}}, the same shape guard gives every other call.
+  const aiCalls = new Map();
+  let usageChain = Promise.resolve();
+  ipcMain.handle('ai:messages', guard(async a => {
+    const ac = new AbortController();
+    const id = a.id != null ? String(a.id) : null;
+    if (id) aiCalls.set(id, ac);
+    try {
+      const r = await ai.messages(cfg.secret('anthropic'), Object.assign({}, a, { signal: ac.signal }));
+      usageChain = usageChain.then(() => ai.recordUsage(store, a.tier, r.usage)).catch(e => console.error('usage record', (e && e.message) || e));
+      return r;
+    } catch (e) {
+      return { error: { code: (e && e.code) || 'unavailable', message: String((e && e.message) || e) } };
+    } finally { if (id) aiCalls.delete(id); }
+  }));
+  ipcMain.handle('ai:abort', guard(a => {
+    const ac = aiCalls.get(String(a.id));
+    if (ac) ac.abort();
+    return { aborted: !!ac };
+  }));
   ipcMain.handle('dl:save', guard(async a => {
     const r = await dialog.showSaveDialog(win, { defaultPath: path.join(app.getPath('downloads'), path.basename(String(a.filename || 'evolve-file'))) });
     if (r.canceled || !r.filePath) return { saved: false };
@@ -156,9 +183,12 @@ function wire() {
     cfg.set({ supabaseUrl: url, supabaseAnon: anon || keep.supabaseAnon || (url === SUPABASE_DEFAULT.url ? SUPABASE_DEFAULT.anon : '') });
     const sb = new SupabaseStore({ url, anonKey: cfg.get().supabaseAnon, storage: cfg.authStorage() });
     const redirect = await linkCatch.waitForLink(async code => {
-      await sb.finishLink(code); useStore(sb); reloadBoard();
+      await sb.finishLink(code); useStore(sb);
       if (cfg.secret('anthropic')) sb.saveKey(cfg.secret('anthropic')).catch(() => {});
+      // The move goes first: a board reload writes diag/boot, which must not
+      // land before the empty check.
       await moveIfEmpty(sb);
+      reloadBoard();
       for (const w of [settingsWin, win]) if (w && !w.isDestroyed()) { w.show(); w.focus(); }
     });
     try { await sb.sendLink(String(a.email || '').trim(), redirect); } catch (e) { linkCatch.stop(); throw e; }
@@ -207,13 +237,24 @@ async function bringIn() {
   if (r.canceled || !r.filePaths[0]) return;
   try {
     const p = r.filePaths[0];
-    let n;
+    let n, exp = { rows: [], skipped: [], unread: [] };
     if (fs.statSync(p).isDirectory()) n = store.importSnapshot ? store.importSnapshot(p) : 0;
     else {
-      const rows = readExport(fs.readFileSync(p, 'utf8'));
-      if (store.importRows) n = await store.importRows(rows);
-      else { n = 0; for (const x of rows) { store.set(x.col + '/' + x.id, x.data); n++; } }
+      // A bad id or a collection the board could not read is noted, never a stop.
+      exp = readExport(fs.readFileSync(p, 'utf8'));
+      if (store.importRows) n = await store.importRows(exp.rows);
+      else {
+        n = 0;
+        for (const x of exp.rows) {
+          try { store.set(x.col + '/' + x.id, x.data); n++; }
+          catch (e) { exp.skipped.push({ path: x.col + '/' + x.id, reason: String(e.code || e.message || e) }); }
+        }
+      }
     }
+    const note = importNote({ rows: exp.rows, skipped: exp.skipped, unread: exp.unread, file: p });
+    note.counts.records = n || 0;
+    logImport('bring in', note);
+    try { await store.set('diag/import', note); } catch (e) { console.error('bring in: diag/import not written', e.message || e); }
     await dialog.showMessageBox(win, { message: n + ' records brought in.' });
     reloadBoard();
   } catch (e) { dialog.showErrorBox('Could not bring that in', String(e.message || e)); }
@@ -244,38 +285,10 @@ function open() {
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('evolve://')) { e.preventDefault(); external(url); } });
   watchBoardStart();
   win.loadURL('evolve://app/index.html');
-  // For automated checks only: run a script, take a picture of the window and quit.
-  // Tour mode for checking a build: open every tab, screenshot each, note errors.
-  if (process.env.EVOLVE_TOUR) {
-    const dir = process.env.EVOLVE_TOUR, errors = [];
-    fs.mkdirSync(dir, { recursive: true });
-    win.webContents.on('console-message', (e, level, message, line, src) => { if (level >= 3) errors.push(String(message).slice(0, 300) + ' @' + path.basename(String(src || '')) + ':' + line); });
-    win.webContents.on('render-process-gone', (e, d) => errors.push('renderer gone: ' + d.reason));
-    win.webContents.once('did-finish-load', () => setTimeout(async () => {
-      const js = s => win.webContents.executeJavaScript(s).catch(e => 'ERR ' + e);
-      const tabs = await js('[...document.querySelectorAll("#modes button[data-m]")].map(b=>({m:b.dataset.m,label:b.textContent.replace(/\\s+/g," ").trim()}))');
-      const seen = [];
-      for (const [i, t] of (Array.isArray(tabs) ? tabs : []).entries()) {
-        await js('document.querySelector("#modes button[data-m=\'' + t.m + '\']").click()');
-        await new Promise(r => setTimeout(r, 1800));
-        const shot = String(i + 1).padStart(2, '0') + '-' + t.m + '.png';
-        fs.writeFileSync(path.join(dir, shot), (await win.webContents.capturePage()).toPNG());
-        seen.push(Object.assign({ shot, current: await js('(document.querySelector("#modes button[aria-current=true]")||{}).dataset?.m||""') }, t));
-      }
-      openSettings();
-      await new Promise(r => setTimeout(r, 2500));
-      if (settingsWin && !settingsWin.isDestroyed()) fs.writeFileSync(path.join(dir, '99-settings.png'), (await settingsWin.webContents.capturePage()).toPNG());
-      const info = await js('({build:typeof BUILD!=="undefined"?BUILD:null,title:document.title})');
-      fs.writeFileSync(path.join(dir, 'tour.json'), JSON.stringify({ app: app.getVersion(), platform: process.platform, arch: process.arch, info, tabs: seen, errors }, null, 1));
-      app.quit();
-    }, Number(process.env.EVOLVE_SHOT_WAIT || 6000)));
-  }
-  if (process.env.EVOLVE_SHOT) win.webContents.once('did-finish-load', () => setTimeout(async () => {
-    if (process.env.EVOLVE_EVAL) { await win.webContents.executeJavaScript(process.env.EVOLVE_EVAL).catch(e => fs.writeFileSync(process.env.EVOLVE_SHOT + '.err', String(e))); await new Promise(r => setTimeout(r, 1500)); }
-    const img = await win.webContents.capturePage(); fs.writeFileSync(process.env.EVOLVE_SHOT, img.toPNG());
-    const info = await win.webContents.executeJavaScript('JSON.stringify({build:typeof BUILD!=="undefined"?BUILD:null,sample:!!(typeof sample!=="undefined"&&sample),conn:(document.getElementById("connt")||{}).textContent||"",title:document.title})').catch(e => String(e));
-    fs.writeFileSync(process.env.EVOLVE_SHOT + '.json', info); app.quit();
-  }, Number(process.env.EVOLVE_SHOT_WAIT || 6000)));
+  // For automated checks only. The tour (EVOLVE_TOUR), one screenshot
+  // (EVOLVE_SHOT, EVOLVE_EVAL) and the feature checks (EVOLVE_CHECK) live in
+  // testhooks.js and do nothing unless one of those is set.
+  testhooks.attach(win, { openSettings, settingsWin: () => settingsWin });
 }
 
 app.whenReady().then(async () => {

@@ -3,6 +3,10 @@
 // It files what you said as a pending capture, and the Mac app's board pulls
 // it in (get_pending, then mark_filed).
 //   POST /capture/note  iPhone shortcut. Header Authorization: Bearer <CAPTURE_KEY>, JSON {"text": "..."}
+//                       Optional id (header X-Capture-Id or JSON "id"; letters, digits, dash, underscore,
+//                       up to 64): the note is filed once under captures/<id>, and a repeat with the same
+//                       id gets the record already filed instead of a second one. Without an id, every
+//                       call files a new note under a fresh id, as before.
 //   POST /capture/sms   Twilio, when the number gets a text. Signed by Twilio; only OWNER_PHONE gets in.
 //   GET  /capture/key   the app, signed in as you, to set up the shortcut.
 // Secrets: CAPTURE_KEY, OWNER_EMAIL, OWNER_PHONE, and TWILIO_AUTH_TOKEN once there is a number.
@@ -27,16 +31,48 @@ async function twilioSigned(req: Request, body: Record<string, string>, token: s
   return same(btoa(String.fromCharCode(...mac)), sig);
 }
 
-async function file(text: string, via: string, from: string) {
+const H = () => ({ apikey: SK, authorization: "Bearer " + SK, "content-type": "application/json" });
+const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
+
+// The id the caller chose, if any. Header first, then the JSON body.
+//   undefined: none given.  null: given but not allowed.  string: fine.
+function clientId(req: Request, body: Record<string, unknown>): string | null | undefined {
+  const fromHeader = req.headers.get("x-capture-id");
+  const raw: unknown = fromHeader !== null && fromHeader !== "" ? fromHeader : body.id;
+  if (raw === undefined || raw === null || raw === "") return undefined;
+  return typeof raw === "string" && ID_RE.test(raw) ? raw : null;
+}
+
+async function existing(id: string): Promise<Record<string, unknown> | null> {
+  const r = await fetch(URL_ + "/rest/v1/docs?select=data&path=eq." + encodeURIComponent("captures/" + id), { headers: H() });
+  if (!r.ok) return null;
+  const rows = await r.json().catch(() => null);
+  return Array.isArray(rows) && rows.length && rows[0] && typeof rows[0].data === "object" ? rows[0].data : null;
+}
+
+type Filed = { id: string; data: Record<string, unknown>; repeat: boolean };
+
+async function file(text: unknown, via: string, from: string, wantId?: string): Promise<Filed | null> {
   const t = String(text || "").trim().slice(0, 8000);
   if (!t) return null;
-  const id = "p-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
+  const id = wantId || "p-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8);
   const data = { id, at: new Date().toISOString(), text: t, via, from, state: "pending" };
-  const r = await fetch(URL_ + "/rest/v1/rpc/doc_set", { method: "POST",
-    headers: { apikey: SK, authorization: "Bearer " + SK, "content-type": "application/json" },
-    body: JSON.stringify({ p_path: "captures/" + id, p_col: "captures", p_id: id, p_data: data }) });
-  if (!r.ok) throw new Error("save failed " + r.status);
-  return id;
+  const call: Record<string, unknown> = { p_path: "captures/" + id, p_col: "captures", p_id: id, p_data: data };
+  // With a chosen id, only a brand new document may be written (version 0 means
+  // none yet). The database refuses a second write with version_moved, and the
+  // record already filed comes back instead, so a retried shortcut files once.
+  if (wantId) call.p_if_version = 0;
+  const r = await fetch(URL_ + "/rest/v1/rpc/doc_set", { method: "POST", headers: H(), body: JSON.stringify(call) });
+  if (r.ok) return { id, data, repeat: false };
+  if (wantId) {
+    const err = await r.json().catch(() => ({}));
+    const moved = err && (String(err.code) === "P0409" || /version_moved/.test(String(err.message || "")));
+    if (moved) {
+      const was = await existing(id);
+      if (was) return { id, data: was, repeat: true };
+    }
+  }
+  throw new Error("save failed " + r.status);
 }
 
 Deno.serve(async (req) => {
@@ -45,9 +81,14 @@ Deno.serve(async (req) => {
     if (req.method === "POST" && path === "/note") {
       const auth = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "");
       if (!same(auth, Deno.env.get("CAPTURE_KEY") || "")) return out(401, { error: "wrong key" });
-      const b = await req.json().catch(() => ({}));
-      const id = await file(b.text, "voice", "voice");
-      return id ? out(200, { ok: true, id }) : out(400, { error: "nothing to save" });
+      const raw = await req.json().catch(() => ({}));
+      const b: Record<string, unknown> = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+      const want = clientId(req, b);
+      if (want === null) return out(400, { error: "bad id" });
+      const f = await file(b.text, "voice", "voice", want);
+      if (!f) return out(400, { error: "nothing to save" });
+      // without an id the answer is the same as before; with one it also says whether this was a repeat
+      return want === undefined ? out(200, { ok: true, id: f.id }) : out(200, { ok: true, id: f.id, repeat: f.repeat, record: f.data });
     }
     if (req.method === "POST" && path === "/sms") {
       const form = await req.formData();
