@@ -11829,12 +11829,31 @@ function lessMotion(){
     &&window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
   catch(x){ return false; }
 }
+/* V187. One video element for the life of the page. Home repaints as each
+   snapshot lands, and a fresh <video> on every paint meant a new player every
+   time: the reel started over, and the page's load event waited on each new
+   player, which on a slow Mac never ended. The element is built once and
+   moved into each new band. Once the file has failed it is not tried again
+   until the page is opened afresh. */
+let FILM_V=null,FILM_DEAD=false;
 function homeFilm(){
   if(!filmOn())return null;
   const b=e("div",{class:"film"});
+  if(FILM_DEAD){
+    b.classList.add("nofilm");
+    b.appendChild(e("div",{class:"scrim"}));
+    return b;
+  }
+  if(FILM_V){
+    b.appendChild(FILM_V);
+    if(FILM_V._go)FILM_V._go();
+    b.appendChild(e("div",{class:"scrim"}));
+    return b;
+  }
   const v=e("video",{class:"fv",loop:"",muted:"",playsinline:"","webkit-playsinline":"",
     preload:"auto",poster:"media/evolve-poster.jpg",
     "aria-hidden":"true",tabindex:"-1"});
+  FILM_V=v;
   v.muted=true;                       // the attribute alone does not always take
   v.defaultMuted=true;
   /* WebM first, because a Chromium build without the h264 licence plays that
@@ -11845,6 +11864,7 @@ function homeFilm(){
   if(!lessMotion()){
     v.autoplay=true;
     const go=()=>{const q=v.play();if(q&&q.catch)q.catch(()=>{});};
+    v._go=go;   /* V187 */
     v.addEventListener("loadedmetadata",go,{once:true});
     v.addEventListener("canplay",go,{once:true});
     setTimeout(go,0);
@@ -11859,6 +11879,7 @@ function homeFilm(){
   const noFilm=()=>{
     if(b.classList.contains("nofilm"))return;
     b.classList.add("nofilm");
+    FILM_DEAD=true;FILM_V=null;   /* V187 */
     try{v.remove();}catch(x){}
   };
   let srcErrs=0;
@@ -29138,7 +29159,7 @@ function pwDrawDel(host,ps){
   host.appendChild(bd);
 }
 
-const BUILD="V186 2026-11-06T06:30Z";
+const BUILD="V187 2026-11-06T09:00Z";
 (async function boot(){
   const c=window.claude;
   if(!c||!c.use){conn("bad","No live data");paint();return;}

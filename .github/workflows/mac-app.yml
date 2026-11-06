@@ -45,7 +45,6 @@ jobs:
         env:
           EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
           EVOLVE_SHOT_WAIT: '9000'
-          EVOLVE_CHECK_CDP: '1'
         # On a failure the app log and every failed check go into the job log,
         # since the artifact host cannot be read from a cloud session.
         run: |
@@ -116,7 +115,6 @@ jobs:
         env:
           EVOLVE_CHECK_WORK: ${{ runner.temp }}/check
           EVOLVE_SHOT_WAIT: '9000'
-          EVOLVE_CHECK_CDP: '1'
         # On a failure the app log and every failed check go into the job log,
         # since the artifact host cannot be read from a cloud session.
         run: |
