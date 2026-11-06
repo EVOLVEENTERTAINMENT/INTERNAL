@@ -1147,3 +1147,10 @@ two per page maximum, never per card.
 - Supabase: supabase/schema.sql tested on local Postgres; app/supabase-store.js not yet run against a real project.
 - Tests: store, importer, shim (db, sample with tools), google (stand-in Google). Mac build green: run 42133585747.
 - Waiting on Jackson: Supabase project URL and anon key; Anthropic key in Settings; Google Cloud OAuth client.
+
+## Evolve OS for Mac, more (Nov 6)
+- claude.ai board V184 live as version 189: the V182 phone CSS (seven tabs fit, .bar .grow line) without the paste feature.
+- Phone site: evolve-desktop/web (sign in page, Supabase host, build.js into web/dist), supabase/functions/claude (Anthropic key as a secret, owner only). test/web.e2e.js: signs in, opens the board on the Oct 12 copy (21 projects), Claude reachable, a write lands in the database. Calendar and texts are Mac only for now.
+- Schema: p_if_version guards on doc_set and doc_update, owner trigger so service key writes belong to the first user.
+- tools/evoldb.py for the scheduled tasks (ArtifactData equivalent), routines/PREAMBLE.txt for the switch.
+- test/fake-supabase.js stands in for Supabase REST and auth on real Postgres. CI runs the Supabase tests against a Postgres service: run 42135090318 green, all six suites ran.
