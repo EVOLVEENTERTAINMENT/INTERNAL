@@ -1,0 +1,2 @@
+5a36ccdad837b5a68a578aed511271b8dd1368be265e8cdfcbe2e9f5db7f315d  Evolve-OS-Apple-chip.dmg
+e28d7a6fc58bb7d8a953ccd14e8c8e9f04e2c47e3cc2c9c4fdf1ced10c9a8f7c  Evolve-OS-Intel.dmg
